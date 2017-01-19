@@ -54,7 +54,7 @@ public class WebAdminServerIntegrationTest {
     public static final String SPECIFIC_MAILBOX = SPECIFIC_USER + SEPARATOR + UserMailboxesRoutes.MAILBOXES + SEPARATOR + MAILBOX;
 
     @Rule
-    public CassandraJmapTestRule cassandraJmapTestRule = new CassandraJmapTestRule();
+    public CassandraJmapTestRule cassandraJmapTestRule = CassandraJmapTestRule.defaultTestRule();
 
     private JmapJamesServer guiceJamesServer;
 
