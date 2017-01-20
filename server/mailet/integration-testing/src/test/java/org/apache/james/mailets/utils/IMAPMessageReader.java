@@ -33,21 +33,24 @@ public class IMAPMessageReader implements Closeable {
         imapClient.connect(host, port);
     }
 
+    public void connectAndSelect(String user, String password, String mailbox) throws IOException{
+        imapClient.login(user, password);
+        imapClient.select(mailbox);
+    }
+
     public boolean userReceivedMessage(String user, String password) throws IOException {
         return userReceivedMessageInMailbox(user, password, "INBOX");
     }
 
     public boolean userReceivedMessageInMailbox(String user, String password, String mailbox) throws IOException {
-        imapClient.login(user, password);
-        imapClient.select(mailbox);
+        connectAndSelect(user, password, mailbox);
         imapClient.fetch("1:1", "ALL");
         return imapClient.getReplyString()
             .contains("OK FETCH completed");
     }
 
     public boolean userGetNotifiedForNewMessagesWhenSelectingMailbox(String user, String password, int numOfNewMessage, String mailboxName) throws IOException {
-        imapClient.login(user, password);
-        imapClient.select(mailboxName);
+        connectAndSelect(user, password, mailboxName);
 
         return imapClient.getReplyString().contains("OK [UNSEEN " + numOfNewMessage +"]");
     }
@@ -57,18 +60,22 @@ public class IMAPMessageReader implements Closeable {
     }
 
     public boolean userDoesNotReceiveMessageInMailbox(String user, String password, String mailboxName) throws IOException {
-        imapClient.login(user, password);
-        imapClient.select(mailboxName);
+        connectAndSelect(user, password, mailboxName);
         imapClient.fetch("1:1", "ALL");
         return imapClient.getReplyString()
              .contains("BAD FETCH failed. Invalid messageset");
     }
 
     public String readFirstMessageInInbox(String user, String password) throws IOException {
-        imapClient.login(user, password);
-        imapClient.select("INBOX");
+        connectAndSelect(user, password, "INBOX");
         imapClient.fetch("1:1", "(BODY[])");
         return imapClient.getReplyString();
+    }
+
+    public boolean userGetNotifiedForNewMessages(int numOfMessage) throws IOException {
+        imapClient.noop();
+
+        return imapClient.getReplyString().contains(numOfMessage + " RECENT");
     }
 
     @Override
