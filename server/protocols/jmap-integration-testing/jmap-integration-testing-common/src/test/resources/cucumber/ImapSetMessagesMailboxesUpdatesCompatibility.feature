@@ -31,3 +31,9 @@ Feature: IMAP compatibility of JMAP setMessages method used to update mailboxes
     Given the user has a open IMAP connexion with mailbox "mailbox" selected
     When the user move "m1" to mailbox "mailbox"
     Then the user has a IMAP RECENT and  notification about new message with uid 1 on connexion for mailbox "mailbox"
+
+  Scenario: If a message is moved by JMAP, IMAP client that have selected the source mailbox will not be notified
+    Given the user has a message "m1" in "source" mailbox with subject "My awesome subject", content "This is the content"
+    Given the user has a open IMAP connexion with mailbox "source" selected
+    When the user move "m1" to mailbox "mailbox"
+    Then the user has IMAP EXPUNGE notification for uid 1 on connexion for mailbox "source"

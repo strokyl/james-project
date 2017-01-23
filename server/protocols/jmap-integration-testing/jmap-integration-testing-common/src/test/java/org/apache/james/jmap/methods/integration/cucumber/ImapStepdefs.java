@@ -96,4 +96,11 @@ public class ImapStepdefs {
         assertThat(imapMessageReader).isNotNull();
         assertThat(imapMessageReader.userGetNotifiedForNewMessages(uid)).isTrue();
     }
+
+    @Then("^the user has IMAP EXPUNGE notification for uid (\\d+) on connexion for mailbox \"([^\"]*)\"$")
+    public void checkExpungeNotificationOnActiveConnexion(int uid, String mailbox) throws Throwable {
+        IMAPMessageReader imapMessageReader = imapConnections.get(mailbox);
+        assertThat(imapMessageReader).isNotNull();
+        assertThat(imapMessageReader.userGetNotifiedForDeletion(uid)).isTrue();
+    }
 }
