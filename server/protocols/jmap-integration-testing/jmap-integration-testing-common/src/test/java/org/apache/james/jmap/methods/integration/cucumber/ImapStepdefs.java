@@ -96,4 +96,11 @@ public class ImapStepdefs {
         assertThat(imapMessageReader).isNotNull();
         assertThat(imapMessageReader.userGetNotifiedForNewMessages(numOfMessage)).isTrue();
     }
+
+    @Then("^the user does not have IMAP notifications on connexion for mailbox \"([^\"]*)\"$")
+    public void checkNoNotificationForNewMessageOnActiveConnexion(String mailbox) throws Throwable {
+        IMAPMessageReader imapMessageReader = imapConnections.get(mailbox);
+        assertThat(imapMessageReader).isNotNull();
+        assertThat(imapMessageReader.userNotGetNotifiedForNewMessages()).isTrue();
+    }
 }
