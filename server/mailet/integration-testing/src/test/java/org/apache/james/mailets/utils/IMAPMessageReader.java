@@ -75,7 +75,7 @@ public class IMAPMessageReader implements Closeable {
     public boolean userGetNotifiedForNewMessages(int numOfMessage) throws IOException {
         imapClient.noop();
 
-        return imapClient.getReplyString().contains(numOfMessage + " RECENT");
+        return imapClient.getReplyString().contains(numOfMessage + " EXIST");
     }
 
     public boolean userNotGetNotifiedForNewMessages() throws IOException {
