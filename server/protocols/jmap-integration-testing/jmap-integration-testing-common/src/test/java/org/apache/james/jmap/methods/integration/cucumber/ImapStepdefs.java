@@ -21,12 +21,13 @@ package org.apache.james.jmap.methods.integration.cucumber;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.inject.Inject;
 
 import org.apache.james.utils.IMAPMessageReader;
+
+import com.google.common.collect.Maps;
 
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
@@ -35,18 +36,21 @@ import cucumber.runtime.java.guice.ScenarioScoped;
 @ScenarioScoped
 public class ImapStepdefs {
 
+    private static final int IMAP_PORT = 1143;
+    private static final String LOCALHOST = "127.0.0.1";
+
     private final UserStepdefs userStepdefs;
     private final Map<String, IMAPMessageReader> imapConnections;
 
     @Inject
     private ImapStepdefs(UserStepdefs userStepdefs) {
         this.userStepdefs = userStepdefs;
-        this.imapConnections = new HashMap<>();
+        this.imapConnections = Maps.newHashMap();
     }
 
     @Then("^the user has a IMAP message in mailbox \"([^\"]*)\"$")
     public void hasMessageInMailbox(String mailbox) throws Throwable {
-        try (IMAPMessageReader imapMessageReader = new IMAPMessageReader("127.0.0.1", 1143);) {
+        try (IMAPMessageReader imapMessageReader = new IMAPMessageReader(LOCALHOST, IMAP_PORT);) {
             assertThat(
                 imapMessageReader.userReceivedMessageInMailbox(userStepdefs.lastConnectedUser,
                     userStepdefs.passwordByUser.get(userStepdefs.lastConnectedUser),
@@ -57,7 +61,7 @@ public class ImapStepdefs {
 
     @Then("^the user has a IMAP notification about (\\d+) new message when selecting mailbox \"([^\"]*)\"$")
     public void hasANotificationAboutNewMessagesInMailbox(int numOfNewMessage, String mailbox) throws Throwable {
-        try (IMAPMessageReader imapMessageReader = new IMAPMessageReader("127.0.0.1", 1143);) {
+        try (IMAPMessageReader imapMessageReader = new IMAPMessageReader(LOCALHOST, IMAP_PORT);) {
             assertThat(
                 imapMessageReader.userGetNotifiedForNewMessagesWhenSelectingMailbox(userStepdefs.lastConnectedUser,
                     userStepdefs.passwordByUser.get(userStepdefs.lastConnectedUser),
@@ -68,7 +72,7 @@ public class ImapStepdefs {
 
     @Then("^the user does not have a IMAP message in mailbox \"([^\"]*)\"$")
     public void hasNoMessageInMailbox(String mailbox) throws Throwable {
-        try (IMAPMessageReader imapMessageReader = new IMAPMessageReader("127.0.0.1", 1143);) {
+        try (IMAPMessageReader imapMessageReader = new IMAPMessageReader(LOCALHOST, IMAP_PORT);) {
             assertThat(
                 imapMessageReader.userDoesNotReceiveMessageInMailbox(userStepdefs.lastConnectedUser,
                     userStepdefs.passwordByUser.get(userStepdefs.lastConnectedUser),
@@ -77,9 +81,9 @@ public class ImapStepdefs {
         }
     }
 
-    @Given("^the user has a open IMAP connexion with mailbox \"([^\"]*)\" selected")
-    public void openImapConnexionAndSelectMailbox(String mailbox) throws Throwable {
-        IMAPMessageReader imapMessageReader = new IMAPMessageReader("127.0.0.1", 1143);
+    @Given("^the user has an open IMAP connection with mailbox \"([^\"]*)\" selected")
+    public void openImapConnectionAndSelectMailbox(String mailbox) throws Throwable {
+        IMAPMessageReader imapMessageReader = new IMAPMessageReader(LOCALHOST, IMAP_PORT);
 
         String login = userStepdefs.lastConnectedUser;
         String password = userStepdefs.passwordByUser.get(login);
@@ -88,17 +92,17 @@ public class ImapStepdefs {
         imapConnections.put(mailbox, imapMessageReader);
     }
 
-    @Then("^the user has a IMAP RECENT and  notification about new message with uid (\\d+) on connexion for mailbox \"([^\"]*)\"$")
-    public void checkNotificationForNewMessageOnActiveConnexion(int uid, String mailbox) throws Throwable {
+    @Then("^the user has a IMAP RECENT and a notification about (\\d+) new message(s) on connection for mailbox \"([^\"]*)\"$")
+    public void checkNotificationForNewMessageOnActiveConnection(int numberOfMessages, String mailbox) throws Throwable {
         IMAPMessageReader imapMessageReader = imapConnections.get(mailbox);
         assertThat(imapMessageReader).isNotNull();
-        assertThat(imapMessageReader.userGetNotifiedForNewMessages(uid)).isTrue();
+        assertThat(imapMessageReader.userGetNotifiedForNewMessages(numberOfMessages)).isTrue();
     }
 
-    @Then("^the user has IMAP EXPUNGE notification for uid (\\d+) on connexion for mailbox \"([^\"]*)\"$")
-    public void checkExpungeNotificationOnActiveConnexion(int uid, String mailbox) throws Throwable {
+    @Then("^the user has IMAP EXPUNGE and a notification for (\\d+) message sequence number on connection for mailbox \"([^\"]*)\"$")
+    public void checkExpungeNotificationOnActiveConnection(int msn, String mailbox) throws Throwable {
         IMAPMessageReader imapMessageReader = imapConnections.get(mailbox);
         assertThat(imapMessageReader).isNotNull();
-        assertThat(imapMessageReader.userGetNotifiedForDeletion(uid)).isTrue();
+        assertThat(imapMessageReader.userGetNotifiedForDeletion(msn)).isTrue();
     }
 }
