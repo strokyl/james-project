@@ -28,8 +28,6 @@
     </parent>
 
     <artifactId>james-server-testing</artifactId>
-    <packaging>bundle</packaging>
-
     <name>Apache James :: Server :: Testing</name>
 
 
