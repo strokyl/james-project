@@ -62,7 +62,6 @@ public class SetMessagesUpdateProcessor implements SetMessagesProcessor {
     private final UpdateMessagePatchConverter updatePatchConverter;
     private final MessageIdManager messageIdManager;
     private final Factory mailboxIdFactory;
-    private final MailboxManager mailboxManager;
     private final SystemMailboxesProvider systemMailboxesProvider;
 
     @Inject
@@ -75,7 +74,6 @@ public class SetMessagesUpdateProcessor implements SetMessagesProcessor {
         this.updatePatchConverter = updatePatchConverter;
         this.messageIdManager = messageIdManager;
         this.mailboxIdFactory = mailboxIdFactory;
-        this.mailboxManager = mailboxManager;
         this.systemMailboxesProvider = systemMailboxesProvider;
     }
 
