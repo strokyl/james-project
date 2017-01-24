@@ -99,6 +99,5 @@ public class SetMessagesMethodStepdefs {
             .bodyString(requestBody, org.apache.http.entity.ContentType.APPLICATION_JSON)
             .execute()
             .discardContent();
-        Thread.sleep(1000L);
     }
 }
