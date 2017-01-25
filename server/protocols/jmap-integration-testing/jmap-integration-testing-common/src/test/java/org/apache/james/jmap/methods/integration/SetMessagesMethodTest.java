@@ -2047,7 +2047,7 @@ public abstract class SetMessagesMethodTest {
     }
 
     @Test
-    public void setMessagesShouldWorkForMovedToTrash() throws Exception {
+    public void setMessagesShouldWorkForMoveToTrash() throws Exception {
         String trashId = jmapServer.serverProbe().getMailbox("#private", USERNAME, "trash").getMailboxId().serialize();
 
         ZonedDateTime dateTime = ZonedDateTime.parse("2014-10-30T14:12:00Z");
