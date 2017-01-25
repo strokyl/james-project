@@ -30,7 +30,7 @@ Feature: IMAP compatibility of JMAP setMessages method used to update mailboxes
     Given the user has a message "m1" in "source" mailbox with subject "My awesome subject", content "This is the content"
     Given the user has an open IMAP connection with mailbox "mailbox" selected
     When the user move "m1" to mailbox "mailbox"
-    Then the user has a IMAP RECENT and a notification about 1 new message(s) on connection for mailbox "mailbox"
+    Then the user has a IMAP RECENT and a notification about 1 new messages on connection for mailbox "mailbox"
 
   Scenario: If a message is moved by JMAP, IMAP client that have selected the source mailbox will not be notified
     Given the user has a message "m1" in "source" mailbox with subject "My awesome subject", content "This is the content"
