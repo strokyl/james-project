@@ -39,6 +39,8 @@ public class IMAPMessageReader implements Closeable {
     public void connectAndSelect(String user, String password, String mailbox) throws IOException{
         imapClient.login(user, password);
         imapClient.select(mailbox);
+        System.out.println("### connexion");
+        System.out.println(imapClient.getReplyString());
     }
 
     public boolean userReceivedMessage(String user, String password) throws IOException {
@@ -89,6 +91,8 @@ public class IMAPMessageReader implements Closeable {
         imapClient.noop();
 
         String replyString = imapClient.getReplyString();
+        System.out.println("## replyString");
+        System.out.println(replyString);
         List<String> parts = Splitter.on('\n')
             .trimResults()
             .omitEmptyStrings()
@@ -116,5 +120,11 @@ public class IMAPMessageReader implements Closeable {
     @Override
     public void close() throws IOException {
         imapClient.close();
+    }
+
+    public void copyFirstMessage(String destMailbox) throws IOException {
+        imapClient.copy("1", destMailbox);
+        System.out.println("Copy to " + destMailbox);
+        System.out.println(imapClient.getReplyString());
     }
 }

@@ -19,8 +19,11 @@
 
 package org.apache.james.jmap.methods.integration.cucumber;
 
+import java.io.IOException;
+
 import javax.inject.Inject;
 
+import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
 import org.apache.james.mailbox.model.MailboxConstants;
 import org.apache.james.mailbox.model.MailboxId;
@@ -63,11 +66,23 @@ public class SetMessagesMethodStepdefs {
             "    \"#0\"" +
             "  ]" +
             "]";
-        Request.Post(mainStepdefs.baseUri().setPath("/jmap").build())
+
+        System.out.println(requestBody);
+        HttpResponse response = Request.Post(mainStepdefs.baseUri().setPath("/jmap").build())
             .addHeader("Authorization", userStepdefs.tokenByUser.get(username).serialize())
             .bodyString(requestBody, org.apache.http.entity.ContentType.APPLICATION_JSON)
             .execute()
-            .discardContent();
+            .returnResponse();
+
+        logResponse(response);
+    }
+
+    private void logResponse(HttpResponse response) throws UnsupportedOperationException, IOException {
+        int code = response.getStatusLine().getStatusCode();
+        if (response.getStatusLine().getStatusCode() != 200) {
+            throw new RuntimeException("Error: " + code);
+        }
+        response.getEntity().writeTo(System.out);
     }
 
     @When("^the user copy \"([^\"]*)\" from mailbox \"([^\"]*)\" to mailbox \"([^\"]*)\"")
@@ -94,10 +109,14 @@ public class SetMessagesMethodStepdefs {
             "    \"#0\"" +
             "  ]" +
             "]";
-        Request.Post(mainStepdefs.baseUri().setPath("/jmap").build())
+
+        System.out.println(requestBody);
+        HttpResponse response = Request.Post(mainStepdefs.baseUri().setPath("/jmap").build())
             .addHeader("Authorization", userStepdefs.tokenByUser.get(username).serialize())
             .bodyString(requestBody, org.apache.http.entity.ContentType.APPLICATION_JSON)
             .execute()
-            .discardContent();
+            .returnResponse();
+
+        logResponse(response);
     }
 }
