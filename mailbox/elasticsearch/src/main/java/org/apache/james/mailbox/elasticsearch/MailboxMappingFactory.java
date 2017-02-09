@@ -23,7 +23,6 @@ import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
 import java.io.IOException;
 
-import org.apache.james.backends.es.ElasticSearchIndexer;
 import org.apache.james.backends.es.IndexCreationFactory;
 import org.apache.james.backends.es.NodeMappingFactory;
 import org.apache.james.mailbox.elasticsearch.json.JsonMessageConstants;
@@ -211,6 +210,10 @@ public class MailboxMappingFactory {
                                         .field(NodeMappingFactory.IGNORE_ABOVE, NodeMappingFactory.LUCENE_LIMIT)
                                     .endObject()
                                 .endObject()
+                            .endObject()
+
+                            .startObject(JsonMessageConstants.HAS_ATTACHMENT)
+                                .field(NodeMappingFactory.TYPE, NodeMappingFactory.BOOLEAN)
                             .endObject()
 
                             .startObject(JsonMessageConstants.TEXT)
