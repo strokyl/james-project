@@ -102,7 +102,7 @@ public class MessageToElasticSearchJson {
                         .users(users)
                         .extractor(textExtractor)
                         .zoneId(zoneId)
-                        .indexAttachments(indexAttachments)
+                        .indexAttachments(IndexAttachments.NO)
                         .build());
             case Optional:
                 return mapper.writeValueAsString(IndexableMessage.builder()
@@ -110,7 +110,7 @@ public class MessageToElasticSearchJson {
                         .users(users)
                         .extractor(textExtractor)
                         .zoneId(zoneId)
-                        .indexAttachments(indexAttachments)
+                        .indexAttachments(IndexAttachments.NO)
                         .build());
             default:
                 throw new NotImplementedException();
