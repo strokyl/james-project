@@ -68,7 +68,6 @@ import org.apache.james.mailbox.model.UpdatedFlags;
 import org.apache.james.mailbox.store.mail.MessageMapperFactory;
 import org.apache.james.mailbox.store.mail.model.Mailbox;
 import org.apache.james.mailbox.store.mail.model.MailboxMessage;
-import org.apache.james.mailbox.store.mail.model.Property;
 import org.apache.james.mailbox.store.mail.model.impl.PropertyBuilder;
 import org.apache.james.mailbox.store.search.ListeningMessageSearchIndex;
 import org.apache.james.mailbox.store.search.MessageSearchIndex;
@@ -124,7 +123,6 @@ import org.apache.lucene.util.Version;
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -988,7 +986,7 @@ public class LuceneMessageSearchIndex extends ListeningMessageSearchIndex {
     }
     
     private Query createAttachmentQuery(boolean isSet, Query inMailboxes) throws MailboxException, UnsupportedSearchException {
-        return new TermQuery(new Term(HAS_ATTACHMENT_FIELD,Boolean.toString(isSet)));
+        return new TermQuery(new Term(HAS_ATTACHMENT_FIELD, Boolean.toString(isSet)));
     }
 
     /**
