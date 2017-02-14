@@ -121,7 +121,7 @@ public class CassandraMailboxDAOTest {
     }
 
     @Test
-    public void retrieveAllMailboxesShouldReturnMultiMailbox() {
+    public void retrieveAllMailboxesShouldReturnMultiMailboxes() {
         testee.save(mailbox1).join();
         testee.save(mailbox2).join();
 
