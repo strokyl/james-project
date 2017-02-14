@@ -29,9 +29,11 @@ public class CompletableFutureUtil {
             .map(future -> future.thenApply(Stream::of))
             .reduce((future1, future2) ->
             future1.thenCompose(
-                stream1 ->
-                    future2.thenCompose(stream2 ->
-                        CompletableFuture.completedFuture(Stream.concat(stream1, stream2)))))
+                stream1 -> future2.thenCompose(
+                    stream2 -> {
+                        Stream<T> concatStream = Stream.concat(stream1, stream2);
+                        return CompletableFuture.completedFuture(concatStream);
+                    })))
             .orElse(CompletableFuture.completedFuture(Stream.of()));
     }
 
