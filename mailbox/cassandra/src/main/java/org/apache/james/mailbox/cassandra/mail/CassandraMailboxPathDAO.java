@@ -41,7 +41,6 @@ import org.apache.james.backends.cassandra.utils.CassandraUtils;
 import org.apache.james.mailbox.cassandra.CassandraId;
 import org.apache.james.mailbox.cassandra.mail.utils.MailboxBaseTupleUtil;
 import org.apache.james.mailbox.cassandra.table.CassandraMailboxTable;
-import org.apache.james.mailbox.cassandra.table.CassandraMessageIds;
 import org.apache.james.mailbox.model.MailboxPath;
 
 import com.datastax.driver.core.PreparedStatement;
@@ -151,7 +150,7 @@ public class CassandraMailboxPathDAO {
 
     private CassandraIdAndPath fromRowToCassandraIdAndPath(Row row) {
         return new CassandraIdAndPath(
-            CassandraId.of(row.getUUID(CassandraMessageIds.MAILBOX_ID)),
+            CassandraId.of(row.getUUID(MAILBOX_ID)),
             new MailboxPath(row.getUDTValue(NAMESPACE_AND_USER).getString(CassandraMailboxTable.MailboxBase.NAMESPACE),
                 row.getUDTValue(NAMESPACE_AND_USER).getString(CassandraMailboxTable.MailboxBase.USER),
                 row.getString(MAILBOX_NAME)));
