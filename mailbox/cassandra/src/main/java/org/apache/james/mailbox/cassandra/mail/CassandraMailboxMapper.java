@@ -54,7 +54,6 @@ public class CassandraMailboxMapper implements MailboxMapper {
     public static final String WILDCARD = "%";
     public static final String VALUES_MAY_NOT_BE_LARGER_THAN_64_K = "Index expression values may not be larger than 64K";
     public static final String CLUSTERING_COLUMNS_IS_TOO_LONG = "The sum of all clustering columns is too long";
-    public static final int MAX_SIZE_FOR_MAILBOX_NAME = 65536;
 
     private final int maxRetry;
     private final CassandraAsyncExecutor cassandraAsyncExecutor;
@@ -129,21 +128,20 @@ public class CassandraMailboxMapper implements MailboxMapper {
 
         CassandraId cassandraId = retrieveId(cassandraMailbox);
         cassandraMailbox.setMailboxId(cassandraId);
-        if (mailbox.getName().length() >= MAX_SIZE_FOR_MAILBOX_NAME) {
-            throw new TooLongMailboxNameException("too long mailbox name");
-        }
         try {
-            boolean applied = mailboxDAO.retrieveMailbox(cassandraId)
-                    .thenCompose(optional -> optional
-                            .map(storedMailbox -> mailboxPathDAO.delete(storedMailbox.generateAssociatedPath()))
-                            .orElse(CompletableFuture.completedFuture(null)))
-                    .thenCompose(any -> mailboxPathDAO.save(mailbox.generateAssociatedPath(), cassandraId))
+            boolean applied = mailboxPathDAO.save(mailbox.generateAssociatedPath(), cassandraId)
                     .thenCompose(result -> {
-                        if (result) {
-                            return mailboxDAO.save(cassandraMailbox).thenApply(any -> result);
-                        }
-                        return CompletableFuture.completedFuture(result);
-                    }).join();
+                                if (result) {
+                                    return mailboxDAO.retrieveMailbox(cassandraId)
+                                            .thenCompose(optional -> optional
+                                                    .map(storedMailbox -> mailboxPathDAO.delete(storedMailbox.generateAssociatedPath()))
+                                                    .orElse(CompletableFuture.completedFuture(null)))
+                                            .thenCompose(any -> mailboxDAO.save(cassandraMailbox).thenApply(_any -> result));
+                                }
+
+                                return CompletableFuture.completedFuture(result);
+                            }
+                    ).join();
 
             if (!applied) {
                 throw new MailboxExistsException(mailbox.generateAssociatedPath().asString());
