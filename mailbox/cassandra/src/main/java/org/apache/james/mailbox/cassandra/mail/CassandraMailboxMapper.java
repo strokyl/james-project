@@ -171,10 +171,9 @@ public class CassandraMailboxMapper implements MailboxMapper {
 
     @Override
     public boolean hasChildren(Mailbox mailbox, char delimiter) {
-        Pattern regex = Pattern.compile(Pattern.quote( mailbox.getName() + String.valueOf(delimiter)) + ".*");
         return mailboxPathDAO.listUserMailboxes(mailbox.getNamespace(), mailbox.getUser())
             .thenApply(stream -> stream
-                .anyMatch(idAndPath -> regex.matcher(idAndPath.getMailboxPath().getName()).matches()))
+                .anyMatch(idAndPath -> idAndPath.getMailboxPath().getName().startsWith(mailbox.getName() + String.valueOf(delimiter))))
             .join();
     }
 
