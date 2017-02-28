@@ -35,10 +35,7 @@ import javax.mail.Flags.Flag;
 import org.apache.james.imap.api.ImapSessionUtils;
 import org.apache.james.imap.api.process.ImapSession;
 import org.apache.james.imap.api.process.SelectedMailbox;
-import org.apache.james.mailbox.MailboxListener;
-import org.apache.james.mailbox.MailboxManager;
-import org.apache.james.mailbox.MailboxSession;
-import org.apache.james.mailbox.MessageUid;
+import org.apache.james.mailbox.*;
 import org.apache.james.mailbox.exception.MailboxException;
 import org.apache.james.mailbox.model.FetchGroupImpl;
 import org.apache.james.mailbox.model.MailboxPath;
@@ -63,17 +60,7 @@ public class SelectedMailboxImpl implements SelectedMailbox, MailboxListener{
     private MailboxPath path;
 
     private final ImapSession session;
-    
 
-    private final static Flags FLAGS = new Flags();
-    static {
-        FLAGS.add(Flags.Flag.ANSWERED);
-        FLAGS.add(Flags.Flag.DELETED);
-        FLAGS.add(Flags.Flag.DRAFT);
-        FLAGS.add(Flags.Flag.FLAGGED);
-        FLAGS.add(Flags.Flag.SEEN);
-    }
-    
     private final long sessionId;
     private final Set<MessageUid> flagUpdateUids = new TreeSet<MessageUid>();
     private final Flags.Flag uninterestingFlag = Flags.Flag.RECENT;
@@ -82,7 +69,7 @@ public class SelectedMailboxImpl implements SelectedMailbox, MailboxListener{
     private boolean isDeletedByOtherSession = false;
     private boolean sizeChanged = false;
     private boolean silentFlagChanges = false;
-    private final Flags applicableFlags = new Flags(FLAGS);
+    private final Flags applicableFlags;
 
     private boolean applicableFlagsChanged;
     
@@ -102,7 +89,20 @@ public class SelectedMailboxImpl implements SelectedMailbox, MailboxListener{
         // Ignore events from our session
         setSilentFlagChanges(true);
         this.path = path;
-        init();
+
+        MailboxSession mailboxSession = ImapSessionUtils.getMailboxSession(session);
+
+        mailboxManager.addListener(path, this, mailboxSession);
+
+        MessageManager messageManager = mailboxManager.getMailbox(path, mailboxSession);
+        applicableFlags = messageManager.getApplicableFlag(mailboxSession);
+        MessageResultIterator messages = messageManager.getMessages(MessageRange.all(), FetchGroupImpl.MINIMAL, mailboxSession);
+        synchronized (this) {
+            while(messages.hasNext()) {
+                MessageResult mr = messages.next();
+                add(mr.getUid());
+            }
+        }
     }
 
     @Override
@@ -113,26 +113,6 @@ public class SelectedMailboxImpl implements SelectedMailbox, MailboxListener{
     @Override
     public ExecutionMode getExecutionMode() {
         return ExecutionMode.SYNCHRONOUS;
-    }
-
-    private void init() throws MailboxException {
-        MailboxSession mailboxSession = ImapSessionUtils.getMailboxSession(session);
-        
-        mailboxManager.addListener(path, this, mailboxSession);
-
-        MessageResultIterator messages = mailboxManager.getMailbox(path, mailboxSession).getMessages(MessageRange.all(), FetchGroupImpl.MINIMAL, mailboxSession);
-        synchronized (this) {
-            while(messages.hasNext()) {
-                MessageResult mr = messages.next();
-                applicableFlags.add(mr.getFlags());
-                add(mr.getUid());
-            }
-            
-          
-            // \RECENT is not a applicable flag in imap so remove it from the list
-            applicableFlags.remove(Flags.Flag.RECENT);
-        }
-       
     }
 
     private void add(int msn, MessageUid uid) {
