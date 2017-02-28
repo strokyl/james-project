@@ -375,9 +375,9 @@ public abstract class AbstractCombinationManagerTest {
 
         messageIdManager.setInMailboxes(messageId, ImmutableList.of(mailbox1.getMailboxId(), mailbox2.getMailboxId()), session);
 
-        assertThat(messageManager1.getApplicableFlag(session))
+        assertThat(messageManager1.getApplicableFlags(session))
             .isEqualTo(messageFlag);
-        assertThat(messageManager2.getApplicableFlag(session))
+        assertThat(messageManager2.getApplicableFlags(session))
             .isEqualTo(messageFlag);
     }
 
@@ -397,7 +397,7 @@ public abstract class AbstractCombinationManagerTest {
 
         messageIdManager.setFlags(deleted, FlagsUpdateMode.ADD, messageId, ImmutableList.of(mailbox1.getMailboxId()), session);
 
-        assertThat(messageManager1.getApplicableFlag(session))
+        assertThat(messageManager1.getApplicableFlags(session))
             .isEqualTo(new FlagsBuilder()
                 .add(Flag.ANSWERED, Flag.DELETED)
                 .add(USER_FLAGS_VALUE, ANOTHER_USER_FLAGS_VALUE)
@@ -413,7 +413,7 @@ public abstract class AbstractCombinationManagerTest {
         messageIdManager.setFlags(deleted, FlagsUpdateMode.ADD, messageId, ImmutableList.of(mailbox1.getMailboxId()), session);
         messageManager1.setFlags(deleted, FlagsUpdateMode.ADD, MessageRange.all(), session);
 
-        Flags applicableFlags = messageManager1.getApplicableFlag(session);
+        Flags applicableFlags = messageManager1.getApplicableFlags(session);
 
         assertThat(applicableFlags)
             .isEqualTo(new FlagsBuilder().add(Flag.ANSWERED, Flag.DELETED).build());
@@ -428,7 +428,7 @@ public abstract class AbstractCombinationManagerTest {
         messageIdManager.setInMailboxes(messageId, ImmutableList.of(mailbox1.getMailboxId(), mailbox2.getMailboxId()), session);
         messageManager2.setFlags(deleted, FlagsUpdateMode.ADD, MessageRange.all(), session);
 
-        assertThat(messageManager2.getApplicableFlag(session))
+        assertThat(messageManager2.getApplicableFlags(session))
             .isEqualTo(new FlagsBuilder().add(Flag.ANSWERED, Flag.DELETED).build());
     }
 

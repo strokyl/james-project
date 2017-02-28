@@ -95,7 +95,7 @@ public class SelectedMailboxImpl implements SelectedMailbox, MailboxListener{
         mailboxManager.addListener(path, this, mailboxSession);
 
         MessageManager messageManager = mailboxManager.getMailbox(path, mailboxSession);
-        applicableFlags = messageManager.getApplicableFlag(mailboxSession);
+        applicableFlags = messageManager.getApplicableFlags(mailboxSession);
         MessageResultIterator messages = messageManager.getMessages(MessageRange.all(), FetchGroupImpl.MINIMAL, mailboxSession);
         synchronized (this) {
             while(messages.hasNext()) {
