@@ -421,7 +421,7 @@ public class SelectedMailboxImpl implements SelectedMailbox, MailboxListener{
 
     @Override
     public synchronized int msn(MessageUid uid) {
-        return uidMsnMapper.get().getMsn(uid).or(SelectedMailbox.NO_SUCH_MESSAGE);
+        return uidMsnMapper.get().getMsn(uid).or(NO_SUCH_MESSAGE);
     }
 
     @Override
