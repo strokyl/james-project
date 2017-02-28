@@ -230,16 +230,12 @@ public class SelectedMailboxImpl implements SelectedMailbox, MailboxListener{
         final Iterator<Flags.Flag> it = updated.systemFlagIterator();
         if (it.hasNext()) {
             final Flags.Flag flag = it.next();
-            if (flag.equals(uninterestingFlag)) {
-                result = false;
-            } else {
-                result = true;
-            }
+            result = !flag.equals(uninterestingFlag);
         } else {
             result = false;
         }
         // See if we need to check the user flags
-        if (result == false) {
+        if (!result) {
             final Iterator<String> userIt = updated.userFlagIterator();
             result = userIt.hasNext();
         }
@@ -315,25 +311,18 @@ public class SelectedMailboxImpl implements SelectedMailbox, MailboxListener{
         
     }
 
-
-
-
-    
-    public synchronized Flags getApplicableFlags() {
+    public Flags getApplicableFlags() {
         return applicableFlags;
     }
 
-    
-    public synchronized boolean hasNewApplicableFlags() {
+    public boolean hasNewApplicableFlags() {
         return applicableFlagsChanged;
     }
 
-    
-    public synchronized void resetNewApplicableFlags() {
+    public void resetNewApplicableFlags() {
         applicableFlagsChanged = false;
     }
 
-    
     public synchronized void event(Event event) {
 
         // Check if the event was for the mailbox we are observing
