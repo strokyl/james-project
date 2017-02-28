@@ -57,6 +57,8 @@ import com.google.common.base.Throwables;
 public class SelectedMailboxImpl implements SelectedMailbox, MailboxListener{
 
     private final Set<MessageUid> recentUids = new TreeSet<MessageUid>();
+    private final MessageManager messageManager;
+    private final MailboxSession mailboxSession;
 
     private boolean recentUidRemoved = false;
 
@@ -88,11 +90,11 @@ public class SelectedMailboxImpl implements SelectedMailbox, MailboxListener{
         setSilentFlagChanges(true);
         this.path = path;
 
-        MailboxSession mailboxSession = ImapSessionUtils.getMailboxSession(session);
+        mailboxSession = ImapSessionUtils.getMailboxSession(session);
 
         mailboxManager.addListener(path, this, mailboxSession);
 
-        MessageManager messageManager = mailboxManager.getMailbox(path, mailboxSession);
+        messageManager = mailboxManager.getMailbox(path, mailboxSession);
         applicableFlags = messageManager.getApplicableFlags(mailboxSession);
         uidMsnMapper = memoizedUIdMsnMapper(mailboxSession, messageManager);
     }
@@ -424,6 +426,10 @@ public class SelectedMailboxImpl implements SelectedMailbox, MailboxListener{
 
     
     public synchronized long existsCount() {
-        return uidMsnMapper.get().getNumMessage();
+        try {
+            return messageManager.getMessageCount(mailboxSession);
+        } catch (MailboxException e) {
+            throw Throwables.propagate(e);
+        }
     }
 }
