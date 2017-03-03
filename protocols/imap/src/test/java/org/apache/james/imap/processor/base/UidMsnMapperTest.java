@@ -20,12 +20,11 @@
 package org.apache.james.imap.processor.base;
 
 import com.google.common.base.Optional;
-import com.google.common.collect.FluentIterable;
 import org.apache.james.mailbox.MessageUid;
 import org.junit.Before;
 import org.junit.Test;
 import static org.assertj.guava.api.Assertions.assertThat;
-import org.assertj.core.api.Assertions;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class UidMsnMapperTest {
     private UidMsnMapper testee;
@@ -115,19 +114,19 @@ public class UidMsnMapperTest {
         testee.addUid(messageUid1);
         testee.addUid(messageUid2);
 
-        Assertions.assertThat(testee.getNumMessage()).isEqualTo(2);
+        assertThat(testee.getNumMessage()).isEqualTo(2);
     }
 
     @Test
     public void isEmptyShouldReturnTrueIfNoMapping() {
-        Assertions.assertThat(testee.isEmpty()).isTrue();
+        assertThat(testee.isEmpty()).isTrue();
     }
 
     @Test
     public void isEmptyShouldReturnFalseIfNoMapping() {
         testee.addUid(messageUid1);
 
-        Assertions.assertThat(testee.isEmpty()).isFalse();
+        assertThat(testee.isEmpty()).isFalse();
     }
 
     @Test
@@ -136,7 +135,7 @@ public class UidMsnMapperTest {
 
         testee.clear();
 
-        Assertions.assertThat(testee.isEmpty()).isTrue();
+        assertThat(testee.isEmpty()).isTrue();
     }
 
     @Test
@@ -147,7 +146,7 @@ public class UidMsnMapperTest {
         testee.addUid(messageUid4);
         testee.addUid(messageUid2);
 
-        Assertions.assertThat(messageNumberAreContiguous(testee)).isTrue();
+        assertThat(messageNumberAreContiguous(testee)).isTrue();
     }
 
     @Test
@@ -157,7 +156,7 @@ public class UidMsnMapperTest {
         testee.addUid(messageUid3);
         testee.addUid(messageUid2);
 
-        Assertions.assertThat(testee.getMsn(messageUid2).get()).isEqualTo(2);
+        assertThat(testee.getMsn(messageUid2).get()).isEqualTo(2);
     }
 
     @Test
@@ -205,7 +204,7 @@ public class UidMsnMapperTest {
 
         testee.remove(messageUid1);
 
-        Assertions.assertThat(messageNumberAreContiguous(testee)).isTrue();
+        assertThat(messageNumberAreContiguous(testee)).isTrue();
     }
 
     @Test
@@ -217,7 +216,7 @@ public class UidMsnMapperTest {
 
         testee.remove(messageUid4);
 
-        Assertions.assertThat(messageNumberAreContiguous(testee)).isTrue();
+        assertThat(messageNumberAreContiguous(testee)).isTrue();
     }
 
     @Test
@@ -229,7 +228,7 @@ public class UidMsnMapperTest {
 
         testee.remove(messageUid3);
 
-        Assertions.assertThat(messageNumberAreContiguous(testee)).isTrue();
+        assertThat(messageNumberAreContiguous(testee)).isTrue();
     }
 
     @Test
@@ -241,7 +240,7 @@ public class UidMsnMapperTest {
 
         testee.remove(messageUid1);
 
-        Assertions.assertThat(uidAreInOrder(testee)).isTrue();
+        assertThat(uidAreInOrder(testee)).isTrue();
     }
 
     @Test
@@ -253,7 +252,7 @@ public class UidMsnMapperTest {
 
         testee.remove(messageUid4);
 
-        Assertions.assertThat(uidAreInOrder(testee)).isTrue();
+        assertThat(uidAreInOrder(testee)).isTrue();
     }
 
     @Test
@@ -265,7 +264,7 @@ public class UidMsnMapperTest {
 
         testee.remove(messageUid3);
 
-        Assertions.assertThat(uidAreInOrder(testee)).isTrue();
+        assertThat(uidAreInOrder(testee)).isTrue();
     }
 
     private static boolean messageNumberAreContiguous(UidMsnMapper testee) {
