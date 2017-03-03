@@ -46,12 +46,6 @@ public class ApplicableFlagBuilder {
         }
     }
 
-    public ApplicableFlagBuilder add(Flags.Flag... flags) {
-        builder.add(flags);
-
-        return this;
-    }
-
     public ApplicableFlagBuilder add(String... flags) {
         builder.add(flags);
 
