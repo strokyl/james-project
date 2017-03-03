@@ -306,11 +306,11 @@ public class CassandraMessageMapper implements MessageMapper {
     public Flags getApplicableFlag(Mailbox mailbox) throws MailboxException {
         ApplicableFlagBuilder flagsBuilder = ApplicableFlagBuilder.builder();
 
-        flagsBuilder.add(applicableFlagDAO.retrieveApplicableFlag((CassandraId) mailbox.getMailboxId())
-            .join()
-            .orElse(new Flags()));
-
-        return flagsBuilder.build();
+        return ApplicableFlagBuilder.builder()
+            .add(applicableFlagDAO.retrieveApplicableFlag((CassandraId) mailbox.getMailboxId())
+                .join()
+                .orElse(new Flags()))
+            .build();
     }
 
     private CompletableFuture<Void> save(Mailbox mailbox, MailboxMessage message) throws MailboxException {
