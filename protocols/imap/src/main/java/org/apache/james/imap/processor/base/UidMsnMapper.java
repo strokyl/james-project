@@ -33,12 +33,6 @@ public class UidMsnMapper {
         msnToUid = HashBiMap.create();
     }
 
-    private synchronized void addMapping(Integer msn, MessageUid uid) {
-        if (msnToUid.inverse().get(uid) == null) {
-            msnToUid.forcePut(msn, uid);
-        }
-    }
-
     public Optional<Integer> getMsn(MessageUid uid) {
         return Optional.fromNullable(msnToUid.inverse().get(uid));
     }
@@ -59,11 +53,6 @@ public class UidMsnMapper {
         return msnToUid.size();
     }
 
-    private int getLastMsn() {
-        return getNumMessage();
-    }
-
-    //TODO: add unit test for that
     public synchronized void remove(MessageUid uid) {
         int msn = getMsn(uid).get();
         msnToUid.remove(msn);
@@ -78,15 +67,25 @@ public class UidMsnMapper {
         return msnToUid.isEmpty();
     }
 
-    private int nextMsn() {
-        return getNumMessage() + FIRST_MSN;
-    }
-
-    public void clear() {
+    public synchronized void clear() {
         msnToUid.clear();
     }
 
     public void addUid(MessageUid uid) {
         this.addMapping(nextMsn(), uid);
+    }
+
+    private synchronized void addMapping(Integer msn, MessageUid uid) {
+        if (msnToUid.inverse().get(uid) == null) {
+            msnToUid.forcePut(msn, uid);
+        }
+    }
+
+    private int nextMsn() {
+        return getNumMessage() + FIRST_MSN;
+    }
+
+    private int getLastMsn() {
+        return getNumMessage();
     }
 }
