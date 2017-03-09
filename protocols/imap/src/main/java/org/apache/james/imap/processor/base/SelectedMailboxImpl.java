@@ -47,6 +47,8 @@ import org.apache.james.mailbox.model.MessageResultIterator;
 import org.apache.james.mailbox.model.UpdatedFlags;
 
 import com.google.common.base.Optional;
+import com.google.common.base.Supplier;
+import com.google.common.base.Suppliers;
 import com.google.common.base.Throwables;
 
 /**
@@ -68,7 +70,7 @@ public class SelectedMailboxImpl implements SelectedMailbox, MailboxListener{
     private final Set<MessageUid> flagUpdateUids = new TreeSet<MessageUid>();
     private final Flags.Flag uninterestingFlag = Flags.Flag.RECENT;
     private final Set<MessageUid> expungedUids = new TreeSet<MessageUid>();
-    private final UidMsnMapper uidMsnMapper;
+    private final Supplier<UidMsnMapper> uidMsnMapper;
 
     private boolean isDeletedByOtherSession = false;
     private boolean sizeChanged = false;
@@ -92,10 +94,13 @@ public class SelectedMailboxImpl implements SelectedMailbox, MailboxListener{
 
         MessageManager messageManager = mailboxManager.getMailbox(path, mailboxSession);
         applicableFlags = messageManager.getApplicableFlags(mailboxSession);
-        uidMsnMapper = getUidMsnMapper(mailboxSession, messageManager);
+        uidMsnMapper = memoizedUIdMsnMapper(mailboxSession, messageManager);
     }
-    
-    private UidMsnMapper getUidMsnMapper(MailboxSession mailboxSession , MessageManager messageManager) {
+
+    private Supplier<UidMsnMapper> memoizedUIdMsnMapper(final MailboxSession mailboxSession, final MessageManager messageManager) {
+        return Suppliers.memoize(new Supplier<UidMsnMapper>() {
+            @Override
+            public UidMsnMapper get() {
                 UidMsnMapper uidMsnMapper = new UidMsnMapper();
                 try {
                     MessageResultIterator messages = messageManager.getMessages(MessageRange.all(), FetchGroupImpl.MINIMAL, mailboxSession);
@@ -111,6 +116,8 @@ public class SelectedMailboxImpl implements SelectedMailbox, MailboxListener{
                 }
 
                 return uidMsnMapper;
+            }
+        });
     }
 
     @Override
@@ -125,12 +132,12 @@ public class SelectedMailboxImpl implements SelectedMailbox, MailboxListener{
 
     @Override
     public synchronized Optional<MessageUid> getFirstUid() {
-        return uidMsnMapper.getFirstUid();
+        return uidMsnMapper.get().getFirstUid();
     }
 
     @Override
     public synchronized Optional<MessageUid> getLastUid() {
-        return uidMsnMapper.getLastUid();
+        return uidMsnMapper.get().getLastUid();
     }
 
     public synchronized void deselect() {
@@ -144,7 +151,7 @@ public class SelectedMailboxImpl implements SelectedMailbox, MailboxListener{
             }
         }
         
-        uidMsnMapper.clear();
+        uidMsnMapper.get().clear();
         flagUpdateUids.clear();
 
         expungedUids.clear();
@@ -214,7 +221,7 @@ public class SelectedMailboxImpl implements SelectedMailbox, MailboxListener{
     @Override
     public synchronized  int remove(MessageUid uid) {
         final int result = msn(uid);
-        uidMsnMapper.remove(uid);
+        uidMsnMapper.get().remove(uid);
         return result;
     }
 
@@ -339,7 +346,7 @@ public class SelectedMailboxImpl implements SelectedMailbox, MailboxListener{
                     final List<MessageUid> uids = ((Added) event).getUids();
                     SelectedMailbox sm = session.getSelected();
                     for (MessageUid uid : uids) {
-                        uidMsnMapper.addUid(uid);
+                        uidMsnMapper.get().addUid(uid);
                         if (sm != null) {
                             sm.addRecent(uid);
                         }
@@ -414,7 +421,7 @@ public class SelectedMailboxImpl implements SelectedMailbox, MailboxListener{
 
     @Override
     public synchronized int msn(MessageUid uid) {
-        return uidMsnMapper.getMsn(uid).or(SelectedMailbox.NO_SUCH_MESSAGE);
+        return uidMsnMapper.get().getMsn(uid).or(SelectedMailbox.NO_SUCH_MESSAGE);
     }
 
     @Override
@@ -423,11 +430,11 @@ public class SelectedMailboxImpl implements SelectedMailbox, MailboxListener{
             return Optional.absent();
         }
 
-        return uidMsnMapper.getUid(msn);
+        return uidMsnMapper.get().getUid(msn);
     }
 
     
     public synchronized long existsCount() {
-        return uidMsnMapper.getNumMessage();
+        return uidMsnMapper.get().getNumMessage();
     }
 }
