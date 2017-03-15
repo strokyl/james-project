@@ -19,7 +19,8 @@
 
 package org.apache.james.imap.processor.base;
 
-import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableBiMap;
+
 import org.apache.james.mailbox.MessageUid;
 import org.junit.Before;
 import org.junit.Test;
@@ -44,19 +45,16 @@ public class UidMsnMapperTest {
 
     @Test
     public void getUidShouldReturnEmptyIfNoMessageWithTheGivenMessageNumber() {
-        assertThat(
-            testee.getUid(0)
-        ).isAbsent();
+        assertThat(testee.getUid(0))
+            .isAbsent();
     }
 
     @Test
     public void getUidShouldTheCorrespondingUidIfItExist() {
         testee.addUid(messageUid1);
 
-        Optional<MessageUid> result = testee.getUid(1);
-
-        assertThat(result).isPresent();
-        assertThat(result).contains(messageUid1);
+        assertThat(testee.getUid(1))
+            .contains(messageUid1);
     }
 
     @Test
@@ -74,9 +72,7 @@ public class UidMsnMapperTest {
         testee.addUid(messageUid1);
         testee.addUid(messageUid2);
 
-        Optional<MessageUid> result = testee.getFirstUid();
-
-        assertThat(result).contains(messageUid1);
+        assertThat(testee.getFirstUid()).contains(messageUid1);
     }
 
     @Test
@@ -84,9 +80,7 @@ public class UidMsnMapperTest {
         testee.addUid(messageUid1);
         testee.addUid(messageUid2);
 
-        Optional<MessageUid> result = testee.getLastUid();
-
-        assertThat(result).contains(messageUid2);
+        assertThat(testee.getLastUid()).contains(messageUid2);
     }
 
     @Test
@@ -101,12 +95,14 @@ public class UidMsnMapperTest {
         testee.addUid(messageUid1);
         testee.addUid(messageUid2);
 
-        Optional<Integer> result = testee.getMsn(messageUid2);
-        assertThat(result).contains(2);
+        assertThat(testee.getMsn(messageUid2))
+            .contains(2);
     }
 
     @Test
     public void getNumMessageShouldReturnZeroIfNoMapping() {
+        assertThat(testee.getNumMessage())
+            .isEqualTo(0);
     }
 
     @Test
@@ -114,19 +110,22 @@ public class UidMsnMapperTest {
         testee.addUid(messageUid1);
         testee.addUid(messageUid2);
 
-        assertThat(testee.getNumMessage()).isEqualTo(2);
+        assertThat(testee.getNumMessage())
+            .isEqualTo(2);
     }
 
     @Test
     public void isEmptyShouldReturnTrueIfNoMapping() {
-        assertThat(testee.isEmpty()).isTrue();
+        assertThat(testee.isEmpty())
+            .isTrue();
     }
 
     @Test
     public void isEmptyShouldReturnFalseIfNoMapping() {
         testee.addUid(messageUid1);
 
-        assertThat(testee.isEmpty()).isFalse();
+        assertThat(testee.isEmpty())
+            .isFalse();
     }
 
     @Test
@@ -135,7 +134,8 @@ public class UidMsnMapperTest {
 
         testee.clear();
 
-        assertThat(testee.isEmpty()).isTrue();
+        assertThat(testee.isEmpty())
+            .isTrue();
     }
 
     @Test
@@ -146,7 +146,12 @@ public class UidMsnMapperTest {
         testee.addUid(messageUid4);
         testee.addUid(messageUid2);
 
-        assertThat(messageNumberAreContiguous(testee)).isTrue();
+        assertThat(testee.getInternals())
+            .isEqualTo(ImmutableBiMap.of(
+                1, messageUid1,
+                2, messageUid2,
+                3, messageUid3,
+                4, messageUid4));
     }
 
     @Test
@@ -156,47 +161,12 @@ public class UidMsnMapperTest {
         testee.addUid(messageUid3);
         testee.addUid(messageUid2);
 
-        assertThat(testee.getMsn(messageUid2).get()).isEqualTo(2);
+        assertThat(testee.getMsn(messageUid2))
+            .contains(2);
     }
 
     @Test
-    public void  removeShouldRemoveOnlyTheCorrectUidWhenOneTheMiddle() {
-        testee.addUid(messageUid1);
-        testee.addUid(messageUid2);
-        testee.addUid(messageUid3);
-        testee.remove(messageUid2);
-
-        assertThat(testee.getMsn(messageUid2)).isAbsent();
-        assertThat(testee.getMsn(messageUid1)).isPresent();
-        assertThat(testee.getMsn(messageUid3)).isPresent();
-    }
-
-    @Test
-    public void  removeShouldRemoveOnlyTheCorrectUidWhenOneTheBeginning() {
-        testee.addUid(messageUid1);
-        testee.addUid(messageUid2);
-        testee.addUid(messageUid3);
-        testee.remove(messageUid1);
-
-        assertThat(testee.getMsn(messageUid1)).isAbsent();
-        assertThat(testee.getMsn(messageUid2)).isPresent();
-        assertThat(testee.getMsn(messageUid3)).isPresent();
-    }
-
-    @Test
-    public void  removeShouldRemoveOnlyTheCorrectUidWhenOneTheEnd() {
-        testee.addUid(messageUid1);
-        testee.addUid(messageUid2);
-        testee.addUid(messageUid3);
-        testee.remove(messageUid3);
-
-        assertThat(testee.getMsn(messageUid3)).isAbsent();
-        assertThat(testee.getMsn(messageUid1)).isPresent();
-        assertThat(testee.getMsn(messageUid2)).isPresent();
-    }
-
-    @Test
-    public void removeShouldKeepMessageNumberContiguousWhenDeletingTheFirstOne() {
+    public void removeShouldKeepAValidMappingWhenDeletingBeginning() {
         testee.addUid(messageUid1);
         testee.addUid(messageUid2);
         testee.addUid(messageUid3);
@@ -204,11 +174,15 @@ public class UidMsnMapperTest {
 
         testee.remove(messageUid1);
 
-        assertThat(messageNumberAreContiguous(testee)).isTrue();
+        assertThat(testee.getInternals())
+            .isEqualTo(ImmutableBiMap.of(
+                1, messageUid2,
+                2, messageUid3,
+                3, messageUid4));
     }
 
     @Test
-    public void removeShouldKeepMessageNumberContiguousWhenDeletingTheLastOne() {
+    public void removeShouldKeepAValidMappingWhenDeletingMiddle() {
         testee.addUid(messageUid1);
         testee.addUid(messageUid2);
         testee.addUid(messageUid3);
@@ -216,11 +190,15 @@ public class UidMsnMapperTest {
 
         testee.remove(messageUid4);
 
-        assertThat(messageNumberAreContiguous(testee)).isTrue();
+        assertThat(testee.getInternals())
+            .isEqualTo(ImmutableBiMap.of(
+                1, messageUid1,
+                2, messageUid2,
+                3, messageUid3));
     }
 
     @Test
-    public void removeShouldKeepMessageNumberContiguousWhenDeletingOneInTheMiddle() {
+    public void removeShouldKeepAValidMappingWhenDeletingEnd() {
         testee.addUid(messageUid1);
         testee.addUid(messageUid2);
         testee.addUid(messageUid3);
@@ -228,74 +206,11 @@ public class UidMsnMapperTest {
 
         testee.remove(messageUid3);
 
-        assertThat(messageNumberAreContiguous(testee)).isTrue();
+        assertThat(testee.getInternals())
+            .isEqualTo(ImmutableBiMap.of(
+                1, messageUid1,
+                2, messageUid2,
+                3, messageUid4));
     }
 
-    @Test
-    public void removeShouldKeepUidInOrderWhenDeletingTheFirstOne() {
-        testee.addUid(messageUid1);
-        testee.addUid(messageUid2);
-        testee.addUid(messageUid3);
-        testee.addUid(messageUid4);
-
-        testee.remove(messageUid1);
-
-        assertThat(uidAreInOrder(testee)).isTrue();
-    }
-
-    @Test
-    public void removeShouldKeepUidInOrderWhenDeletingTheLastOne() {
-        testee.addUid(messageUid1);
-        testee.addUid(messageUid2);
-        testee.addUid(messageUid3);
-        testee.addUid(messageUid4);
-
-        testee.remove(messageUid4);
-
-        assertThat(uidAreInOrder(testee)).isTrue();
-    }
-
-    @Test
-    public void removeShouldKeepUidInOrderWhenDeletingOneInTheMiddle() {
-        testee.addUid(messageUid1);
-        testee.addUid(messageUid2);
-        testee.addUid(messageUid3);
-        testee.addUid(messageUid4);
-
-        testee.remove(messageUid3);
-
-        assertThat(uidAreInOrder(testee)).isTrue();
-    }
-
-    private static boolean messageNumberAreContiguous(UidMsnMapper testee) {
-        int first = UidMsnMapper.FIRST_MSN;
-        int last = testee.getNumMessage();
-
-        for(int i = first; i < last; i++) {
-            if (!testee.getUid(i).isPresent()) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    private static boolean uidAreInOrder(UidMsnMapper testee) {
-        int first = UidMsnMapper.FIRST_MSN;
-        int last = testee.getNumMessage();
-        Optional<MessageUid> previous = Optional.absent();
-        Optional<MessageUid> current;
-
-        for(int i = first; i < last; i++) {
-            current = testee.getUid(i);
-
-            if (current.isPresent() && previous.isPresent() && previous.get().compareTo(current.get()) > 0) {
-                return false;
-            }
-
-            previous = current;
-        }
-
-        return true;
-    }
 }

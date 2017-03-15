@@ -19,8 +19,11 @@
 
 package org.apache.james.imap.processor.base;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
 import com.google.common.collect.HashBiMap;
+import com.google.common.collect.ImmutableBiMap;
+
 import org.apache.james.mailbox.MessageUid;
 
 public class UidMsnMapper {
@@ -73,6 +76,11 @@ public class UidMsnMapper {
 
     public void addUid(MessageUid uid) {
         this.addMapping(nextMsn(), uid);
+    }
+
+    @VisibleForTesting
+    ImmutableBiMap<Integer, MessageUid> getInternals() {
+        return ImmutableBiMap.copyOf(msnToUid);
     }
 
     private synchronized void addMapping(Integer msn, MessageUid uid) {
