@@ -19,13 +19,14 @@
 
 package org.apache.james.imap.processor.base;
 
-import com.google.common.collect.ImmutableBiMap;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.guava.api.Assertions.assertThat;
 
 import org.apache.james.mailbox.MessageUid;
 import org.junit.Before;
 import org.junit.Test;
-import static org.assertj.guava.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThat;
+
+import com.google.common.collect.ImmutableBiMap;
 
 public class UidMsnMapperTest {
     private UidMsnMapper testee;
