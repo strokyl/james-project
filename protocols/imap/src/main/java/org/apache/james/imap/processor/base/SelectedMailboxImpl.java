@@ -314,7 +314,7 @@ public class SelectedMailboxImpl implements SelectedMailbox, MailboxListener{
     }
 
     public Flags getApplicableFlags() {
-        return applicableFlags;
+        return new Flags(applicableFlags);
     }
 
     public boolean hasNewApplicableFlags() {
