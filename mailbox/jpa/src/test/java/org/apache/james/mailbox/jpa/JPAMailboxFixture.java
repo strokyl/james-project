@@ -19,10 +19,7 @@
 
 package org.apache.james.mailbox.jpa;
 
-import org.apache.james.mailbox.jpa.mail.model.JPAMailbox;
-import org.apache.james.mailbox.jpa.mail.model.JPAMailboxAnnotation;
-import org.apache.james.mailbox.jpa.mail.model.JPAProperty;
-import org.apache.james.mailbox.jpa.mail.model.JPAUserFlag;
+import org.apache.james.mailbox.jpa.mail.model.*;
 import org.apache.james.mailbox.jpa.mail.model.openjpa.AbstractJPAMailboxMessage;
 import org.apache.james.mailbox.jpa.mail.model.openjpa.JPAMailboxMessage;
 import org.apache.james.mailbox.jpa.user.model.JPASubscription;
@@ -35,7 +32,8 @@ public interface JPAMailboxFixture {
         JPAProperty.class,
         JPAUserFlag.class,
         JPAMailboxAnnotation.class,
-        JPASubscription.class};
+        JPASubscription.class,
+        JPAMailboxAnnotationId.class};
 
     String[] MAILBOX_TABLE_NAMES = new String[] {"JAMES_MAIL_USERFLAG",
         "JAMES_MAIL_PROPERTY",
