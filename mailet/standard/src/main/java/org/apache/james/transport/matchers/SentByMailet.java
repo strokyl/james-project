@@ -17,32 +17,38 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.jmap.memory;
 
-import org.apache.james.GuiceJamesServer;
-import org.apache.james.MemoryJmapTestRule;
-import org.apache.james.dnsservice.api.DNSService;
-import org.apache.james.dnsservice.api.InMemoryDNSService;
-import org.apache.james.jmap.VacationRelayIntegrationTest;
-import org.junit.Rule;
 
-public class MemoryVacationRelayIntegrationTest extends VacationRelayIntegrationTest {
+package org.apache.james.transport.matchers;
 
-    @Rule
-    public MemoryJmapTestRule memoryJmap = new MemoryJmapTestRule();
+import java.util.Collection;
 
-    private final InMemoryDNSService inMemoryDNSService = new InMemoryDNSService();
+import org.apache.mailet.Mail;
+import org.apache.mailet.MailAddress;
+import org.apache.mailet.base.GenericMatcher;
 
-    @Override
-    protected void await() {}
+/**
+ * <P>Matches mails that are sent by an SMTP authenticated user.</P>
+ * <P>If the sender was not authenticated it will not match.</P>
+ * <PRE><CODE>
+ * &lt;mailet match=&quot;SMTPAuthSuccessful&quot; class=&quot;&lt;any-class&gt;&quot;&gt;
+ * </CODE></PRE>
+ *
+ * @version CVS $Revision$ $Date$
+ * @since 2.2.0
+ */
+public class SentByMailet extends GenericMatcher {
+    
+    /**
+     * The mail attribute holding the SMTP AUTH user name, if any.
+     */
 
-    @Override
-    protected GuiceJamesServer getJmapServer() {
-        return memoryJmap.jmapServer((binder) -> binder.bind(DNSService.class).toInstance(inMemoryDNSService));
-    }
-
-    @Override
-    protected InMemoryDNSService getInMemoryDns() {
-        return inMemoryDNSService;
+    public Collection<MailAddress> match(Mail mail) {
+        String authUser = (String) mail.getAttribute(Mail.SENT_BY_MAILET);
+        if (authUser != null) {
+            return mail.getRecipients();
+        } else {
+            return null;
+        }
     }
 }
