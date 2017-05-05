@@ -195,6 +195,12 @@
                     <type>test-jar</type>
                     <scope>test</scope>
                 </dependency>
+            	<dependency>
+            	    <groupId>org.apache.james</groupId>
+           		    <artifactId>james-server-dnsservice-api</artifactId>
+            	    <type>test-jar</type>
+            	    <version>${project.version}</version>
+           		</dependency>
                 <dependency>
                     <groupId>org.apache.james</groupId>
                     <artifactId>james-server-testing</artifactId>
