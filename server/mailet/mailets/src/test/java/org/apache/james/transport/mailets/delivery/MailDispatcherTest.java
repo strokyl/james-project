@@ -153,6 +153,7 @@ public class MailDispatcherTest {
         FakeMailContext.SentMail expected = FakeMailContext.sentMailBuilder()
             .sender(MailAddressFixture.OTHER_AT_JAMES)
             .recipient(MailAddressFixture.ANY_AT_JAMES)
+            .attribute(Mail.SENT_BY_MAILET, "true")
             .state(Mail.ERROR).build();
         assertThat(actual).containsOnly(expected);
         assertThat(IOUtils.toString(actual.get(0).getMsg().getInputStream(), Charsets.UTF_8))
