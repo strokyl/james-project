@@ -107,7 +107,11 @@ public abstract class VacationRelayIntegrationTest {
             .build();
 
         Duration slowPacedPollInterval = Duration.FIVE_HUNDRED_MILLISECONDS;
-        calmlyAwait = Awaitility.with().pollInterval(slowPacedPollInterval).and().with().pollDelay(slowPacedPollInterval).await();
+        calmlyAwait = Awaitility
+            .with()
+            .pollInterval(slowPacedPollInterval)
+            .and()
+            .pollDelay(slowPacedPollInterval).await();
     }
 
     @After
