@@ -164,7 +164,7 @@ public class RecipientRewriteTableProcessorTest {
         FakeMailContext.SentMail expected = FakeMailContext.sentMailBuilder()
                 .sender(MailAddressFixture.ANY_AT_JAMES)
                 .recipients(ImmutableList.of(MailAddressFixture.ANY_AT_JAMES, MailAddressFixture.OTHER_AT_JAMES))
-                .attribute(Mail.SENT_BY_MAILET, "true")
+                .fromMailet()
                 .message(message)
                 .build();
 
@@ -214,7 +214,7 @@ public class RecipientRewriteTableProcessorTest {
         FakeMailContext.SentMail expected = FakeMailContext.sentMailBuilder()
                 .sender(MailAddressFixture.ANY_AT_JAMES)
                 .recipients(ImmutableList.of(MailAddressFixture.ANY_AT_JAMES, MailAddressFixture.OTHER_AT_JAMES))
-                .attribute(Mail.SENT_BY_MAILET, "true")
+                .fromMailet()
                 .message(message)
                 .build();
 
@@ -253,7 +253,7 @@ public class RecipientRewriteTableProcessorTest {
                 .sender(MailAddressFixture.ANY_AT_JAMES)
                 .recipient(MailAddressFixture.OTHER_AT_LOCAL)
                 .message(message)
-                .attribute(Mail.SENT_BY_MAILET, "true")
+                .fromMailet()
                 .state(Mail.ERROR)
                 .build();
 
@@ -279,7 +279,7 @@ public class RecipientRewriteTableProcessorTest {
                 .recipient(MailAddressFixture.OTHER_AT_LOCAL)
                 .message(message)
                 .state(Mail.ERROR)
-                .attribute(Mail.SENT_BY_MAILET, "true")
+                .fromMailet()
                 .build();
 
         assertThat(mailetContext.getSentMails()).containsOnly(expected);
@@ -303,7 +303,7 @@ public class RecipientRewriteTableProcessorTest {
                 .sender(MailAddressFixture.ANY_AT_JAMES)
                 .recipient(MailAddressFixture.OTHER_AT_LOCAL)
                 .message(message)
-                .attribute(Mail.SENT_BY_MAILET, "true")
+                .fromMailet()
                 .state(Mail.ERROR)
                 .build();
 

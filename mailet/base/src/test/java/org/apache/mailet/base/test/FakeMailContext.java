@@ -112,7 +112,7 @@ public class FakeMailContext implements MailetContext {
             private MimeMessage msg;
             private Map<String, Serializable> attributes = new HashMap<String, Serializable>();
             private Optional<String> state = Optional.absent();
-            private boolean fromMailet = false;
+            private Optional<Boolean> fromMailet = Optional.absent();
 
             public Builder sender(MailAddress sender) {
                 this.sender = sender;
@@ -125,7 +125,7 @@ public class FakeMailContext implements MailetContext {
             }
 
             public Builder fromMailet() {
-                this.fromMailet = true;
+                this.fromMailet = Optional.of(true);
                 return this;
             }
 
@@ -160,7 +160,7 @@ public class FakeMailContext implements MailetContext {
             }
 
             public SentMail build() {
-                if (fromMailet) {
+                if (fromMailet.or(false)) {
                     this.attribute(Mail.SENT_BY_MAILET, "true");
                 }
                 return new SentMail(sender, recipients.or(ImmutableList.<MailAddress>of()), msg,

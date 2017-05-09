@@ -349,7 +349,7 @@ public class BouncerTest {
             .sender(MailAddressFixture.ANY_AT_JAMES)
             .attribute(DELIVERY_ERROR, errorMessage)
             .state(BOUNCE_PROCESSOR)
-            .attribute(Mail.SENT_BY_MAILET, "true")
+            .fromMailet()
             .build();
         assertThat(mailetContext.getSentMails()).containsOnly(expected);
         assertThat(mailetContext.getBouncedMails()).isEmpty();
@@ -451,7 +451,7 @@ public class BouncerTest {
             .sender(MailAddressFixture.ANY_AT_JAMES)
             .attribute(DELIVERY_ERROR, "null")
             .state(BOUNCE_PROCESSOR)
-            .attribute(Mail.SENT_BY_MAILET, "true")
+            .fromMailet()
             .build();
         assertThat(mailetContext.getSentMails()).containsOnly(expected);
         assertThat(mailetContext.getBouncedMails()).isEmpty();
