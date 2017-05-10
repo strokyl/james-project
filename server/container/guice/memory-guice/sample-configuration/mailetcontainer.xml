@@ -50,6 +50,9 @@
                 <name>X-UserIsAuth</name>
                 <value>true</value>
             </mailet>
+            <mailet match="SentByJmap" class="SetMailAttribute">
+                <RelayAllowed>true</RelayAllowed>
+            </mailet>
             <mailet match="HasMailAttribute=org.apache.james.SMIMECheckSignature" class="SetMimeHeader">
                 <name>X-WasSigned</name>
                 <value>true</value>
@@ -66,8 +69,7 @@
                 <RelayAllowed>true</RelayAllowed>
             </mailet>
             <mailet match="SentByMailet" class="SetMailAttribute">
-                <RelayAllowed>true</RelayAllowed>
-            </mailet>
+                <RelayAllowed>true</RelayAllowed> </mailet>
             <mailet match="HasMailAttribute=RelayAllowed" class="RemoteDelivery">
                 <outgoingQueue>outgoing</outgoingQueue>
                 <delayTime>5000, 100000, 500000</delayTime>

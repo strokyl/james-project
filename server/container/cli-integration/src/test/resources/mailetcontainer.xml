@@ -66,6 +66,9 @@
             <mailet match="SentByMailet" class="SetMailAttribute">
                 <RelayAllowed>true</RelayAllowed>
             </mailet>
+            <mailet match="SentByJmap" class="SetMailAttribute">
+                <RelayAllowed>true</RelayAllowed>
+            </mailet>
             <mailet match="HasMailAttribute=RelayAllowed" class="RemoteDelivery">
                 <outgoingQueue>outgoing</outgoingQueue>
                 <delayTime>5000, 100000, 500000</delayTime>
