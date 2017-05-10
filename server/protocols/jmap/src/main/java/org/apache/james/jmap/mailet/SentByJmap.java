@@ -19,19 +19,20 @@
 
 
 
-package org.apache.james.transport.matchers;
+package org.apache.james.jmap.mailet;
 
 import java.util.Collection;
 
-import com.google.common.collect.ImmutableList;
+import org.apache.james.jmap.send.MailMetadata;
 import org.apache.mailet.Mail;
 import org.apache.mailet.MailAddress;
 import org.apache.mailet.base.GenericMatcher;
 
-public class SentByMailet extends GenericMatcher {
+import com.google.common.collect.ImmutableList;
 
+public class SentByJmap extends GenericMatcher {
     public Collection<MailAddress> match(Mail mail) {
-        String authUser = (String) mail.getAttribute(Mail.SENT_BY_MAILET);
+        String authUser = (String) mail.getAttribute(MailMetadata.MAIL_METADATA_USERNAME_ATTRIBUTE);
         if (authUser != null) {
             return mail.getRecipients();
         } else {

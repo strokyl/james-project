@@ -17,12 +17,13 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.transport.matchers;
+package org.apache.james.jmap.mailet;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Collection;
 
+import org.apache.james.jmap.send.MailMetadata;
 import org.apache.mailet.Mail;
 import org.apache.mailet.MailAddress;
 import org.apache.mailet.base.MailAddressFixture;
@@ -32,24 +33,24 @@ import org.apache.mailet.base.test.FakeMatcherConfig;
 import org.junit.Before;
 import org.junit.Test;
 
-public class SentByMailetTest {
+public class SentByJmapTest {
 
-    private SentByMailet testee;
+    private SentByJmap testee;
 
     @Before
     public void setUp() throws Exception {
-        testee = new SentByMailet();
+        testee = new SentByJmap();
         testee.init(FakeMatcherConfig.builder().matcherName("matcherName")
             .mailetContext(FakeMailContext.defaultContext())
             .build());
     }
 
     @Test
-    public void matchShouldReturnRecipientsWhenAuthUserAttributeIsPresent() throws Exception{
+    public void matchShouldReturnRecipientsWhenUserAttributeIsPresent() throws Exception{
         MailAddress recipient = MailAddressFixture.ANY_AT_JAMES;
         FakeMail fakeMail = FakeMail.builder()
             .recipient(recipient)
-            .attribute(Mail.SENT_BY_MAILET, "true")
+            .attribute(MailMetadata.MAIL_METADATA_USERNAME_ATTRIBUTE, "true")
             .build();
 
         Collection<MailAddress> results =  testee.match(fakeMail);
@@ -58,7 +59,7 @@ public class SentByMailetTest {
     }
 
     @Test
-    public void matchShouldReturnEmptyCollectionWhenAuthUserAttributeIsAbsent() throws Exception{
+    public void matchShouldReturnEmptyCollectionWhenUserAttributeIsAbsent() throws Exception{
         FakeMail fakeMail = FakeMail.builder()
             .recipients(MailAddressFixture.ANY_AT_JAMES)
             .build();
@@ -69,7 +70,7 @@ public class SentByMailetTest {
     }
 
     @Test
-    public void matchShouldReturnEmptyCollectionWhenAuthUserAttributeIsAbsentAndThereIsNoRecipient() throws Exception {
+    public void matchShouldReturnEmptyCollectionWhenUserAttributeIsAbsentAndThereIsNoRecipient() throws Exception {
         FakeMail fakeMail = FakeMail.builder()
             .recipients()
             .build();
@@ -80,10 +81,10 @@ public class SentByMailetTest {
     }
 
     @Test
-    public void matchShouldReturnEmptyCollectionWhenAuthUserAttributeIsPresentAndThereIsNoRecipient() throws Exception {
+    public void matchShouldReturnEmptyCollectionWhenUserAttributeIsPresentAndThereIsNoRecipient() throws Exception {
         FakeMail fakeMail = FakeMail.builder()
             .recipients()
-            .attribute(Mail.SENT_BY_MAILET, "true")
+            .attribute(MailMetadata.MAIL_METADATA_USERNAME_ATTRIBUTE, "true")
             .build();
 
         Collection<MailAddress> results =  testee.match(fakeMail);

@@ -76,10 +76,10 @@
             <mailet match="SentByMailet" class="SetMailAttribute">
                 <RelayAllowed>true</RelayAllowed>
             </mailet>
-            <mailet match="HasMailAttribute=RelayAllowed" class="ToProcessor">
-                <processor>relay</processor>
+            <mailet match="SentByJmap" class="SetMailAttribute">
+                <RelayAllowed>true</RelayAllowed>
             </mailet>
-            <mailet match="HasMailAttribute=org.apache.james.jmap.send.MailMetaData.messageId" class="ToProcessor">
+            <mailet match="HasMailAttribute=RelayAllowed" class="ToProcessor">
                 <processor>relay</processor>
             </mailet>
 
