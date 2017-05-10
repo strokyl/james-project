@@ -73,7 +73,7 @@
             <mailet match="SMTPAuthSuccessful" class="ToProcessor">
                 <processor>relay</processor>
             </mailet>
-            <mailet match="SentByJmap" class="ToProcessor">
+            <mailet match="org.apache.james.jmap.mailet.SentByJmap" class="ToProcessor">
                 <processor>relay</processor>
             </mailet>
             <mailet match="SentByMailet" class="ToProcessor">

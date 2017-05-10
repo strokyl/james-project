@@ -67,7 +67,7 @@
             <mailet match="SentByMailet" class="SetMailAttribute">
                 <RelayAllowed>true</RelayAllowed>
             </mailet>
-            <mailet match="SentByJmap" class="SetMailAttribute">
+            <mailet match="org.apache.james.jmap.mailet.SentByJmap" class="SetMailAttribute">
                 <RelayAllowed>true</RelayAllowed>
             </mailet>
             <mailet match="HasMailAttribute=RelayAllowed" class="RemoteDelivery">
