@@ -59,19 +59,10 @@ import com.google.common.collect.ImmutableSet;
 
 public class ObjectMapperFactory {
 
-    private static final ImmutableSet.Builder<Module> JACKSON_BASE_MODULES;
-
-    static {
-        JavaTimeModule javaTimeModule = new JavaTimeModule();
-
-        javaTimeModule.addDeserializer(Instant.class, InstantDeserializer.INSTANT);
-        javaTimeModule.addSerializer(Instant.class, InstantSerializer.INSTANCE);
-
-        JACKSON_BASE_MODULES = ImmutableSet.<Module>builder().add(
+    private static final ImmutableSet.Builder<Module> JACKSON_BASE_MODULES = ImmutableSet.<Module>builder().add(
             new Jdk8Module(),
             new JavaTimeModule(),
             new GuavaModule());
-    }
 
     private final Set<Module> jacksonModules;
     private static final TimeZone UTC_TIMEZONE = TimeZone.getTimeZone("UTC");

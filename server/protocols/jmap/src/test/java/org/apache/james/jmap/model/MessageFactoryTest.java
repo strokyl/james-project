@@ -22,9 +22,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.ByteArrayInputStream;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Date;
 import java.util.Optional;
 
 import javax.mail.Flags;
@@ -52,7 +49,7 @@ import com.google.common.collect.ImmutableMap;
 
 public class MessageFactoryTest {
     private static final InMemoryId MAILBOX_ID = InMemoryId.of(18L);
-    private static final Instant DATE = Instant.now();
+    private static final Instant INTERNAL_DATE = Instant.parse("2012-02-03T14:30:42Z");
 
     private MessageFactory messageFactory;
     private MessagePreviewGenerator messagePreview ;
@@ -74,7 +71,7 @@ public class MessageFactoryTest {
                 .uid(MessageUid.of(2))
                 .flags(new Flags(Flag.SEEN))
                 .size(0)
-                .internalDate(DATE)
+                .internalDate(INTERNAL_DATE)
                 .content(new ByteArrayInputStream("".getBytes(Charsets.UTF_8)))
                 .attachments(ImmutableList.of())
                 .mailboxId(MAILBOX_ID)
@@ -84,7 +81,7 @@ public class MessageFactoryTest {
         Message testee = messageFactory.fromMetaDataWithContent(testMail);
         assertThat(testee)
             .extracting(Message::getPreview, Message::getSize, Message::getSubject, Message::getHeaders, Message::getDate)
-            .containsExactly("(Empty)", 0L, "", ImmutableMap.of("MIME-Version", "1.0"), DATE);
+            .containsExactly("(Empty)", 0L, "", ImmutableMap.of("MIME-Version", "1.0"), INTERNAL_DATE);
     }
 
     @Test
@@ -97,7 +94,7 @@ public class MessageFactoryTest {
                 .uid(MessageUid.of(2))
                 .flags(flags)
                 .size(0)
-                .internalDate(DATE)
+                .internalDate(INTERNAL_DATE)
                 .content(new ByteArrayInputStream("".getBytes(Charsets.UTF_8)))
                 .attachments(ImmutableList.of())
                 .mailboxId(MAILBOX_ID)
@@ -124,7 +121,7 @@ public class MessageFactoryTest {
                 .uid(MessageUid.of(2))
                 .flags(new Flags(Flag.SEEN))
                 .size(headers.length())
-                .internalDate(DATE)
+                .internalDate(INTERNAL_DATE)
                 .content(new ByteArrayInputStream(headers.getBytes(Charsets.UTF_8)))
                 .attachments(ImmutableList.of())
                 .mailboxId(MAILBOX_ID)
@@ -181,7 +178,7 @@ public class MessageFactoryTest {
                 .uid(MessageUid.of(2))
                 .flags(new Flags(Flag.SEEN))
                 .size(mail.length())
-                .internalDate(DATE)
+                .internalDate(INTERNAL_DATE)
                 .content(new ByteArrayInputStream(mail.getBytes(Charsets.UTF_8)))
                 .attachments(ImmutableList.of())
                 .mailboxId(MAILBOX_ID)
@@ -213,7 +210,7 @@ public class MessageFactoryTest {
         MetaDataWithContent testMail = MetaDataWithContent.builder()
             .uid(MessageUid.of(2))
             .flags(new Flags(Flag.SEEN))
-            .internalDate(DATE)
+            .internalDate(INTERNAL_DATE)
             .size(1000)
             .content(messageContent)
             .attachments(ImmutableList.of())
@@ -243,7 +240,7 @@ public class MessageFactoryTest {
                 .uid(MessageUid.of(2))
                 .flags(new Flags(Flag.SEEN))
                 .size(mail.length())
-                .internalDate(DATE)
+                .internalDate(INTERNAL_DATE)
                 .content(new ByteArrayInputStream(mail.getBytes(Charsets.UTF_8)))
                 .attachments(ImmutableList.of())
                 .mailboxId(MAILBOX_ID)
@@ -259,7 +256,7 @@ public class MessageFactoryTest {
                 .uid(MessageUid.of(2))
                 .flags(new Flags(Flag.SEEN))
                 .size(0)
-                .internalDate(DATE)
+                .internalDate(INTERNAL_DATE)
                 .content(new ByteArrayInputStream(IOUtils.toByteArray(ClassLoader.getSystemResourceAsStream("spamMail.eml"))))
                 .attachments(ImmutableList.of())
                 .mailboxId(MAILBOX_ID)
@@ -285,7 +282,7 @@ public class MessageFactoryTest {
                 .uid(MessageUid.of(2))
                 .flags(new Flags(Flag.SEEN))
                 .size(0)
-                .internalDate(DATE)
+                .internalDate(INTERNAL_DATE)
                 .content(new ByteArrayInputStream(IOUtils.toByteArray(ClassLoader.getSystemResourceAsStream("spamMail.eml"))))
                 .attachments(ImmutableList.of(MessageAttachment.builder()
                         .attachment(org.apache.james.mailbox.model.Attachment.builder()
@@ -317,7 +314,7 @@ public class MessageFactoryTest {
             .uid(MessageUid.of(2))
             .flags(new Flags(Flag.SEEN))
             .size(headers.length())
-            .internalDate(DATE)
+            .internalDate(INTERNAL_DATE)
             .content(new ByteArrayInputStream(headers.getBytes(Charsets.UTF_8)))
             .attachments(ImmutableList.of())
             .mailboxId(MAILBOX_ID)
@@ -351,7 +348,7 @@ public class MessageFactoryTest {
             .uid(MessageUid.of(2))
             .flags(new Flags(Flag.SEEN))
             .size(headers.length())
-            .internalDate(DATE)
+            .internalDate(INTERNAL_DATE)
             .content(new ByteArrayInputStream(headers.getBytes(Charsets.UTF_8)))
             .attachments(ImmutableList.of())
             .mailboxId(MAILBOX_ID)
@@ -376,7 +373,7 @@ public class MessageFactoryTest {
             .uid(MessageUid.of(2))
             .flags(new Flags(Flag.SEEN))
             .size(headers.length())
-            .internalDate(DATE)
+            .internalDate(INTERNAL_DATE)
             .content(new ByteArrayInputStream(headers.getBytes(Charsets.UTF_8)))
             .attachments(ImmutableList.of())
             .mailboxId(MAILBOX_ID)
@@ -385,7 +382,7 @@ public class MessageFactoryTest {
 
         Message testee = messageFactory.fromMetaDataWithContent(testMail);
 
-        assertThat(testee.getDate()).isEqualTo(DATE);
+        assertThat(testee.getDate()).isEqualTo(INTERNAL_DATE);
     }
 
     @Test
@@ -394,7 +391,7 @@ public class MessageFactoryTest {
                 .uid(MessageUid.of(2))
                 .flags(new Flags(Flag.SEEN))
                 .size(1010)
-                .internalDate(DATE)
+                .internalDate(INTERNAL_DATE)
                 .content(new ByteArrayInputStream((StringUtils.repeat("0123456789", 101).getBytes(Charsets.UTF_8))))
                 .attachments(ImmutableList.of())
                 .mailboxId(MAILBOX_ID)
@@ -404,7 +401,7 @@ public class MessageFactoryTest {
         Message testee = messageFactory.fromMetaDataWithContent(testMail);
         assertThat(testee)
             .extracting(Message::getPreview, Message::getSize, Message::getSubject, Message::getHeaders, Message::getDate)
-            .containsExactly("(Empty)", 1010L, "", ImmutableMap.of("MIME-Version", "1.0"), DATE);
+            .containsExactly("(Empty)", 1010L, "", ImmutableMap.of("MIME-Version", "1.0"), INTERNAL_DATE);
     }
 
     @Test
@@ -417,7 +414,7 @@ public class MessageFactoryTest {
             .uid(MessageUid.of(2))
             .flags(new Flags(Flag.SEEN))
             .size(messageContent.read())
-            .internalDate(DATE)
+            .internalDate(INTERNAL_DATE)
             .content(messageContent)
             .attachments(ImmutableList.of())
             .mailboxId(MAILBOX_ID)
@@ -438,7 +435,7 @@ public class MessageFactoryTest {
             .uid(MessageUid.of(2))
             .flags(new Flags(Flag.SEEN))
             .size(messageContent.read())
-            .internalDate(DATE)
+            .internalDate(INTERNAL_DATE)
             .content(messageContent)
             .attachments(ImmutableList.of())
             .mailboxId(MAILBOX_ID)
@@ -470,7 +467,7 @@ public class MessageFactoryTest {
             .uid(MessageUid.of(2))
             .flags(new Flags(Flag.SEEN))
             .size(messageContent.read())
-            .internalDate(DATE)
+            .internalDate(INTERNAL_DATE)
             .content(messageContent)
             .attachments(ImmutableList.of())
             .mailboxId(MAILBOX_ID)
@@ -492,7 +489,7 @@ public class MessageFactoryTest {
             .uid(MessageUid.of(2))
             .flags(new Flags(Flag.SEEN))
             .size(messageContent.read())
-            .internalDate(DATE)
+            .internalDate(INTERNAL_DATE)
             .content(messageContent)
             .attachments(ImmutableList.of())
             .mailboxId(MAILBOX_ID)
@@ -511,7 +508,7 @@ public class MessageFactoryTest {
             .uid(MessageUid.of(2))
             .flags(new Flags(Flag.SEEN))
             .size(messageContent.read())
-            .internalDate(DATE)
+            .internalDate(INTERNAL_DATE)
             .content(messageContent)
             .attachments(ImmutableList.of())
             .mailboxId(MAILBOX_ID)
@@ -535,7 +532,7 @@ public class MessageFactoryTest {
             .uid(MessageUid.of(2))
             .flags(new Flags(Flag.SEEN))
             .size(messageContent.read())
-            .internalDate(DATE)
+            .internalDate(INTERNAL_DATE)
             .content(messageContent)
             .attachments(ImmutableList.of())
             .mailboxId(MAILBOX_ID)
@@ -571,7 +568,7 @@ public class MessageFactoryTest {
             .uid(MessageUid.of(2))
             .flags(new Flags(Flag.SEEN))
             .size(messageContent.read())
-            .internalDate(DATE)
+            .internalDate(INTERNAL_DATE)
             .content(messageContent)
             .attachments(ImmutableList.of())
             .mailboxId(MAILBOX_ID)
