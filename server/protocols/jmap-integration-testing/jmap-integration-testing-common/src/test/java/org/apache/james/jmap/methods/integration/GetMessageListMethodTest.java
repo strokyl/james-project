@@ -825,7 +825,6 @@ public abstract class GetMessageListMethodTest {
     }
 
     @Test
-    @Ignore
     public void getMessageListShouldSortUsingInternalDateWhenNoDateHeader() throws Exception {
         mailboxProbe.createMailbox(MailboxConstants.USER_NAMESPACE, username, "mailbox");
 
