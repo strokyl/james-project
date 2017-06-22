@@ -121,7 +121,7 @@ public class MailAttributesToMimeHeadersTest {
         FakeMailetConfig mailetConfig = FakeMailetConfig.builder()
                 .mailetName("Test")
                 .build();
-        expectedException.expect(MessagingException.class);
+        expectedException.expect(IllegalArgumentException.class);
         mailet.init(mailetConfig);
     }
 }

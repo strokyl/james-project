@@ -28,6 +28,8 @@ import java.util.Map.Entry;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import org.apache.mailet.Mail;
 import org.apache.mailet.base.GenericMailet;
 
@@ -54,20 +56,10 @@ public class MailAttributesToMimeHeaders extends GenericMailet {
 
     @Override
     public void init() throws MessagingException {
-        String simplemappings = getInitParameter("simplemapping");
-        Builder<String, String> mappingsBuilder = ImmutableMap.builder();
-        if (simplemappings != null) {
-            for (String mapping : Splitter.on(',').split(simplemappings)) {
-                List<String> pair = Splitter.on(';').trimResults().splitToList(mapping);
-                if (pair.size() != 2) {
-                    throw new MessagingException(CONFIGURATION_ERROR_MESSAGE);
-                }
-                mappingsBuilder.put(pair.get(0), pair.get(1));
-            }
-        } else {
-            throw new MessagingException(CONFIGURATION_ERROR_MESSAGE);
-        }
-        mappings = mappingsBuilder.build();
+        String simpleMappings = getInitParameter("simplemapping");
+        Preconditions.checkArgument(!Strings.isNullOrEmpty(simpleMappings), "simplemapping is required");
+
+        mappings = MappingArgument.parse(simpleMappings);
     }
 
     @Override
