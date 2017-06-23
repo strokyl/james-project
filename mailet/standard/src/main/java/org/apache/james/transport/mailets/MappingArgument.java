@@ -25,6 +25,7 @@ import com.google.common.collect.ImmutableMap;
 
 import javax.mail.MessagingException;
 import java.util.List;
+import org.apache.commons.lang3.tuple.Pair;
 
 public class MappingArgument {
 
@@ -39,20 +40,20 @@ public class MappingArgument {
         }
 
         for (String keyValue : Splitter.on(',').split(mapping)) {
-            List<String> pair = parseKeyValue(keyValue);
-            mappingsBuilder.put(pair.get(0), pair.get(1));
+            Pair<String, String> pair = parseKeyValue(keyValue);
+            mappingsBuilder.put(pair.getLeft(), pair.getRight());
         }
 
         return mappingsBuilder.build();
     }
 
-    private static List<String> parseKeyValue(String keyValue) throws MessagingException {
+    private static Pair<String, String> parseKeyValue(String keyValue) throws MessagingException {
         List<String> pair = Splitter.on(';').trimResults().splitToList(keyValue);
 
         if (pair.size() != 2) {
             throw new MessagingException(CONFIGURATION_ERROR_MESSAGE);
         }
 
-        return pair;
+        return Pair.of(pair.get(0), pair.get(1));
     }
 }
