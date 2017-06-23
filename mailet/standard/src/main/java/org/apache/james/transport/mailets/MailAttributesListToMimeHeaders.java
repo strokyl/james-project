@@ -17,8 +17,6 @@
  * under the License.                                           *
  ****************************************************************/
 
-
-
 package org.apache.james.transport.mailets;
 
 import java.util.List;
@@ -31,7 +29,6 @@ import javax.mail.internet.MimeMessage;
 import org.apache.mailet.Mail;
 import org.apache.mailet.base.GenericMailet;
 
-import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 /**
@@ -48,22 +45,23 @@ import com.google.common.base.Strings;
  */
 public class MailAttributesListToMimeHeaders extends GenericMailet {
 
-    private static final String CONFIGURATION_ERROR_MESSAGE = "Invalid config. Please use \"attributeName; headerName\"";
-    private Map<String, String> mappings;
+    private Map<String, String> attributeNameToHeader;
 
     @Override
     public void init() throws MessagingException {
         String simpleMappings = getInitParameter("simplemapping");
-        Preconditions.checkArgument(!Strings.isNullOrEmpty(simpleMappings), "simplemapping is required");
+        if (Strings.isNullOrEmpty(simpleMappings)) {
+            throw new MessagingException("simplemapping is required");
+        }
 
-        mappings = MappingArgument.parse(simpleMappings);
+        attributeNameToHeader = MappingArgument.parse(simpleMappings);
     }
 
     @Override
     public void service(Mail mail) {
         try {
             MimeMessage message = mail.getMessage();
-            for (Entry<String, String> entry : mappings.entrySet()) {
+            for (Entry<String, String> entry : attributeNameToHeader.entrySet()) {
                 List<String> values = (List<String>) mail.getAttribute(entry.getKey());
                 addHeaders(message, entry.getValue(), values);
             }

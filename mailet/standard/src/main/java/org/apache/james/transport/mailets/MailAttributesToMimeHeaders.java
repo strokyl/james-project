@@ -17,8 +17,6 @@
  * under the License.                                           *
  ****************************************************************/
 
-
-
 package org.apache.james.transport.mailets;
 
 import java.util.List;
@@ -57,7 +55,10 @@ public class MailAttributesToMimeHeaders extends GenericMailet {
     @Override
     public void init() throws MessagingException {
         String simpleMappings = getInitParameter("simplemapping");
-        Preconditions.checkArgument(!Strings.isNullOrEmpty(simpleMappings), "simplemapping is required");
+
+        if (Strings.isNullOrEmpty(simpleMappings)) {
+            throw new MessagingException("simplemapping is required");
+        }
 
         mappings = MappingArgument.parse(simpleMappings);
     }
