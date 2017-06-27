@@ -67,7 +67,7 @@ public class MailAttributesListToMimeHeaders extends GenericMailet {
             }
             message.saveChanges();
         } catch (MessagingException e) {
-            log(e.getMessage());
+            log("Exception while adding headers", e);
         }
     }
 
