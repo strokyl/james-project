@@ -51,38 +51,68 @@
       "username"
    ],
    "isDraft" : false,
-   "headers" : {
-      "content-type" : [
+   "headers" : [
+     {
+       "key": "content-type",
+       "value": [
          "multipart/mixed; boundary=\"-=Part.0.16b49c355c1c1b54.158b4d6fd1b.bd3741f90275bb0a=-\""
-      ],
-      "subject" : [
+       ]
+     },
+     {
+       "key": "subject",
+       "value": [
          "test"
-      ],
-      "from" : [
+       ]
+     },
+     {
+       "key": "from",
+       "value": [
          "Laura ROYET <laura.ro@linagora.com>"
-      ],
-      "return-path" : [
+       ]
+     },
+     {
+       "key": "return-path",
+       "value": [
          "<laura.ro@linagora.com>"
-      ],
-      "sender" : [
+       ]
+     },
+     {
+       "key": "sender",
+       "value": [
          "Laura ROYET <laura.ro@linagora.com>"
-      ],
-      "message-id" : [
+       ]
+     },
+     {
+       "key": "message-id",
+       "value": [
          "1480502737913"
-      ],
-      "mime-version" : [
+       ]
+     },
+     {
+       "key": "mime-version",
+       "value": [
          "1.0"
-      ],
-      "delivered-to" : [
+       ]
+     },
+     {
+       "key": "delivered-to",
+       "value": [
          "laura.ro@linagora.com"
-      ],
-      "date" : [
+       ]
+     },
+     {
+       "key": "date",
+       "value": [
          "Wed, 30 Nov 2016 10:45:38 +0000"
-      ],
-      "to" : [
+       ]
+     },
+     {
+       "key": "to",
+       "value": [
          "Laura ROYET <laura.ro@linagora.com>"
-      ]
-   },
+       ]
+     }
+   ],
    "textBody" : null,
    "subtype" : "text",
    "isAnswered" : false,

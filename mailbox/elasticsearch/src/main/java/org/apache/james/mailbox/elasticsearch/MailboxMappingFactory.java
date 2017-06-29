@@ -29,15 +29,19 @@ import static org.apache.james.backends.es.NodeMappingFactory.INDEX;
 import static org.apache.james.backends.es.NodeMappingFactory.LONG;
 import static org.apache.james.backends.es.NodeMappingFactory.NESTED;
 import static org.apache.james.backends.es.NodeMappingFactory.NOT_ANALYZED;
+import static org.apache.james.backends.es.NodeMappingFactory.OBJECT;
 import static org.apache.james.backends.es.NodeMappingFactory.PROPERTIES;
 import static org.apache.james.backends.es.NodeMappingFactory.RAW;
 import static org.apache.james.backends.es.NodeMappingFactory.SNOWBALL;
+import static org.apache.james.backends.es.NodeMappingFactory.STRING;
 import static org.apache.james.backends.es.NodeMappingFactory.TYPE;
+import static org.apache.james.mailbox.elasticsearch.json.JsonMessageConstants.ATTACHMENTS;
 import static org.apache.james.mailbox.elasticsearch.json.JsonMessageConstants.BCC;
 import static org.apache.james.mailbox.elasticsearch.json.JsonMessageConstants.CC;
 import static org.apache.james.mailbox.elasticsearch.json.JsonMessageConstants.DATE;
 import static org.apache.james.mailbox.elasticsearch.json.JsonMessageConstants.FROM;
 import static org.apache.james.mailbox.elasticsearch.json.JsonMessageConstants.HAS_ATTACHMENT;
+import static org.apache.james.mailbox.elasticsearch.json.JsonMessageConstants.HEADERS;
 import static org.apache.james.mailbox.elasticsearch.json.JsonMessageConstants.HTML_BODY;
 import static org.apache.james.mailbox.elasticsearch.json.JsonMessageConstants.IS_ANSWERED;
 import static org.apache.james.mailbox.elasticsearch.json.JsonMessageConstants.IS_DELETED;
@@ -59,13 +63,13 @@ import static org.apache.james.mailbox.elasticsearch.json.JsonMessageConstants.T
 import static org.apache.james.mailbox.elasticsearch.json.JsonMessageConstants.UID;
 import static org.apache.james.mailbox.elasticsearch.json.JsonMessageConstants.USERS;
 import static org.apache.james.mailbox.elasticsearch.json.JsonMessageConstants.USER_FLAGS;
+import static org.apache.james.mailbox.elasticsearch.json.JsonMessageConstants.Attachment.TEXT_CONTENT;
+import static org.apache.james.mailbox.elasticsearch.json.JsonMessageConstants.Header.KEY;
+import static org.apache.james.mailbox.elasticsearch.json.JsonMessageConstants.Header.VALUE;
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
 import java.io.IOException;
 
-import static org.apache.james.backends.es.NodeMappingFactory.STRING;
-
-import org.apache.james.backends.es.IndexCreationFactory;
 import org.apache.james.backends.es.NodeMappingFactory;
 import org.apache.james.mailbox.elasticsearch.json.JsonMessageConstants.EMailer;
 import org.apache.james.mailbox.elasticsearch.json.JsonMessageConstants.Property;
@@ -83,7 +87,42 @@ public class MailboxMappingFactory {
                 .startObject()
 
                     .startObject(MailboxElasticsearchConstants.MESSAGE_TYPE.getValue())
+                        .field(NodeMappingFactory.DYNAMIC, false)
+
                         .startObject(PROPERTIES)
+                            .startObject(MESSAGE_ID)
+                                .field(TYPE, STRING)
+                                .field(INDEX, NOT_ANALYZED)
+                            .endObject()
+
+                            .startObject(HEADERS)
+                                .field(TYPE, NESTED)
+                                .startObject(PROPERTIES)
+                                    .startObject(KEY)
+                                        .field(TYPE, STRING)
+                                        .field(INDEX, NOT_ANALYZED)
+                                    .endObject()
+                                    .startObject(VALUE)
+                                        .field(TYPE, STRING)
+                                        .startObject(FIELDS)
+                                            .startObject(RAW)
+                                                .field(TYPE, STRING)
+                                                .field(INDEX, NOT_ANALYZED)
+                                            .endObject()
+                                        .endObject()
+                                    .endObject()
+                                .endObject()
+                            .endObject()
+
+                            .startObject(ATTACHMENTS)
+                                .field(TYPE, OBJECT)
+                                .startObject(PROPERTIES)
+                                    .startObject(TEXT_CONTENT)
+                                        .field(TYPE, STRING)
+                                        .field(IGNORE_ABOVE, MAXIMUM_TERM_LENGTH)
+                                    .endObject()
+                                .endObject()
+                            .endObject()
 
                             .startObject(MESSAGE_ID)
                                 .field(TYPE, STRING)
@@ -127,12 +166,12 @@ public class MailboxMappingFactory {
                             .endObject()
 
                             .startObject(DATE)
-                                .field(TYPE, NodeMappingFactory.DATE)
+                                .field(TYPE, DATE)
                                 .field(FORMAT, "yyyy-MM-dd'T'HH:mm:ssZ")
                             .endObject()
 
                             .startObject(SENT_DATE)
-                                .field(TYPE, NodeMappingFactory.DATE)
+                                .field(TYPE, DATE)
                                 .field(FORMAT, "yyyy-MM-dd'T'HH:mm:ssZ")
                             .endObject()
 

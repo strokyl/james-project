@@ -11,51 +11,93 @@
     "security",
     "debian"
   ],
-  "headers": {
-    "date": [
-      "Wed, 10 Jun 2015 10:45:27 +0200"
-    ],
-    "mime-version": [
-      "1.0"
-    ],
-    "in-reply-to": [
-      "<556EA5E0.8010008@linagora.com>"
-    ],
-    "references": [
-      "<556EA5E0.8010008@linagora.com>"
-    ],
-    "return-path": [
-      "<mbaechler@linagora.com>"
-    ],
-    "x-forwarded-message-id": [
-      "<556EA5E0.8010008@linagora.com>"
-    ],
-    "subject": [
-      "Fwd: Courbe Sprint"
-    ],
-    "received": [
-      "from alderaan.linagora.com (smtp.linagora.dc1 [172.16.18.53])\t by imap (Cyrus v2.2.13-Debian-2.2.13-19+squeeze3) with LMTPA;\t Wed, 10 Jun 2015 10:45:29 +0200",
-      "from [10.69.2.28] (mne69-10-88-173-78-196.fbx.proxad.net [88.173.78.196])\t(using TLSv1 with cipher DHE-RSA-AES128-SHA (128/128 bits))\t(No client certificate requested)\tby alderaan.linagora.com (Postfix) with ESMTPSA id 7F33E728\tfor <btellier@linagora.com>; Wed, 10 Jun 2015 10:45:28 +0200 (CEST)"
-    ],
-    "x-sieve": [
-      "CMU Sieve 2.2"
-    ],
-    "message-id": [
-      "<5577F927.2040409@linagora.com>"
-    ],
-    "from": [
-      "Matthieu Baechler <mbaechler@linagora.com>"
-    ],
-    "content-type": [
-      "multipart/mixed; boundary=\"------------080603090509090707040003\""
-    ],
-    "to": [
-      "btellier@linagora.com"
-    ],
-    "user-agent": [
-      "Mozilla/5.0 (X11; Linux x86_64; rv:31.0) Gecko/20100101 Icedove/31.7.0"
-    ]
-  },
+  "headers": [
+    {
+      "key": "date",
+      "value": [
+        "Wed, 10 Jun 2015 10:45:27 +0200"
+      ]
+    },
+    {
+      "key": "mime-version",
+      "value": [
+        "1.0"
+      ]
+    },
+    {
+      "key": "in-reply-to",
+      "value": [
+        "<556EA5E0.8010008@linagora.com>"
+      ]
+    },
+    {
+      "key": "references",
+      "value": [
+        "<556EA5E0.8010008@linagora.com>"
+      ]
+    },
+    {
+      "key": "return-path",
+      "value": [
+        "<mbaechler@linagora.com>"
+      ]
+    },
+    {
+      "key": "x-forwarded-message-id",
+      "value": [
+        "<556EA5E0.8010008@linagora.com>"
+      ]
+    },
+    {
+      "key": "subject",
+      "value": [
+        "Fwd: Courbe Sprint"
+      ]
+    },
+    {
+      "key": "received",
+      "value": [
+        "from alderaan.linagora.com (smtp.linagora.dc1 [172.16.18.53])\t by imap (Cyrus v2.2.13-Debian-2.2.13-19+squeeze3) with LMTPA;\t Wed, 10 Jun 2015 10:45:29 +0200",
+        "from [10.69.2.28] (mne69-10-88-173-78-196.fbx.proxad.net [88.173.78.196])\t(using TLSv1 with cipher DHE-RSA-AES128-SHA (128/128 bits))\t(No client certificate requested)\tby alderaan.linagora.com (Postfix) with ESMTPSA id 7F33E728\tfor <btellier@linagora.com>; Wed, 10 Jun 2015 10:45:28 +0200 (CEST)"
+      ]
+    },
+    {
+      "key": "x-sieve",
+      "value": [
+        "CMU Sieve 2.2"
+      ]
+    },
+    {
+      "key": "message-id",
+      "value": [
+        "<5577F927.2040409@linagora.com>"
+      ]
+    },
+    {
+      "key": "from",
+      "value": [
+        "Matthieu Baechler <mbaechler@linagora.com>"
+      ]
+    },
+    {
+      "key": "content-type",
+      "value": [
+        "multipart/mixed; boundary=\"------------080603090509090707040003\""
+      ]
+    },
+    {
+      "key": "to",
+      "value": [
+        "btellier@linagora.com"
+      ]
+    },
+    {
+      "key": "user-agent",
+      "value": [
+        "Mozilla/5.0 (X11; Linux x86_64; rv:31.0) Gecko/20100101 Icedove/31.7.0"
+      ]
+    }
+  ],
   "from": [
     {
       "name": "Matthieu Baechler",
@@ -97,83 +139,131 @@
       "textContent": "Forward as attachment !\n\n\n",
       "mediaType": "text",
       "subtype": "plain",
-      "fileMetadata":{},
+      "fileMetadata": [],
       "fileName": null,
       "fileExtension": null,
       "contentDisposition": null,
-      "headers": {
-        "content-transfer-encoding": [
-          "7bit"
-        ],
-        "content-type": [
-          "text/plain; charset=utf-8; format=flowed"
-        ]
-      }
+      "headers": [
+        {
+          "key": "content-transfer-encoding",
+          "value": [
+            "7bit"
+          ]
+        },
+        {
+          "key": "content-type",
+          "value": [
+            "text/plain; charset=utf-8; format=flowed"
+          ]
+        }
+      ]
     },
     {
       "textContent": null,
       "mediaType": null,
       "subtype": null,
-      "fileMetadata":{},
+      "fileMetadata": [],
       "fileName": null,
       "fileExtension": null,
       "contentDisposition": null,
-      "headers": {
-        "content-transfer-encoding": [
-          "8bit"
-        ],
-        "content-disposition": [
-          "attachment; filename=\"Courbe Sprint.eml\""
-        ],
-        "content-type": [
-          "message/rfc822; name=\"Courbe Sprint.eml\""
-        ]
-      }
+      "headers": [
+        {
+          "key": "content-transfer-encoding",
+          "value": [
+            "8bit"
+          ]
+        },
+        {
+          "key": "content-disposition",
+          "value": [
+            "attachment; filename=\"Courbe Sprint.eml\""
+          ]
+        },
+        {
+          "key": "content-type",
+          "value": [
+            "message/rfc822; name=\"Courbe Sprint.eml\""
+          ]
+        }
+      ]
     },
     {
       "textContent": null,
       "mediaType": null,
       "subtype": null,
       "fileName": null,
-      "fileMetadata":{},
+      "fileMetadata": [],
       "fileExtension": null,
       "contentDisposition": null,
-      "headers": {
-        "date": [
-          "Wed, 03 Jun 2015 08:59:44 +0200"
-        ],
-        "mime-version": [
-          "1.0"
-        ],
-        "x-sieve": [
-          "CMU Sieve 2.2"
-        ],
-        "return-path": [
-          "<aduprat@linagora.com>"
-        ],
-        "subject": [
-          "Courbe Sprint"
-        ],
-        "message-id": [
-          "<556EA5E0.8010008@linagora.com>"
-        ],
-        "received": [
-          "from alderaan.linagora.com (smtp.linagora.dc1 [172.16.18.53])\t by imap (Cyrus v2.2.13-Debian-2.2.13-19+squeeze3) with LMTPA;\t Wed, 03 Jun 2015 08:59:45 +0200",
-          "from [10.69.43.36] (mne69-10-88-173-78-196.fbx.proxad.net [88.173.78.196])\t(using TLSv1 with cipher DHE-RSA-AES128-SHA (128/128 bits))\t(No client certificate requested)\tby alderaan.linagora.com (Postfix) with ESMTPSA id 4FBAF720\tfor <mbaechler@linagora.com>; Wed,  3 Jun 2015 08:59:45 +0200 (CEST)"
-        ],
-        "from": [
-          "Antoine DUPRAT <aduprat@linagora.com>"
-        ],
-        "content-type": [
-          "multipart/mixed; boundary=\"------------000406070706000403020805\""
-        ],
-        "to": [
-          "\"mbaechler@linagora.com\" <mbaechler@linagora.com>"
-        ],
-        "user-agent": [
-          "Mozilla/5.0 (X11; Linux x86_64; rv:31.0) Gecko/20100101 Thunderbird/31.6.0"
-        ]
-      }
+      "headers": [
+        {
+          "key": "date",
+          "value": [
+            "Wed, 03 Jun 2015 08:59:44 +0200"
+          ]
+        },
+        {
+          "key": "mime-version",
+          "value": [
+            "1.0"
+          ]
+        },
+        {
+          "key": "x-sieve",
+          "value": [
+            "CMU Sieve 2.2"
+          ]
+        },
+        {
+          "key": "return-path",
+          "value": [
+            "<aduprat@linagora.com>"
+          ]
+        },
+        {
+          "key": "subject",
+          "value": [
+            "Courbe Sprint"
+          ]
+        },
+        {
+          "key": "message-id",
+          "value": [
+            "<556EA5E0.8010008@linagora.com>"
+          ]
+        },
+        {
+          "key": "received",
+          "value": [
+            "from alderaan.linagora.com (smtp.linagora.dc1 [172.16.18.53])\t by imap (Cyrus v2.2.13-Debian-2.2.13-19+squeeze3) with LMTPA;\t Wed, 03 Jun 2015 08:59:45 +0200",
+            "from [10.69.43.36] (mne69-10-88-173-78-196.fbx.proxad.net [88.173.78.196])\t(using TLSv1 with cipher DHE-RSA-AES128-SHA (128/128 bits))\t(No client certificate requested)\tby alderaan.linagora.com (Postfix) with ESMTPSA id 4FBAF720\tfor <mbaechler@linagora.com>; Wed,  3 Jun 2015 08:59:45 +0200 (CEST)"
+          ]
+        },
+        {
+          "key": "from",
+          "value": [
+            "Antoine DUPRAT <aduprat@linagora.com>"
+          ]
+        },
+        {
+          "key": "content-type",
+          "value": [
+            "multipart/mixed; boundary=\"------------000406070706000403020805\""
+          ]
+        },
+        {
+          "key": "to",
+          "value": [
+            "\"mbaechler@linagora.com\" <mbaechler@linagora.com>"
+          ]
+        },
+        {
+          "key": "user-agent",
+          "value": [
+            "Mozilla/5.0 (X11; Linux x86_64; rv:31.0) Gecko/20100101 Thunderbird/31.6.0"
+          ]
+        }
+      ]
     },
     {
       "textContent": "Textual content of one attachment ( mail signature )\n",
@@ -181,36 +271,51 @@
       "subtype": "plain",
       "fileName": null,
       "fileExtension": null,
-      "fileMetadata":{},
+      "fileMetadata": [],
       "contentDisposition": null,
-      "headers": {
-        "content-transfer-encoding": [
-          "8bit"
-        ],
-        "content-type": [
-          "text/plain; charset=utf-8; format=flowed"
-        ]
-      }
+      "headers": [
+        {
+          "key": "content-transfer-encoding",
+          "value": [
+            "8bit"
+          ]
+        },
+        {
+          "key": "content-type",
+          "value": [
+            "text/plain; charset=utf-8; format=flowed"
+          ]
+        }
+      ]
     },
     {
       "textContent": null,
-      "fileMetadata":{},
+      "fileMetadata": [],
       "mediaType": "application",
       "subtype": "vnd.oasis.opendocument.spreadsheet",
       "fileName": "Sprint-2015-05-18.ods",
       "fileExtension": "ods",
       "contentDisposition": "attachment",
-      "headers": {
-        "content-transfer-encoding": [
-          "base64"
-        ],
-        "content-disposition": [
-          "attachment; filename=\"Sprint-2015-05-18.ods\""
-        ],
-        "content-type": [
-          "application/vnd.oasis.opendocument.spreadsheet; name=\"Sprint-2015-05-18.ods\""
-        ]
-      }
+      "headers": [
+        {
+          "key": "content-transfer-encoding",
+          "value": [
+            "base64"
+          ]
+        },
+        {
+          "key": "content-disposition",
+          "value": [
+            "attachment; filename=\"Sprint-2015-05-18.ods\""
+          ]
+        },
+        {
+          "key": "content-type",
+          "value": [
+            "application/vnd.oasis.opendocument.spreadsheet; name=\"Sprint-2015-05-18.ods\""
+          ]
+        }
+      ]
     }
   ],
   "textBody": "Forward as attachment !\n\n\n",

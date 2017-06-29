@@ -45,12 +45,12 @@ public interface JsonMessageConstants {
     String HTML_BODY = "htmlBody";
     String SENT_DATE = "sentDate";
     String ATTACHMENTS = "attachments";
+    String PROPERTIES = "properties";
     String TEXT = "text";
 
     /*
     James properties we can easily get
      */
-    String PROPERTIES = "properties";
     String MODSEQ = "modSeq";
     String USER_FLAGS = "userFlags";
     String IS_RECENT = "isRecent";
@@ -58,6 +58,11 @@ public interface JsonMessageConstants {
     String MEDIA_TYPE = "mediaType";
     String SUBTYPE = "subtype";
     String HAS_ATTACHMENT = "hasAttachment";
+
+    interface Header {
+        String KEY = "key";
+        String VALUE = "value";
+    }
 
     interface EMailer {
         String NAME = "name";
@@ -79,5 +84,4 @@ public interface JsonMessageConstants {
         String NAME = "name";
         String VALUE = "value";
     }
-
 }

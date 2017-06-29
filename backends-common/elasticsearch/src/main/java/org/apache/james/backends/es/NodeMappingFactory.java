@@ -30,8 +30,8 @@ public class NodeMappingFactory {
     public static final String INDEX = "index";
     public static final String NOT_ANALYZED = "not_analyzed";
     public static final String STRING = "string";
-    public static final String PROPERTIES = "properties";
     public static final String DATE = "date";
+    public static final String DYNAMIC = "dynamic";
     public static final String FORMAT = "format";
     public static final String NESTED = "nested";
     public static final String FIELDS = "fields";
@@ -39,6 +39,9 @@ public class NodeMappingFactory {
     public static final String ANALYZER = "analyzer";
     public static final String SNOWBALL = "snowball";
     public static final String IGNORE_ABOVE = "ignore_above";
+    public static final String OBJECT = "object";
+    public static final String PROPERTIES = "properties";
+    public static final int LUCENE_LIMIT = 32766;
 
     public static Client applyMapping(Client client, IndexName indexName, TypeName typeName, XContentBuilder mappingsSources) {
         client.admin()

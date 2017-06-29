@@ -46,6 +46,7 @@ import org.apache.james.mailbox.model.SearchQuery.HeaderOperator;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.TermQueryBuilder;
 
 public class CriterionConverter {
 
@@ -87,14 +88,26 @@ public class CriterionConverter {
     private <T extends Criterion> void registerCriterionConverter(Class<T> type, Function<T, QueryBuilder> f) {
         criterionConverterMap.put(type, (Function<Criterion, QueryBuilder>) f);
     }
-    
+
+    private QueryBuilder createHeaderNameQuery(String headerName) {
+        String path = JsonMessageConstants.HEADERS + "." + JsonMessageConstants.Header.KEY;
+
+        return termQuery(path, headerName);
+    }
+
+    private QueryBuilder createHeaderValueQuery(String headerValue) {
+        String path = JsonMessageConstants.HEADERS + "." + JsonMessageConstants.Header.VALUE;
+
+        return matchQuery(path, headerValue);
+    }
+
     private void registerHeaderOperatorConverters() {
 
         registerHeaderOperatorConverter(
             SearchQuery.ExistsOperator.class,
             (headerName, operator) ->
-                existsQuery(JsonMessageConstants.HEADERS + "." + headerName));
-        
+                nestedQuery(JsonMessageConstants.HEADERS, createHeaderNameQuery(headerName)));
+
         registerHeaderOperatorConverter(
             SearchQuery.AddressOperator.class,
             (headerName, operator) -> manageAddressFields(headerName, operator.getAddress()));
@@ -102,11 +115,14 @@ public class CriterionConverter {
         registerHeaderOperatorConverter(
             SearchQuery.DateOperator.class,
             (headerName, operator) -> dateRangeFilter(JsonMessageConstants.SENT_DATE, operator));
-        
+
         registerHeaderOperatorConverter(
             SearchQuery.ContainsOperator.class,
-            (headerName, operator) -> matchQuery(JsonMessageConstants.HEADERS + "." + headerName,
-                    operator.getValue()));
+            (headerName, operator) ->
+                nestedQuery(JsonMessageConstants.HEADERS,
+                    boolQuery()
+                        .must(createHeaderNameQuery(headerName))
+                        .must(createHeaderValueQuery(operator.getValue()))));
     }
 
     @SuppressWarnings("unchecked")

@@ -32,10 +32,17 @@ import org.apache.james.mailbox.extractor.TextExtractor;
 import org.apache.james.mailbox.store.mail.model.MailboxMessage;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.ser.std.StdDelegatingSerializer;
+import com.fasterxml.jackson.databind.type.TypeFactory;
+import com.fasterxml.jackson.databind.util.Converter;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Multimap;
 
 public class MessageToElasticSearchJson {
 
@@ -51,6 +58,7 @@ public class MessageToElasticSearchJson {
         this.mapper = new ObjectMapper();
         this.mapper.registerModule(new GuavaModule());
         this.mapper.registerModule(new Jdk8Module());
+        this.mapper.registerModule(getCustomMultimapModule());
     }
 
     @Inject
@@ -83,5 +91,42 @@ public class MessageToElasticSearchJson {
     public String getUpdatedJsonMessagePart(Flags flags, long modSeq) throws JsonProcessingException {
         Preconditions.checkNotNull(flags);
         return mapper.writeValueAsString(new MessageUpdateJson(flags, modSeq));
+    }
+
+    private Module getCustomMultimapModule() {
+        SimpleModule customMultimapModule = new SimpleModule();
+        customMultimapModule.addSerializer(Multimap.class, new StdDelegatingSerializer(getMultimapToJsonRepresentationConverter()));
+
+        return customMultimapModule;
+    }
+
+    private Converter<Multimap<String, Object>, MultimapJsonRepresentation<Object>> getMultimapToJsonRepresentationConverter() {
+        return new Converter<Multimap<String, Object>, MultimapJsonRepresentation<Object>>() {
+            @Override
+            public MultimapJsonRepresentation<Object> convert(Multimap<String, Object> multimap) {
+                return new MultimapJsonRepresentation<>(multimap);
+            }
+
+            @Override
+            public JavaType getInputType(TypeFactory typeFactory) {
+                return TypeFactory
+                    .defaultInstance()
+                    .constructParametrizedType(
+                        Multimap.class,
+                        Multimap.class,
+                        String.class,
+                        Object.class);
+            }
+
+            @Override
+            public JavaType getOutputType(TypeFactory typeFactory) {
+                return TypeFactory
+                    .defaultInstance()
+                    .constructParametrizedType(
+                        MultimapJsonRepresentation.class,
+                        MultimapJsonRepresentation.class,
+                        Object.class);
+            }
+        };
     }
 }
