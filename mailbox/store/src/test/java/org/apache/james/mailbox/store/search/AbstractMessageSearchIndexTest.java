@@ -710,6 +710,14 @@ public abstract class AbstractMessageSearchIndexTest {
     }
 
     @Test
+    public void headerContainsShouldReturnUidsOfMessageHavingThisHeaderWithAValueThatContainTheGivenString() throws Exception {
+        SearchQuery searchQuery = new SearchQuery(SearchQuery.headerContains("Subject", "Convert Message into JSON"));
+
+        assertThat(messageSearchIndex.search(session, mailbox, searchQuery))
+            .containsOnly(m2.getUid());
+    }
+
+    @Test
     public void headerExistsShouldReturnUidsOfMessageHavingThisHeader() throws Exception {
         SearchQuery searchQuery = new SearchQuery(SearchQuery.headerExists("Precedence"));
 
