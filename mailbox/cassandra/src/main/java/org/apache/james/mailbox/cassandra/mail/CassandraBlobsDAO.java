@@ -31,12 +31,14 @@ import java.nio.ByteBuffer;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import javax.inject.Inject;
 
 import org.apache.james.backends.cassandra.utils.CassandraAsyncExecutor;
 import org.apache.james.backends.cassandra.utils.CassandraUtils;
+import org.apache.james.util.CompletableFutureUtil;
 import org.apache.james.util.FluentFutureStream;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -47,7 +49,9 @@ import com.datastax.driver.core.Session;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
 import com.datastax.driver.core.utils.UUIDs;
 import com.github.steveash.guavate.Guavate;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.primitives.Bytes;
 
 public class CassandraBlobsDAO {
 
@@ -117,15 +121,30 @@ public class CassandraBlobsDAO {
             .thenApply(any -> Optional.of(uuid));
     }
 
-    public InputStream read(UUID blobId) {
-        ImmutableMap<Long, UUID> partIds = CassandraUtils.convertToStream(readBlob(blobId)
-            .join())
-            .map(row -> Pair.of(row.getLong(Blobs.POSITION), row.getUUID(Blobs.PART)))
-            .collect(Guavate.toImmutableMap(Pair::getKey, Pair::getValue));
-        return new SequenceInputStream(
-                        new CassandraBackedInputStreamEnumeration(i -> readPart(partIds.get(Long.valueOf(i)))));
+    public CompletableFuture<byte[]> read(UUID blobId) {
+        return readBlob(blobId)
+            .thenApply(resultSet -> CassandraUtils.convertToStream(resultSet)
+                .map(row -> Pair.of(row.getLong(Blobs.POSITION), row.getUUID(Blobs.PART)))
+                .collect(Guavate.toImmutableMap(Pair::getKey, Pair::getValue)))
+            .thenCompose(positionToIds -> CompletableFutureUtil.chainAll(
+                positionToIds.values().stream(),
+                this::readPart))
+            .thenApply(rows -> readRows(rows));
     }
 
+    private byte[] readRows(Stream<Optional<Row>> rows) {
+        ImmutableList<byte[]> parts = rows.filter(Optional::isPresent)
+            .map(row -> rowToData(row.get()))
+            .collect(Guavate.toImmutableList());
+
+        return Bytes.concat(parts.toArray(new byte[][] {}));
+    }
+
+    private byte[] rowToData(Row row) {
+        byte[] data = new byte[row.getBytes(BlobParts.DATA).remaining()];
+        row.getBytes(BlobParts.DATA).get(data);
+        return data;
+    }
 
     public CompletableFuture<ResultSet> readBlob(UUID blobId) {
         return cassandraAsyncExecutor.execute(select.bind()

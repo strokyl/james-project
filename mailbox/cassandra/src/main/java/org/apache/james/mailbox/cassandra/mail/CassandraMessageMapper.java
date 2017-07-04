@@ -76,6 +76,7 @@ public class CassandraMessageMapper implements MessageMapper {
     private final CassandraUidProvider uidProvider;
     private final int maxRetries;
     private final CassandraMessageDAO messageDAO;
+    private final CassandraMessageDAOV2 messageDAOV2;
     private final CassandraMessageIdDAO messageIdDAO;
     private final CassandraMessageIdToImapUidDAO imapUidDAO;
     private final CassandraMailboxCounterDAO mailboxCounterDAO;
@@ -88,7 +89,8 @@ public class CassandraMessageMapper implements MessageMapper {
 
     public CassandraMessageMapper(CassandraUidProvider uidProvider, CassandraModSeqProvider modSeqProvider,
                                   MailboxSession mailboxSession, int maxRetries, CassandraAttachmentMapper attachmentMapper,
-                                  CassandraMessageDAO messageDAO, CassandraMessageIdDAO messageIdDAO, CassandraMessageIdToImapUidDAO imapUidDAO,
+                                  CassandraMessageDAO messageDAO, CassandraMessageDAOV2 messageDAOV2,
+                                  CassandraMessageIdDAO messageIdDAO, CassandraMessageIdToImapUidDAO imapUidDAO,
                                   CassandraMailboxCounterDAO mailboxCounterDAO, CassandraMailboxRecentsDAO mailboxRecentDAO, CassandraApplicableFlagDAO applicableFlagDAO,
                                   CassandraIndexTableHandler indexTableHandler, CassandraFirstUnseenDAO firstUnseenDAO, CassandraDeletedMessageDAO deletedMessageDAO) {
         this.uidProvider = uidProvider;
@@ -96,6 +98,7 @@ public class CassandraMessageMapper implements MessageMapper {
         this.mailboxSession = mailboxSession;
         this.maxRetries = maxRetries;
         this.messageDAO = messageDAO;
+        this.messageDAOV2 = messageDAOV2;
         this.messageIdDAO = messageIdDAO;
         this.imapUidDAO = imapUidDAO;
         this.mailboxCounterDAO = mailboxCounterDAO;
@@ -184,7 +187,7 @@ public class CassandraMessageMapper implements MessageMapper {
     }
 
     private CompletableFuture<Stream<SimpleMailboxMessage>> retrieveMessages(List<ComposedMessageIdWithMetaData> messageIds, FetchType fetchType, Optional<Integer> limit) {
-        CompletableFuture<Stream<Pair<CassandraMessageDAO.MessageWithoutAttachment, Stream<CassandraMessageDAO.MessageAttachmentRepresentation>>>>
+        CompletableFuture<Stream<Pair<MessageWithoutAttachment, Stream<MessageAttachmentRepresentation>>>>
             messageRepresentations = messageDAO.retrieveMessages(messageIds, fetchType, limit);
         if (fetchType == FetchType.Body || fetchType == FetchType.Full) {
             return FluentFutureStream.of(messageRepresentations)
@@ -378,7 +381,7 @@ public class CassandraMessageMapper implements MessageMapper {
 
     private CompletableFuture<Void> save(Mailbox mailbox, MailboxMessage message) throws MailboxException {
         CassandraId mailboxId = (CassandraId) mailbox.getMailboxId();
-        return messageDAO.save(message)
+        return messageDAOV2.save(message)
             .thenCompose(aVoid -> insertIds(message, mailboxId));
     }
 

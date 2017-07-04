@@ -76,4 +76,8 @@ public class MessageWithoutAttachment {
     public SharedByteArrayInputStream getContent() {
         return content;
     }
+
+    public PropertyBuilder getPropertyBuilder() {
+        return propertyBuilder;
+    }
 }

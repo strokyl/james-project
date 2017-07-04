@@ -109,11 +109,15 @@ public class CassandraMapperProvider implements MapperProvider {
         CassandraMailboxPathDAO mailboxPathDAO = new CassandraMailboxPathDAO(cassandra.getConf(), cassandra.getTypesProvider());
         CassandraFirstUnseenDAO firstUnseenDAO = new CassandraFirstUnseenDAO(cassandra.getConf());
         CassandraDeletedMessageDAO deletedMessageDAO = new CassandraDeletedMessageDAO(cassandra.getConf());
+        CassandraBlobsDAO blobsDAO = new CassandraBlobsDAO(cassandra.getConf());
+        CassandraMessageDAO messageDAO = new CassandraMessageDAO(cassandra.getConf(), cassandra.getTypesProvider());
+        CassandraMessageDAOV2 messageDAOV2 = new CassandraMessageDAOV2(cassandra.getConf(), cassandra.getTypesProvider(), blobsDAO);
         return new CassandraMailboxSessionMapperFactory(
             new CassandraUidProvider(cassandra.getConf()),
             cassandraModSeqProvider,
             cassandra.getConf(),
-            new CassandraMessageDAO(cassandra.getConf(), cassandra.getTypesProvider()),
+            messageDAO,
+            messageDAOV2,
             new CassandraMessageIdDAO(cassandra.getConf(), MESSAGE_ID_FACTORY),
             new CassandraMessageIdToImapUidDAO(cassandra.getConf(), MESSAGE_ID_FACTORY),
             new CassandraMailboxCounterDAO(cassandra.getConf()),

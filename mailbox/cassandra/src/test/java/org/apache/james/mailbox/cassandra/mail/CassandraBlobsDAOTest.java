@@ -66,7 +66,7 @@ public class CassandraBlobsDAOTest {
     public void saveShouldSaveEmptyData() throws Exception {
         Optional<UUID> uuid = testee.save(new byte[]{}).join();
 
-        byte[] bytes = IOUtils.toByteArray(testee.read(uuid.get()));
+        byte[] bytes = testee.read(uuid.get()).join();
 
         assertThat(uuid.isPresent()).isTrue();
         assertThat(new String(bytes, Charsets.UTF_8)).isEmpty();
@@ -76,7 +76,7 @@ public class CassandraBlobsDAOTest {
     public void saveShouldSaveBlankData() throws Exception {
         Optional<UUID> uuid = testee.save("".getBytes(Charsets.UTF_8)).join();
 
-        byte[] bytes = IOUtils.toByteArray(testee.read(uuid.get()));
+        byte[] bytes = testee.read(uuid.get()).join();
 
         assertThat(uuid.isPresent()).isTrue();
         assertThat(new String(bytes, Charsets.UTF_8)).isEmpty();
@@ -91,7 +91,7 @@ public class CassandraBlobsDAOTest {
 
     @Test
     public void readShouldBeEmptyWhenNoExisting() throws IOException {
-        byte[] bytes = IOUtils.toByteArray(testee.read(UUIDs.timeBased()));
+        byte[] bytes = testee.read(UUIDs.timeBased()).join();
 
         assertThat(bytes).isEmpty();
     }
@@ -100,7 +100,7 @@ public class CassandraBlobsDAOTest {
     public void readShouldReturnSavedData() throws IOException {
         Optional<UUID> uuid = testee.save("toto".getBytes(Charsets.UTF_8)).join();
 
-        byte[] bytes = IOUtils.toByteArray(testee.read(uuid.get()));
+        byte[] bytes = testee.read(uuid.get()).join();
 
         assertThat(new String(bytes, Charsets.UTF_8)).isEqualTo("toto");
     }
@@ -110,7 +110,7 @@ public class CassandraBlobsDAOTest {
         String longString = Strings.repeat("0123456789\n", 1000);
         Optional<UUID> uuid = testee.save(longString.getBytes(Charsets.UTF_8)).join();
 
-        byte[] bytes = IOUtils.toByteArray(testee.read(uuid.get()));
+        byte[] bytes = testee.read(uuid.get()).join();
 
         assertThat(new String(bytes, Charsets.UTF_8)).isEqualTo(longString);
     }
@@ -120,7 +120,7 @@ public class CassandraBlobsDAOTest {
         String longString = Strings.repeat("0123456789\n", MULTIPLE_CHUNK_SIZE);
         Optional<UUID> uuid = testee.save(longString.getBytes(Charsets.UTF_8)).join();
 
-        byte[] bytes = IOUtils.toByteArray(testee.read(uuid.get()));
+        byte[] bytes = testee.read(uuid.get()).join();
 
         assertThat(new String(bytes, Charsets.UTF_8)).isEqualTo(longString);
     }
