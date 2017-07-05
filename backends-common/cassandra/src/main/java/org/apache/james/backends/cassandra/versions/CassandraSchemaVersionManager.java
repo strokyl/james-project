@@ -19,6 +19,11 @@
 
 package org.apache.james.backends.cassandra.versions;
 
+import static org.apache.james.backends.cassandra.versions.CassandraSchemaVersionManager.SchemaState.UP_TO_DATE;
+import static org.apache.james.backends.cassandra.versions.CassandraSchemaVersionManager.SchemaState.UPGRADABLE;
+import static org.apache.james.backends.cassandra.versions.CassandraSchemaVersionManager.SchemaState.TOO_OLD;
+import static org.apache.james.backends.cassandra.versions.CassandraSchemaVersionManager.SchemaState.TOO_RECENT;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 
@@ -36,7 +41,14 @@ public class CassandraSchemaVersionManager {
 
     private final int minVersion;
     private final int maxVersion;
-    private final int version;
+    private final CassandraSchemaVersionDAO schemaVersionDAO;
+
+    public enum SchemaState {
+        UP_TO_DATE,
+        TOO_RECENT,
+        TOO_OLD,
+        UPGRADABLE
+    }
 
     @Inject
     public CassandraSchemaVersionManager(CassandraSchemaVersionDAO schemaVersionDAO) {
@@ -50,9 +62,13 @@ public class CassandraSchemaVersionManager {
         Preconditions.checkArgument(maxVersion >= minVersion,
             "maxVersion should not be inferior to minVersion");
 
+        this.schemaVersionDAO = schemaVersionDAO;
         this.minVersion = minVersion;
         this.maxVersion = maxVersion;
-        this.version = schemaVersionDAO
+    }
+
+    public int computeVersion() {
+        return schemaVersionDAO
             .getCurrentSchemaVersion()
             .join()
             .orElseGet(() -> {
@@ -60,10 +76,6 @@ public class CassandraSchemaVersionManager {
                     CassandraSchemaVersionManager.DEFAULT_VERSION);
                 return DEFAULT_VERSION;
             });
-    }
-
-    public int getVersion() {
-        return version;
     }
 
     public int getMinimumSupportedVersion() {
@@ -74,23 +86,16 @@ public class CassandraSchemaVersionManager {
         return maxVersion;
     }
 
-    public void ensureSchemaIsSupported() {
+    public SchemaState computeSchemaState() {
+        int version = computeVersion();
         if (version < minVersion) {
-
-            throw new IllegalStateException(
-                String.format("Current schema version is %d whereas minimum required version is %d. " +
-                    "Recommended version is %d", version, minVersion, maxVersion));
+            return TOO_OLD;
         } else if (version < maxVersion) {
-
-            LOGGER.warn("Current schema version is %d. Recommended version is %d", version, maxVersion);
+            return UPGRADABLE;
         } else if (version == maxVersion){
-
-            LOGGER.info("Schema version is up-to-date");
+            return UP_TO_DATE;
         } else {
-
-            throw new IllegalStateException(
-                String.format("Current schema version is %d whereas the minimum supported version is %d. " +
-                    "Recommended version is %d.", version, minVersion, maxVersion));
+            return TOO_RECENT;
         }
     }
 
