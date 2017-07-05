@@ -34,7 +34,6 @@ public class CassandraSchemaVersionDAOTest {
 
     private CassandraSchemaVersionDAO testee;
 
-
     @Before
     public void setUp() {
         cassandra = CassandraCluster.create(new CassandraSchemaVersionModule());
@@ -60,6 +59,16 @@ public class CassandraSchemaVersionDAOTest {
 
         testee.updateVersion(version).join();
 
-        assertThat(testee.getCurrentSchemaVersion().join()).isEqualTo(Optional.of(version));
+        assertThat(testee.getCurrentSchemaVersion().join()).contains(version);
+    }
+
+    @Test
+    public void getCurrentSchemaVersionShouldBeIdempotent() {
+        int version = 42;
+
+        testee.updateVersion(version + 1).join();
+        testee.updateVersion(version).join();
+
+        assertThat(testee.getCurrentSchemaVersion().join()).contains(version + 1);
     }
 }
