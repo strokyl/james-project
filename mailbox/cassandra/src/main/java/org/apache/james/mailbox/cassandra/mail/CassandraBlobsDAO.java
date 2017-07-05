@@ -137,7 +137,7 @@ public class CassandraBlobsDAO {
             .map(row -> rowToData(row.get()))
             .collect(Guavate.toImmutableList());
 
-        return Bytes.concat(parts.toArray(new byte[][] {}));
+        return Bytes.concat(parts.toArray(new byte[parts.size()][]));
     }
 
     private byte[] rowToData(Row row) {
