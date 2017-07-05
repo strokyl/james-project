@@ -38,6 +38,7 @@ import javax.inject.Inject;
 
 import org.apache.james.backends.cassandra.utils.CassandraAsyncExecutor;
 import org.apache.james.backends.cassandra.utils.CassandraUtils;
+import org.apache.james.mailbox.cassandra.HashByte;
 import org.apache.james.util.CompletableFutureUtil;
 import org.apache.james.util.FluentFutureStream;
 import org.apache.commons.lang3.tuple.Pair;
@@ -105,23 +106,34 @@ public class CassandraBlobsDAO {
                 .where(eq(Blobs.ID, bindMarker(Blobs.ID))));
     }
 
-    public CompletableFuture<Optional<UUID>> save(byte[] data) {
+    public CompletableFuture<Optional<String>> save(byte[] data) {
         if (data == null) {
             return CompletableFuture.completedFuture(Optional.empty());
         }
-        UUID uuid = UUIDs.timeBased();
+        String id = HashByte.hash(data);
+
+        return alreadyExist(id).thenCompose(alreadyExist -> {
+            if (alreadyExist) {
+                return CompletableFuture.completedFuture(Optional.of(id));
+            } else {
+                return saveWithoutCheckingExistance(id, data);
+            }
+        });
+    }
+
+    private CompletableFuture<Optional<String>> saveWithoutCheckingExistance(String id, byte [] data) {
         return FluentFutureStream.of(
             saveBlobParts(data)
                 .map(pair ->
                     cassandraAsyncExecutor.executeVoid(insert.bind()
-                        .setUUID(Blobs.ID, uuid)
+                        .setString(Blobs.ID, id)
                         .setLong(Blobs.POSITION, pair.getKey())
                         .setUUID(Blobs.PART, pair.getValue()))))
             .completableFuture()
-            .thenApply(any -> Optional.of(uuid));
+            .thenApply(any -> Optional.of(id));
     }
 
-    public CompletableFuture<byte[]> read(UUID blobId) {
+    public CompletableFuture<byte[]> read(String blobId) {
         return readBlob(blobId)
             .thenApply(resultSet -> CassandraUtils.convertToStream(resultSet)
                 .map(row -> Pair.of(row.getLong(Blobs.POSITION), row.getUUID(Blobs.PART)))
@@ -146,9 +158,14 @@ public class CassandraBlobsDAO {
         return data;
     }
 
-    public CompletableFuture<ResultSet> readBlob(UUID blobId) {
+    public CompletableFuture<ResultSet> readBlob(String blobId) {
         return cassandraAsyncExecutor.execute(select.bind()
-                .setUUID(Blobs.ID, blobId));
+                .setString(Blobs.ID, blobId));
+    }
+
+    private CompletableFuture<Boolean> alreadyExist(String blobId) {
+        return readBlob(blobId)
+            .thenApply(row -> row.one() != null);
     }
 
     private CompletableFuture<Optional<Row>> readPart(UUID partId) {

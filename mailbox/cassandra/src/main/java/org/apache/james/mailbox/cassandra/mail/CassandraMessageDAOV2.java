@@ -87,7 +87,7 @@ import org.slf4j.LoggerFactory;
 public class CassandraMessageDAOV2 {
     public static final int CHUNK_SIZE_ON_READ = 100;
     public static final long DEFAULT_LONG_VALUE = 0L;
-    public static final UUID DEFAULT_OBJECT_VALUE = null;
+    public static final String DEFAULT_OBJECT_VALUE = null;
     private final CassandraAsyncExecutor cassandraAsyncExecutor;
     private final CassandraTypesProvider typesProvider;
     private final CassandraBlobsDAO blobsDAO;
@@ -142,13 +142,13 @@ public class CassandraMessageDAOV2 {
             cassandraAsyncExecutor.executeVoid(boundWriteStatement(message, pair)));
     }
 
-    private CompletableFuture<Pair<Optional<UUID>, Optional<UUID>>> saveContent(MailboxMessage message) throws MailboxException {
+    private CompletableFuture<Pair<Optional<String>, Optional<String>>> saveContent(MailboxMessage message) throws MailboxException {
         try {
-            CompletableFuture<Optional<UUID>> bodyContent = blobsDAO.save(
+            CompletableFuture<Optional<String>> bodyContent = blobsDAO.save(
                 IOUtils.toByteArray(
                     message.getBodyContent(),
                     message.getBodyOctets()));
-            CompletableFuture<Optional<UUID>> headerContent = blobsDAO.save(
+            CompletableFuture<Optional<String>> headerContent = blobsDAO.save(
                 IOUtils.toByteArray(
                     message.getHeaderContent(),
                     message.getFullContentOctets() - message.getBodyOctets()));
@@ -161,7 +161,7 @@ public class CassandraMessageDAOV2 {
         }
     }
 
-    private BoundStatement boundWriteStatement(MailboxMessage message, Pair<Optional<UUID>, Optional<UUID>> pair) {
+    private BoundStatement boundWriteStatement(MailboxMessage message, Pair<Optional<String>, Optional<String>> pair) {
         CassandraMessageId messageId = (CassandraMessageId) message.getMessageId();
         return insert.bind()
                 .setUUID(MESSAGE_ID, messageId.get())
@@ -169,8 +169,8 @@ public class CassandraMessageDAOV2 {
                 .setInt(BODY_START_OCTET, (int) (message.getFullContentOctets() - message.getBodyOctets()))
                 .setLong(FULL_CONTENT_OCTETS, message.getFullContentOctets())
                 .setLong(BODY_OCTECTS, message.getBodyOctets())
-                .setUUID(BODY_CONTENT, pair.getLeft().orElse(DEFAULT_OBJECT_VALUE))
-                .setUUID(HEADER_CONTENT, pair.getRight().orElse(DEFAULT_OBJECT_VALUE))
+                .setString(BODY_CONTENT, pair.getLeft().orElse(DEFAULT_OBJECT_VALUE))
+                .setString(HEADER_CONTENT, pair.getRight().orElse(DEFAULT_OBJECT_VALUE))
                 .setLong(TEXTUAL_LINE_COUNT, Optional.ofNullable(message.getTextualLineCount()).orElse(DEFAULT_LONG_VALUE))
                 .setList(PROPERTIES, message.getProperties().stream()
                         .map(x -> typesProvider.getDefinedUserType(PROPERTIES)
@@ -323,6 +323,6 @@ public class CassandraMessageDAOV2 {
     }
 
     private CompletableFuture<byte[]> getFieldContent(String field, Row row) {
-        return blobsDAO.read(row.getUUID(field));
+        return blobsDAO.read(row.getString(field));
     }
 }

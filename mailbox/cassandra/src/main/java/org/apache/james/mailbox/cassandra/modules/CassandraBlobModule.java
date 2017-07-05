@@ -41,13 +41,13 @@ public class CassandraBlobModule implements CassandraModule {
                 new CassandraTable(Blobs.TABLE_NAME,
                         SchemaBuilder.createTable(Blobs.TABLE_NAME)
                                 .ifNotExists()
-                                .addPartitionKey(Blobs.ID, DataType.timeuuid())
+                                .addPartitionKey(Blobs.ID, DataType.text())
                                 .addClusteringColumn(Blobs.POSITION, DataType.bigint())
                                 .addColumn(Blobs.PART, DataType.timeuuid())),
                 new CassandraTable(BlobParts.TABLE_NAME,
                         SchemaBuilder.createTable(BlobParts.TABLE_NAME)
                                 .ifNotExists()
-                                .addPartitionKey(BlobParts.ID, DataType.timeuuid())
+                                .addPartitionKey(BlobParts.ID, DataType.text())
                                 .addColumn(BlobParts.DATA, DataType.blob())));
         types = ImmutableList.of();
     }
