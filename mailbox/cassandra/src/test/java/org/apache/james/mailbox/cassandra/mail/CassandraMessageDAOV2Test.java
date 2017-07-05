@@ -36,6 +36,7 @@ import org.apache.james.backends.cassandra.init.CassandraModuleComposite;
 import org.apache.james.mailbox.MessageUid;
 import org.apache.james.mailbox.cassandra.CassandraId;
 import org.apache.james.mailbox.cassandra.CassandraMessageId;
+import org.apache.james.mailbox.cassandra.Limit;
 import org.apache.james.mailbox.cassandra.modules.CassandraBlobModule;
 import org.apache.james.mailbox.cassandra.modules.CassandraMessageModule;
 import org.apache.james.mailbox.model.ComposedMessageId;
@@ -59,7 +60,6 @@ public class CassandraMessageDAOV2Test {
     private static final CassandraId MAILBOX_ID = CassandraId.timeBased();
     private static final String CONTENT = "Subject: Test7 \n\nBody7\n.\n";
     private static final MessageUid messageUid = MessageUid.of(1);
-    public static final Optional<Integer> UNLIMITED = Optional.empty();
 
     private CassandraCluster cassandra;
 
@@ -104,7 +104,7 @@ public class CassandraMessageDAOV2Test {
         testee.save(message).join();
 
         MessageWithoutAttachment attachmentRepresentation =
-            toMessage(testee.retrieveMessages(messageIds, MessageMapper.FetchType.Metadata, UNLIMITED));
+            toMessage(testee.retrieveMessages(messageIds, MessageMapper.FetchType.Metadata, Limit.unlimited()));
 
         assertThat(attachmentRepresentation.getPropertyBuilder().getTextualLineCount())
             .isEqualTo(0L);
@@ -120,7 +120,7 @@ public class CassandraMessageDAOV2Test {
         testee.save(message).join();
 
         MessageWithoutAttachment attachmentRepresentation =
-            toMessage(testee.retrieveMessages(messageIds, MessageMapper.FetchType.Metadata, UNLIMITED));
+            toMessage(testee.retrieveMessages(messageIds, MessageMapper.FetchType.Metadata, Limit.unlimited()));
 
         assertThat(attachmentRepresentation.getPropertyBuilder().getTextualLineCount()).isEqualTo(textualLineCount);
     }
@@ -132,7 +132,7 @@ public class CassandraMessageDAOV2Test {
         testee.save(message).join();
 
         MessageWithoutAttachment attachmentRepresentation =
-            toMessage(testee.retrieveMessages(messageIds, MessageMapper.FetchType.Full, UNLIMITED));
+            toMessage(testee.retrieveMessages(messageIds, MessageMapper.FetchType.Full, Limit.unlimited()));
 
         assertThat(IOUtils.toString(attachmentRepresentation.getContent(), Charsets.UTF_8))
             .isEqualTo(CONTENT);
@@ -145,7 +145,7 @@ public class CassandraMessageDAOV2Test {
         testee.save(message).join();
 
         MessageWithoutAttachment attachmentRepresentation =
-            toMessage(testee.retrieveMessages(messageIds, MessageMapper.FetchType.Body, UNLIMITED));
+            toMessage(testee.retrieveMessages(messageIds, MessageMapper.FetchType.Body, Limit.unlimited()));
 
         assertThat(IOUtils.toString(attachmentRepresentation.getContent(), Charsets.UTF_8))
             .isEqualTo(CONTENT.substring(BODY_START));
@@ -158,7 +158,7 @@ public class CassandraMessageDAOV2Test {
         testee.save(message).join();
 
         MessageWithoutAttachment attachmentRepresentation =
-            toMessage(testee.retrieveMessages(messageIds, MessageMapper.FetchType.Headers, UNLIMITED));
+            toMessage(testee.retrieveMessages(messageIds, MessageMapper.FetchType.Headers, Limit.unlimited()));
 
         assertThat(IOUtils.toString(attachmentRepresentation.getContent(), Charsets.UTF_8))
             .isEqualTo(CONTENT.substring(0, BODY_START));
@@ -170,11 +170,12 @@ public class CassandraMessageDAOV2Test {
             propertyBuilder, MAILBOX_ID);
     }
 
-    private MessageWithoutAttachment toMessage(CompletableFuture<Stream<Pair<MessageWithoutAttachment, Stream<MessageAttachmentRepresentation>>>> readOptional) throws InterruptedException, java.util.concurrent.ExecutionException {
+    private MessageWithoutAttachment toMessage(
+        CompletableFuture<Stream<Pair<MessageWithoutAttachment, Stream<MessageAttachmentRepresentation>>>> readOptional
+    ) throws InterruptedException, java.util.concurrent.ExecutionException {
         return readOptional.join()
             .map(Pair::getLeft)
             .findAny()
             .orElseThrow(() -> new IllegalStateException("Collection is not supposed to be empty"));
     }
-
 }

@@ -35,6 +35,7 @@ import org.apache.james.mailbox.MailboxSession;
 import org.apache.james.mailbox.MessageManager;
 import org.apache.james.mailbox.cassandra.CassandraId;
 import org.apache.james.mailbox.cassandra.CassandraMessageId;
+import org.apache.james.mailbox.cassandra.Limit;
 import org.apache.james.mailbox.exception.MailboxException;
 import org.apache.james.mailbox.model.ComposedMessageId;
 import org.apache.james.mailbox.model.ComposedMessageIdWithMetaData;
@@ -100,7 +101,8 @@ public class CassandraMessageIdMapper implements MessageIdMapper {
                 .map(messageId -> imapUidDAO.retrieve((CassandraMessageId) messageId, Optional.empty())))
             .thenApply(stream -> stream.flatMap(Function.identity()))
             .thenApply(stream -> stream.collect(Guavate.toImmutableList()))
-            .thenCompose(composedMessageIds -> messageDAO.retrieveMessages(composedMessageIds, fetchType, Optional.empty()))
+            .thenCompose(composedMessageIds ->
+                messageDAO.retrieveMessages(composedMessageIds, fetchType, Limit.unlimited()))
             .thenCompose(stream -> CompletableFutureUtil.allOf(
                 stream.map(pair -> mailboxExists(pair.getLeft())
                     .thenApply(b -> Optional.of(pair).filter(any -> b)))))

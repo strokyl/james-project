@@ -52,6 +52,7 @@ import javax.mail.util.SharedByteArrayInputStream;
 import org.apache.james.backends.cassandra.init.CassandraTypesProvider;
 import org.apache.james.backends.cassandra.utils.CassandraAsyncExecutor;
 import org.apache.james.mailbox.cassandra.CassandraMessageId;
+import org.apache.james.mailbox.cassandra.Limit;
 import org.apache.james.mailbox.cassandra.table.CassandraMessageV2Table.Attachments;
 import org.apache.james.mailbox.cassandra.table.CassandraMessageV2Table.Properties;
 import org.apache.james.mailbox.exception.MailboxException;
@@ -84,8 +85,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class CassandraMessageDAOV2 {
-    private static final Logger LOG = LoggerFactory.getLogger(CassandraMessageDAOV2.class);
-
     public static final int CHUNK_SIZE_ON_READ = 100;
     public static final long DEFAULT_LONG_VALUE = 0L;
     public static final UUID DEFAULT_OBJECT_VALUE = null;
@@ -194,9 +193,10 @@ public class CassandraMessageDAOV2 {
             .setBool(Attachments.IS_INLINE, messageAttachment.isInline());
     }
 
-    public CompletableFuture<Stream<Pair<MessageWithoutAttachment, Stream<MessageAttachmentRepresentation>>>> retrieveMessages(List<ComposedMessageIdWithMetaData> messageIds, FetchType fetchType, Optional<Integer> limit) {
+    public CompletableFuture<Stream<Pair<MessageWithoutAttachment, Stream<MessageAttachmentRepresentation>>>>
+    retrieveMessages(List<ComposedMessageIdWithMetaData> messageIds, FetchType fetchType, Limit limit) {
         return CompletableFutureUtil.chainAll(
-            getLimitedIdStream(messageIds.stream().distinct(), limit)
+            limit.applyOnStream(messageIds.stream().distinct())
                 .collect(JamesCollectors.chunker(CHUNK_SIZE_ON_READ)),
             ids -> FluentFutureStream.of(
                 ids.stream()
@@ -205,13 +205,6 @@ public class CassandraMessageDAOV2 {
                             message(resultSet.one(), id, fetchType))))
                 .completableFuture())
             .thenApply(stream -> stream.flatMap(Function.identity()));
-    }
-
-    private Stream<ComposedMessageIdWithMetaData> getLimitedIdStream(Stream<ComposedMessageIdWithMetaData> messageIds, Optional<Integer> limit) {
-        return limit
-            .filter(value -> value > 0)
-            .map(messageIds::limit)
-            .orElse(messageIds);
     }
 
     private CompletableFuture<ResultSet> retrieveRow(ComposedMessageIdWithMetaData messageId, FetchType fetchType) {
