@@ -72,7 +72,6 @@ public class CassandraMessageMapper implements MessageMapper {
     public static final int EXPUNGE_BATCH_SIZE = 100;
     public static final int UPDATE_FLAGS_BATCH_SIZE = 20;
     public static final Logger LOGGER = LoggerFactory.getLogger(CassandraMessageMapper.class);
-    public static final Optional<Integer> UNLIMITED = Optional.empty();
 
     private final CassandraModSeqProvider modSeqProvider;
     private final MailboxSession mailboxSession;
@@ -193,16 +192,8 @@ public class CassandraMessageMapper implements MessageMapper {
         CompletableFuture<Stream<Pair<MessageWithoutAttachment, Stream<MessageAttachmentRepresentation>>>>
             messageRepresentations = retrieveMessagesAndDoMigrationIfNeeded(messageIds, fetchType, limit);
 
-        if (fetchType == FetchType.Body || fetchType == FetchType.Full) {
-            return attachmentLoader.toMailboxMessageWithAttachments(messageRepresentations);
-        } else {
-            return FluentFutureStream.of(messageRepresentations)
-                .map(pair ->
-                    pair
-                        .getLeft()
-                        .toMailboxMessage(ImmutableList.of()))
-                .completableFuture();
-        }
+        return messageRepresentations
+            .thenCompose(stream -> attachmentLoader.addAttachmentToMessages(stream, fetchType));
     }
 
 
