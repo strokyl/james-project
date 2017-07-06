@@ -97,7 +97,7 @@ public class CassandraMessageIdMapper implements MessageIdMapper {
     }
 
     private Stream<SimpleMailboxMessage> findAsStream(List<MessageId> messageIds, FetchType fetchType) {
-        return FluentFutureStream.ofUnboxedStreams(
+        return FluentFutureStream.ofNestedStreams(
             messageIds.stream()
                 .map(messageId -> imapUidDAO.retrieve((CassandraMessageId) messageId, Optional.empty())))
             .completableFuture()
@@ -118,7 +118,7 @@ public class CassandraMessageIdMapper implements MessageIdMapper {
     }
 
     private CompletableFuture<Stream<SimpleMailboxMessage>> filterMessagesWithExistingMailbox(Stream<SimpleMailboxMessage> stream) {
-        return FluentFutureStream.ofUnboxedStreams(stream.map(this::mailboxExists))
+        return FluentFutureStream.ofNestedStreams(stream.map(this::mailboxExists))
             .completableFuture();
     }
 

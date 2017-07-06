@@ -34,14 +34,14 @@ public class FluentFutureStream<T> {
         return new FluentFutureStream<>(completableFuture);
     }
 
-    public static <T> FluentFutureStream<T> ofUnboxedStreams(Stream<CompletableFuture<Stream<T>>> completableFuture) {
+    public static <T> FluentFutureStream<T> ofNestedStreams(Stream<CompletableFuture<Stream<T>>> completableFuture) {
         return of(completableFuture)
-            .flatMap(s -> s);
+            .flatMap(Function.identity());
     }
 
-    public static <T> FluentFutureStream<T> ofUnboxedOptionals(Stream<CompletableFuture<Optional<T>>> completableFuture) {
+    public static <T> FluentFutureStream<T> ofOptionals(Stream<CompletableFuture<Optional<T>>> completableFuture) {
         return of(completableFuture)
-            .flatMapOptional(s -> s);
+            .flatMapOptional(Function.identity());
     }
 
     public static <T> FluentFutureStream<T> of(Stream<CompletableFuture<T>> completableFutureStream) {
@@ -80,16 +80,16 @@ public class FluentFutureStream<T> {
             CompletableFutureUtil.thenComposeOnAll(completableFuture(), function));
     }
 
-    public <U> FluentFutureStream<U> thenComposeOnAllUnboxed(Function<T, CompletableFuture<Stream<U>>> function) {
+    public <U> FluentFutureStream<U> thenFlatCompose(Function<T, CompletableFuture<Stream<U>>> function) {
         return FluentFutureStream.of(
             CompletableFutureUtil.thenComposeOnAll(completableFuture(), function))
-            .flatMap(u -> u);
+            .flatMap(Function.identity());
     }
 
-    public <U> FluentFutureStream<U> thenComposeOnAllUnboxedOptional(Function<T, CompletableFuture<Optional<U>>> function) {
+    public <U> FluentFutureStream<U> thenFlatComposeOnOptional(Function<T, CompletableFuture<Optional<U>>> function) {
         return FluentFutureStream.of(
             CompletableFutureUtil.thenComposeOnAll(completableFuture(), function))
-            .flatMapOptional(u -> u);
+            .flatMapOptional(Function.identity());
     }
 
     public <U> FluentFutureStream<U> flatMap(Function<T, Stream<U>> function) {

@@ -43,7 +43,6 @@ import org.apache.james.mailbox.store.mail.model.Mailbox;
 import org.apache.james.mailbox.store.mail.model.impl.SimpleMailbox;
 import org.apache.james.util.CompletableFutureUtil;
 import org.apache.james.util.FluentFutureStream;
-import org.apache.james.util.OptionalConverter;
 
 import com.datastax.driver.core.Session;
 import com.datastax.driver.core.exceptions.InvalidQueryException;
@@ -115,7 +114,7 @@ public class CassandraMailboxMapper implements MailboxMapper {
         return FluentFutureStream.of(mailboxPathDAO.listUserMailboxes(path.getNamespace(), path.getUser()))
             .filter(idAndPath -> regex.matcher(idAndPath.getMailboxPath().getName()).matches())
             .map(CassandraMailboxPathDAO.CassandraIdAndPath::getCassandraId)
-            .thenComposeOnAllUnboxedOptional(mailboxDAO::retrieveMailbox)
+            .thenFlatComposeOnOptional(mailboxDAO::retrieveMailbox)
             .completableFuture()
             .join()
             .collect(Guavate.toImmutableList());
