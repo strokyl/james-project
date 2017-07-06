@@ -19,18 +19,18 @@
 
 package org.apache.james.backends.cassandra.versions;
 
-import static org.apache.james.backends.cassandra.versions.CassandraSchemaVersionManager.SchemaState.UP_TO_DATE;
-import static org.apache.james.backends.cassandra.versions.CassandraSchemaVersionManager.SchemaState.UPGRADABLE;
 import static org.apache.james.backends.cassandra.versions.CassandraSchemaVersionManager.SchemaState.TOO_OLD;
 import static org.apache.james.backends.cassandra.versions.CassandraSchemaVersionManager.SchemaState.TOO_RECENT;
+import static org.apache.james.backends.cassandra.versions.CassandraSchemaVersionManager.SchemaState.UPGRADABLE;
+import static org.apache.james.backends.cassandra.versions.CassandraSchemaVersionManager.SchemaState.UP_TO_DATE;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Preconditions;
+import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Preconditions;
 
 public class CassandraSchemaVersionManager {
     public static final int MIN_VERSION = 1;
@@ -92,11 +92,10 @@ public class CassandraSchemaVersionManager {
             return TOO_OLD;
         } else if (version < maxVersion) {
             return UPGRADABLE;
-        } else if (version == maxVersion){
+        } else if (version == maxVersion) {
             return UP_TO_DATE;
         } else {
             return TOO_RECENT;
         }
     }
-
 }
