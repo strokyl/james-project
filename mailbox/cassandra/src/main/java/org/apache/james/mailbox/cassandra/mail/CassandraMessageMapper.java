@@ -52,8 +52,8 @@ import org.apache.james.mailbox.store.mail.MessageMapper;
 import org.apache.james.mailbox.store.mail.model.Mailbox;
 import org.apache.james.mailbox.store.mail.model.MailboxMessage;
 import org.apache.james.mailbox.store.mail.model.impl.SimpleMailboxMessage;
+import org.apache.james.util.CompletableFutureUtil;
 import org.apache.james.util.FluentFutureStream;
-import org.apache.james.util.OptionalConverter;
 import org.apache.james.util.streams.JamesCollectors;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -227,22 +227,20 @@ public class CassandraMessageMapper implements MessageMapper {
     }
 
     private CompletableFuture<Stream<SimpleMailboxMessage>> expungeUidChunk(CassandraId mailboxId, Collection<MessageUid> uidChunk) {
-        return FluentFutureStream.of(uidChunk.stream()
-            .map(uid -> messageIdDAO.retrieve(mailboxId, uid)))
-            .flatMap(OptionalConverter::toStream)
+        return FluentFutureStream.ofUnboxedOptionals(
+                uidChunk.stream().map(uid -> messageIdDAO.retrieve(mailboxId, uid)))
             .performOnAll(this::deleteUsingMailboxId)
-            .thenComposeOnAll(idWithMetadata -> retrieveMessagesAndDoMigrationIfNeeded(ImmutableList.of(idWithMetadata), FetchType.Metadata, Limit.unlimited()))
-            .flatMap(s -> s)
+            .thenComposeOnAllUnboxed(idWithMetadata -> retrieveMessagesAndDoMigrationIfNeeded(ImmutableList.of(idWithMetadata), FetchType.Metadata, Limit.unlimited()))
             .map(pair -> pair.getKey().toMailboxMessage(ImmutableList.of()))
             .completableFuture();
     }
 
     private CompletableFuture<Stream<Pair<MessageWithoutAttachment, Stream<MessageAttachmentRepresentation>>>> retrieveMessagesAndDoMigrationIfNeeded(
         List<ComposedMessageIdWithMetaData> messageIds, FetchType fetchType, Limit limit) {
-        return messageDAOV2.retrieveMessages(messageIds, fetchType, limit)
-            .thenCompose(messageResults -> FluentFutureStream.of(messageResults
-                .map(v1ToV2Migration::moveFromV1toV2))
-                .completableFuture());
+
+        return FluentFutureStream.of(messageDAOV2.retrieveMessages(messageIds, fetchType, limit))
+            .thenComposeOnAll(v1ToV2Migration::moveFromV1toV2)
+            .completableFuture();
     }
 
     @Override
@@ -310,9 +308,8 @@ public class CassandraMessageMapper implements MessageMapper {
     }
 
     private FlagsUpdateStageResult retryUpdatesStage(CassandraId mailboxId, FlagsUpdateCalculator flagsUpdateCalculator, List<MessageUid> failed) {
-        Stream<ComposedMessageIdWithMetaData> idsFailed = FluentFutureStream.of(
+        Stream<ComposedMessageIdWithMetaData> idsFailed = FluentFutureStream.ofUnboxedOptionals(
             failed.stream().map(uid -> messageIdDAO.retrieve(mailboxId, uid)))
-            .flatMap(OptionalConverter::toStream)
             .join();
 
         return runUpdateStage(mailboxId, idsFailed, flagsUpdateCalculator);
