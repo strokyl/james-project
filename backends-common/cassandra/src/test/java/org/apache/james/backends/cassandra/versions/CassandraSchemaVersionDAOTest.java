@@ -21,12 +21,12 @@ package org.apache.james.backends.cassandra.versions;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.Optional;
-
 import org.apache.james.backends.cassandra.CassandraCluster;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.Optional;
 
 public class CassandraSchemaVersionDAOTest {
 
@@ -49,8 +49,9 @@ public class CassandraSchemaVersionDAOTest {
     }
 
     @Test
-    public void getCurrentSchemaVersionShouldReturn1WhenTableIsEmpty() {
-        assertThat(testee.getCurrentSchemaVersion().join().isPresent()).isFalse();
+    public void getCurrentSchemaVersionShouldReturnEmptyWhenTableIsEmpty() {
+        assertThat(testee.getCurrentSchemaVersion().join())
+            .isEqualTo(Optional.empty());
     }
 
     @Test
@@ -59,7 +60,8 @@ public class CassandraSchemaVersionDAOTest {
 
         testee.updateVersion(version).join();
 
-        assertThat(testee.getCurrentSchemaVersion().join()).contains(version);
+        assertThat(testee.getCurrentSchemaVersion().join())
+            .contains(version);
     }
 
     @Test
@@ -69,6 +71,7 @@ public class CassandraSchemaVersionDAOTest {
         testee.updateVersion(version + 1).join();
         testee.updateVersion(version).join();
 
-        assertThat(testee.getCurrentSchemaVersion().join()).contains(version + 1);
+        assertThat(testee.getCurrentSchemaVersion().join())
+            .contains(version + 1);
     }
 }
