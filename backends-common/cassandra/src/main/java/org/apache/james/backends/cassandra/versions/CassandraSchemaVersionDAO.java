@@ -23,12 +23,13 @@ import static com.datastax.driver.core.querybuilder.QueryBuilder.bindMarker;
 import static com.datastax.driver.core.querybuilder.QueryBuilder.insertInto;
 import static com.datastax.driver.core.querybuilder.QueryBuilder.select;
 import static org.apache.james.backends.cassandra.versions.table.CassandraSchemaVersionTable.KEY;
-import static org.apache.james.backends.cassandra.versions.table.CassandraSchemaVersionTable.KEY_FOR_VERSION;
 import static org.apache.james.backends.cassandra.versions.table.CassandraSchemaVersionTable.TABLE_NAME;
 import static org.apache.james.backends.cassandra.versions.table.CassandraSchemaVersionTable.VALUE;
 
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+
+import javax.inject.Inject;
 
 import org.apache.james.backends.cassandra.utils.CassandraAsyncExecutor;
 import org.apache.james.backends.cassandra.utils.CassandraUtils;
@@ -36,21 +37,20 @@ import org.apache.james.backends.cassandra.versions.table.CassandraSchemaVersion
 
 import com.datastax.driver.core.PreparedStatement;
 import com.datastax.driver.core.Session;
-import com.datastax.driver.core.querybuilder.QueryBuilder;
 import com.datastax.driver.core.utils.UUIDs;
-
-import javax.inject.Inject;
 
 public class CassandraSchemaVersionDAO {
     private final PreparedStatement readVersionStatement;
     private final PreparedStatement writeVersionStatement;
+    private CassandraUtils cassandraUtils;
     private final CassandraAsyncExecutor cassandraAsyncExecutor;
 
     @Inject
-    public CassandraSchemaVersionDAO(Session session) {
+    public CassandraSchemaVersionDAO(Session session, CassandraUtils cassandraUtils) {
         cassandraAsyncExecutor = new CassandraAsyncExecutor(session);
         readVersionStatement = prepareReadVersionStatement(session);
         writeVersionStatement = prepareWriteVersionStatement(session);
+        this.cassandraUtils = cassandraUtils;
     }
 
     private PreparedStatement prepareReadVersionStatement(Session session) {
@@ -68,7 +68,7 @@ public class CassandraSchemaVersionDAO {
 
     public CompletableFuture<Optional<Integer>> getCurrentSchemaVersion() {
         return cassandraAsyncExecutor.execute(readVersionStatement.bind())
-            .thenApply(resultSet -> CassandraUtils.convertToStream(resultSet)
+            .thenApply(resultSet -> cassandraUtils.convertToStream(resultSet)
                 .map(row -> row.getInt(VALUE))
                 .reduce(Math::max));
     }
