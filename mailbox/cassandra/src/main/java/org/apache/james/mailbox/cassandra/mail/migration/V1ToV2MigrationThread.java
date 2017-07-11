@@ -31,8 +31,12 @@ import org.apache.james.mailbox.cassandra.mail.CassandraMessageDAO;
 import org.apache.james.mailbox.cassandra.mail.CassandraMessageDAOV2;
 import org.apache.james.mailbox.cassandra.mail.MessageAttachmentRepresentation;
 import org.apache.james.mailbox.cassandra.mail.MessageWithoutAttachment;
+import org.apache.james.mailbox.cassandra.mail.RawMessageWithoutAttachment;
 import org.apache.james.mailbox.exception.MailboxException;
+import org.apache.james.mailbox.model.Attachment;
+import org.apache.james.mailbox.model.MessageAttachment;
 import org.apache.james.mailbox.store.mail.MessageMapper;
+import org.apache.james.mailbox.store.mail.model.Message;
 import org.apache.james.mailbox.store.mail.model.impl.SimpleMailboxMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,14 +45,14 @@ public class V1ToV2MigrationThread implements Runnable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(V1ToV2MigrationThread.class);
 
-    private final BlockingQueue<Pair<MessageWithoutAttachment, Stream<MessageAttachmentRepresentation>>> messagesToBeMigrated;
+    private final BlockingQueue<Pair<RawMessageWithoutAttachment, Stream<MessageAttachmentRepresentation>>> messagesToBeMigrated;
     private final CassandraMessageDAO messageDAOV1;
     private final CassandraMessageDAOV2 messageDAOV2;
     private final AttachmentLoader attachmentLoader;
     private final MigrationTracking migrationTracking;
 
     public V1ToV2MigrationThread(
-        BlockingQueue<Pair<MessageWithoutAttachment,
+        BlockingQueue<Pair<RawMessageWithoutAttachment,
         Stream<MessageAttachmentRepresentation>>> messagesToBeMigrated,
         CassandraMessageDAO messageDAOV1,
         CassandraMessageDAOV2 messageDAOV2,
@@ -66,7 +70,7 @@ public class V1ToV2MigrationThread implements Runnable {
     public void run() {
         while (true) {
             try {
-                Pair<MessageWithoutAttachment, Stream<MessageAttachmentRepresentation>> message = messagesToBeMigrated.take();
+                Pair<RawMessageWithoutAttachment, Stream<MessageAttachmentRepresentation>> message = messagesToBeMigrated.take();
                 performV1ToV2Migration(message).join();
             } catch (Exception e) {
                 LOGGER.error("Error occured in migration thread", e);
@@ -74,25 +78,25 @@ public class V1ToV2MigrationThread implements Runnable {
         }
     }
 
-    private CompletableFuture<Void> performV1ToV2Migration(Pair<MessageWithoutAttachment, Stream<MessageAttachmentRepresentation>> messageV1) {
+    private CompletableFuture<Void> performV1ToV2Migration(Pair<RawMessageWithoutAttachment, Stream<MessageAttachmentRepresentation>> messageV1) {
         return attachmentLoader.addAttachmentToMessages(Stream.of(messageV1), MessageMapper.FetchType.Full)
             .thenApply(stream -> stream.findAny().get())
             .thenCompose(this::performV1ToV2Migration);
     }
 
-    private CompletableFuture<Void> performV1ToV2Migration(SimpleMailboxMessage message) {
+    private CompletableFuture<Void> performV1ToV2Migration(Message message) {
         return saveInV2FromV1(message)
             .thenCompose(this::deleteInV1);
     }
 
-    private CompletableFuture<Void> deleteInV1(Optional<SimpleMailboxMessage> optional) {
-        return optional.map(SimpleMailboxMessage::getMessageId)
+    private CompletableFuture<Void> deleteInV1(Optional<Message> optional) {
+        return optional.map(Message::getMessageId)
             .map(messageId -> (CassandraMessageId) messageId)
             .map(messageDAOV1::delete)
             .orElse(CompletableFuture.completedFuture(null));
     }
 
-    private CompletableFuture<Optional<SimpleMailboxMessage>> saveInV2FromV1(SimpleMailboxMessage message) {
+    private CompletableFuture<Optional<Message>> saveInV2FromV1(Message message) {
         try {
             return messageDAOV2.save(message).thenApply(any -> {
                 migrationTracking.reportSuccess();
@@ -102,7 +106,7 @@ public class V1ToV2MigrationThread implements Runnable {
         } catch (MailboxException e) {
             LOGGER.error("Exception while saving message during migration", e);
             migrationTracking.reportError();
-            return CompletableFuture.completedFuture(Optional.<SimpleMailboxMessage>empty());
+            return CompletableFuture.completedFuture(Optional.<Message>empty());
         }
     }
 }
