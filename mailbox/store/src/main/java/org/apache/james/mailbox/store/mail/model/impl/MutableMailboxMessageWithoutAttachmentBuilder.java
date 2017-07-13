@@ -24,78 +24,79 @@ import org.apache.james.mailbox.model.ComposedMessageIdWithMetaData;
 import org.apache.james.mailbox.model.MailboxId;
 import org.apache.james.mailbox.model.MessageId;
 import org.apache.james.mailbox.store.mail.model.MailboxMessageWithoutAttachment;
+import org.apache.james.mailbox.store.mail.model.MutableMailboxMessageWithoutAttachment;
 
 import javax.mail.Flags;
 import javax.mail.internet.SharedInputStream;
 import java.util.Date;
 
-public class MailboxMessageWithoutAttachmentBuilder {
+public class MutableMailboxMessageWithoutAttachmentBuilder {
     private MessageWithoutAttachmentBuilder messageWithoutAttachmentBuilder;
-    private MailboxContextBuilder mailboxContextBuilder;
+    private MutableMailboxContextBuilder mailboxContextBuilder;
 
-    MailboxMessageWithoutAttachmentBuilder() {
+    MutableMailboxMessageWithoutAttachmentBuilder() {
         messageWithoutAttachmentBuilder = new MessageWithoutAttachmentBuilder();
-        mailboxContextBuilder = new MailboxContextBuilder();
+        mailboxContextBuilder = new MutableMailboxContextBuilder();
     }
 
-    public MailboxMessageWithoutAttachmentBuilder messageId(MessageId messageId) {
+    public MutableMailboxMessageWithoutAttachmentBuilder messageId(MessageId messageId) {
         messageWithoutAttachmentBuilder.messageId(messageId);
         return this;
     }
 
-    public MailboxMessageWithoutAttachmentBuilder content(SharedInputStream content) {
+    public MutableMailboxMessageWithoutAttachmentBuilder content(SharedInputStream content) {
         messageWithoutAttachmentBuilder.content(content);
         return this;
     }
 
-    public MailboxMessageWithoutAttachmentBuilder bodyStartOctet(int bodyStartOctet) {
+    public MutableMailboxMessageWithoutAttachmentBuilder bodyStartOctet(int bodyStartOctet) {
         messageWithoutAttachmentBuilder.bodyStartOctet(bodyStartOctet);
         return this;
     }
 
-    public MailboxMessageWithoutAttachmentBuilder internalDate(Date internalDate) {
+    public MutableMailboxMessageWithoutAttachmentBuilder internalDate(Date internalDate) {
         messageWithoutAttachmentBuilder.internalDate(internalDate);
         return this;
     }
 
-    public MailboxMessageWithoutAttachmentBuilder size(long size) {
+    public MutableMailboxMessageWithoutAttachmentBuilder size(long size) {
         messageWithoutAttachmentBuilder.size(size);
         return this;
     }
 
-    public MailboxMessageWithoutAttachmentBuilder propertyBuilder(PropertyBuilder propertyBuilder) {
+    public MutableMailboxMessageWithoutAttachmentBuilder propertyBuilder(PropertyBuilder propertyBuilder) {
         messageWithoutAttachmentBuilder.propertyBuilder(propertyBuilder);
         return this;
     }
 
-    public MailboxMessageWithoutAttachmentBuilder mailboxId(MailboxId mailboxId) {
+    public MutableMailboxMessageWithoutAttachmentBuilder mailboxId(MailboxId mailboxId) {
         mailboxContextBuilder.mailboxId(mailboxId);
         return this;
     }
 
-    public MailboxMessageWithoutAttachmentBuilder uid(MessageUid uid) {
+    public MutableMailboxMessageWithoutAttachmentBuilder uid(MessageUid uid) {
         mailboxContextBuilder.uid(uid);
         return this;
     }
 
-    public MailboxMessageWithoutAttachmentBuilder modSeq(long modSeq) {
+    public MutableMailboxMessageWithoutAttachmentBuilder modSeq(long modSeq) {
         mailboxContextBuilder.modSeq(modSeq);
         return this;
     }
 
-    public MailboxMessageWithoutAttachmentBuilder flags(Flags flags) {
+    public MutableMailboxMessageWithoutAttachmentBuilder flags(Flags flags) {
         mailboxContextBuilder.flags(flags);
         return this;
     }
 
-    public MailboxMessageWithoutAttachmentBuilder idWithMetatData(ComposedMessageIdWithMetaData idWithMetaData) {
+    public MutableMailboxMessageWithoutAttachmentBuilder idWithMetatData(ComposedMessageIdWithMetaData idWithMetaData) {
         this.messageId(idWithMetaData.getComposedMessageId().getMessageId());
         mailboxContextBuilder.idWithMetatData(idWithMetaData);
         return this;
     }
 
-    public MailboxMessageWithoutAttachment build() {
-        return MessageUtil.addMailboxContext(
+    public MutableMailboxMessageWithoutAttachment build() {
+        return MessageUtil.addMutableMailboxContext(
             messageWithoutAttachmentBuilder.build(),
             mailboxContextBuilder.build());
     }

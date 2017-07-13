@@ -67,7 +67,7 @@ public class CassandraMessageDAOV2Test {
     private CassandraBlobsDAO blobsDAO;
     private CassandraMessageId.Factory messageIdFactory;
 
-    private MailboxMessage message;
+    private MutableMailboxMessage message;
     private CassandraMessageId messageId;
     private ComposedMessageId composedMessageId;
     private List<ComposedMessageIdWithMetaData> messageIds;
@@ -166,8 +166,8 @@ public class CassandraMessageDAOV2Test {
             .isEqualTo(CONTENT.substring(0, BODY_START));
     }
 
-    private MailboxMessage createMessage(MessageId messageId, String content, int bodyStart, PropertyBuilder propertyBuilder) {
-        return MessageUtil.buildMailboxMessage()
+    private MutableMailboxMessage createMessage(MessageId messageId, String content, int bodyStart, PropertyBuilder propertyBuilder) {
+        return MessageUtil.buildMutableMailboxMessage()
             .messageId(messageId)
             .mailboxId(MAILBOX_ID)
             .uid(messageUid)

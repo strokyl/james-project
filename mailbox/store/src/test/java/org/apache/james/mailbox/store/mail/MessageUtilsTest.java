@@ -39,6 +39,7 @@ import org.apache.james.mailbox.model.MessageId;
 import org.apache.james.mailbox.store.mail.model.DefaultMessageId;
 import org.apache.james.mailbox.store.mail.model.Mailbox;
 import org.apache.james.mailbox.store.mail.model.MailboxMessage;
+import org.apache.james.mailbox.store.mail.model.MutableMailboxMessage;
 import org.apache.james.mailbox.store.mail.model.impl.MessageUtil;
 import org.apache.james.mailbox.store.mail.model.impl.PropertyBuilder;
 import org.junit.Before;
@@ -63,14 +64,14 @@ public class MessageUtilsTest {
     public ExpectedException expectedException = ExpectedException.none();
 
     private MessageUtils messageUtils;
-    private MailboxMessage message;
+    private MutableMailboxMessage message;
 
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
         mailboxSession = new MockMailboxSession("user");
         messageUtils = new MessageUtils(mailboxSession, uidProvider, modSeqProvider);
-        message = MessageUtil.buildMailboxMessage()
+        message = MessageUtil.buildMutableMailboxMessage()
             .messageId(MESSAGE_ID)
             .internalDate(new Date())
             .size(CONTENT.length())

@@ -27,87 +27,88 @@ import org.apache.james.mailbox.model.MailboxId;
 import org.apache.james.mailbox.model.MessageAttachment;
 import org.apache.james.mailbox.model.MessageId;
 import org.apache.james.mailbox.store.mail.model.MailboxMessage;
+import org.apache.james.mailbox.store.mail.model.MutableMailboxMessage;
 
 import javax.mail.Flags;
 import javax.mail.internet.SharedInputStream;
 import java.util.Collection;
 import java.util.Date;
 
-public class MailboxMessageBuilder {
-    private final MailboxMessageWithoutAttachmentBuilder mailboxMessageWithoutAttachmentBuilder;
+public class MutableMailboxMessageBuilder {
+    private final MutableMailboxMessageWithoutAttachmentBuilder mailboxMessageWithoutAttachmentBuilder;
     private Optional<Collection<MessageAttachment>> attachments;
 
-    MailboxMessageBuilder() {
-        mailboxMessageWithoutAttachmentBuilder = new MailboxMessageWithoutAttachmentBuilder();
+    MutableMailboxMessageBuilder() {
+        mailboxMessageWithoutAttachmentBuilder = new MutableMailboxMessageWithoutAttachmentBuilder();
         attachments = Optional.absent();
     }
 
-    public MailboxMessageBuilder attachments(Collection<MessageAttachment> attachments) {
+    public MutableMailboxMessageBuilder attachments(Collection<MessageAttachment> attachments) {
         this.attachments = Optional.of(attachments);
         return this;
     }
 
-    public MailboxMessageBuilder messageId(MessageId messageId) {
+    public MutableMailboxMessageBuilder messageId(MessageId messageId) {
         mailboxMessageWithoutAttachmentBuilder.messageId(messageId);
         return this;
     }
 
-    public MailboxMessageBuilder content(SharedInputStream content) {
+    public MutableMailboxMessageBuilder content(SharedInputStream content) {
         mailboxMessageWithoutAttachmentBuilder.content(content);
         return this;
     }
 
-    public MailboxMessageBuilder bodyStartOctet(int bodyStartOctet) {
+    public MutableMailboxMessageBuilder bodyStartOctet(int bodyStartOctet) {
         Preconditions.checkArgument(bodyStartOctet >= 0, "bodyStartOctet must be positive");
         mailboxMessageWithoutAttachmentBuilder.bodyStartOctet(bodyStartOctet);
         return this;
     }
 
-    public MailboxMessageBuilder internalDate(Date internalDate) {
+    public MutableMailboxMessageBuilder internalDate(Date internalDate) {
         mailboxMessageWithoutAttachmentBuilder.internalDate(internalDate);
         return this;
     }
 
-    public MailboxMessageBuilder size(long size) {
+    public MutableMailboxMessageBuilder size(long size) {
         Preconditions.checkArgument(size >= 0, "size must be positive");
         mailboxMessageWithoutAttachmentBuilder.size(size);
         return this;
     }
 
-    public MailboxMessageBuilder propertyBuilder(PropertyBuilder propertyBuilder) {
+    public MutableMailboxMessageBuilder propertyBuilder(PropertyBuilder propertyBuilder) {
         mailboxMessageWithoutAttachmentBuilder.propertyBuilder(propertyBuilder);
         return this;
     }
 
-    public MailboxMessageBuilder mailboxId(MailboxId mailboxId) {
+    public MutableMailboxMessageBuilder mailboxId(MailboxId mailboxId) {
         mailboxMessageWithoutAttachmentBuilder.mailboxId(mailboxId);
         return this;
     }
 
-    public MailboxMessageBuilder uid(MessageUid uid) {
+    public MutableMailboxMessageBuilder uid(MessageUid uid) {
         mailboxMessageWithoutAttachmentBuilder.uid(uid);
         return this;
     }
 
-    public MailboxMessageBuilder modSeq(long modSeq) {
+    public MutableMailboxMessageBuilder modSeq(long modSeq) {
         Preconditions.checkArgument(modSeq >= 0, "modSeq must be positive");
         mailboxMessageWithoutAttachmentBuilder.modSeq(modSeq);
         return this;
     }
 
-    public MailboxMessageBuilder flags(Flags flags) {
+    public MutableMailboxMessageBuilder flags(Flags flags) {
         mailboxMessageWithoutAttachmentBuilder.flags(flags);
         return this;
     }
 
-    public MailboxMessageBuilder idWithMetatData(ComposedMessageIdWithMetaData idWithMetaData) {
+    public MutableMailboxMessageBuilder idWithMetatData(ComposedMessageIdWithMetaData idWithMetaData) {
         mailboxMessageWithoutAttachmentBuilder.idWithMetatData(idWithMetaData);
         return this;
     }
 
-    public MailboxMessage build() {
+    public MutableMailboxMessage build() {
         Preconditions.checkState(attachments.isPresent(), "attachments is required");
-        return MessageUtil.addAttachmentToMailboxMessage(
+        return MessageUtil.addAttachmentToMutableMailboxMessage(
             mailboxMessageWithoutAttachmentBuilder.build(),
             attachments.get()
         );

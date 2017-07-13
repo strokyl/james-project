@@ -60,7 +60,7 @@ public abstract class MessageMoveTest {
     private SimpleMailbox benwaInboxMailbox;
     private SimpleMailbox benwaWorkMailbox;
 
-    private MailboxMessage message1;
+    private MutableMailboxMessage message1;
 
     protected abstract MapperProvider createMapperProvider();
 
@@ -151,12 +151,12 @@ public abstract class MessageMoveTest {
         return mailbox;
     }
 
-    private MailboxMessage retrieveMessageFromStorage(Mailbox mailbox, MailboxMessage message) throws MailboxException {
+    private MutableMailboxMessage retrieveMessageFromStorage(Mailbox mailbox, MailboxMessage message) throws MailboxException {
         return messageMapper.findInMailbox(mailbox, MessageRange.one(message.getUid()), FetchType.Metadata, LIMIT).next();
     }
     
-    private MailboxMessage createMessage(Mailbox mailbox, MessageId messageId, String content, int bodyStart, PropertyBuilder propertyBuilder) {
-        return MessageUtil.buildMailboxMessage()
+    private MutableMailboxMessage createMessage(Mailbox mailbox, MessageId messageId, String content, int bodyStart, PropertyBuilder propertyBuilder) {
+        return MessageUtil.buildMutableMailboxMessage()
             .messageId(messageId)
             .internalDate(new Date())
             .size(content.length())

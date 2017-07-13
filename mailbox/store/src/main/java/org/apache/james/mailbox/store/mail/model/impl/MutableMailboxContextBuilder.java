@@ -25,45 +25,45 @@ import org.apache.james.mailbox.MessageUid;
 import org.apache.james.mailbox.model.ComposedMessageIdWithMetaData;
 import org.apache.james.mailbox.model.MailboxId;
 import org.apache.james.mailbox.store.mail.model.HasMailboxContext;
-import org.apache.james.mailbox.store.mail.model.MailboxMessage;
+import org.apache.james.mailbox.store.mail.model.MutableMailboxContext;
 
 import javax.mail.Flags;
 
 
-public class MailboxContextBuilder {
+public class MutableMailboxContextBuilder {
     private Optional<MailboxId> mailboxId;
     private Optional<MessageUid> uid;
     private Optional<Long> modSeq;
     private Optional<Flags> flags;
 
-    MailboxContextBuilder() {
+    MutableMailboxContextBuilder() {
         this.mailboxId = Optional.absent();
         this.uid = Optional.absent();
         this.modSeq = Optional.absent();
         this.flags = Optional.absent();
     }
 
-    public MailboxContextBuilder mailboxId(MailboxId mailboxId) {
+    public MutableMailboxContextBuilder mailboxId(MailboxId mailboxId) {
         this.mailboxId = Optional.of(mailboxId);
         return this;
     }
 
-    public MailboxContextBuilder uid(MessageUid uid) {
+    public MutableMailboxContextBuilder uid(MessageUid uid) {
         this.uid = Optional.of(uid);
         return this;
     }
 
-    public MailboxContextBuilder modSeq(long modSeq) {
+    public MutableMailboxContextBuilder modSeq(long modSeq) {
         this.modSeq = Optional.of(modSeq);
         return this;
     }
 
-    public MailboxContextBuilder flags(Flags flags) {
+    public MutableMailboxContextBuilder flags(Flags flags) {
         this.flags = Optional.of(flags);
         return this;
     }
 
-    public MailboxContextBuilder idWithMetatData(ComposedMessageIdWithMetaData idWithMetaData) {
+    public MutableMailboxContextBuilder idWithMetatData(ComposedMessageIdWithMetaData idWithMetaData) {
         mailboxId(idWithMetaData.getComposedMessageId().getMailboxId());
         uid(idWithMetaData.getComposedMessageId().getUid());
         modSeq(idWithMetaData.getModSeq());
@@ -71,14 +71,14 @@ public class MailboxContextBuilder {
         return this;
     }
 
-    public HasMailboxContext build() {
+    public MutableMailboxContext build() {
         Preconditions.checkState(mailboxId.isPresent(), "mailboxId is required");
         Preconditions.checkState(flags.isPresent(), "flags is required");
 
-        return new HasMailboxContextImpl(mailboxId.get(), uid.orNull(), modSeq.or(0l), flags.get());
+        return new MutableMailboxContextImpl(mailboxId.get(), uid.orNull(), modSeq.or(0l), flags.get());
     }
 
-    public MailboxContextBuilder mailboxContext(HasMailboxContext origin) {
+    public MutableMailboxContextBuilder mailboxContext(HasMailboxContext origin) {
         this.mailboxId(origin.getMailboxId());
         if (origin.getUid() != null) {
             this.uid(origin.getUid());

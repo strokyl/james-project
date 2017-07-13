@@ -155,7 +155,7 @@ public class HBaseUtilsTest {
         HBaseId uuid = HBaseId.of(UUID.randomUUID());
         DefaultMessageId messageId = new DefaultMessageId();
 
-        final MailboxMessage message = MessageUtil.buildMailboxMessage()
+        final MailboxMessage message = MessageUtil.buildMutableMailboxMessage()
             .messageId(messageId)
             .internalDate(new Date())
             .size(100)

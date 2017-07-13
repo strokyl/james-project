@@ -20,12 +20,12 @@
 package org.apache.james.mailbox.store.mail.model.impl;
 
 import org.apache.james.mailbox.MessageUid;
-import org.apache.james.mailbox.model.ComposedMessageIdWithMetaData;
 import org.apache.james.mailbox.model.MailboxId;
 import org.apache.james.mailbox.model.MessageId;
 import org.apache.james.mailbox.store.mail.model.HasMailboxContext;
-import org.apache.james.mailbox.store.mail.model.MailboxMessageWithoutAttachment;
 import org.apache.james.mailbox.store.mail.model.MessageWithoutAttachment;
+import org.apache.james.mailbox.store.mail.model.MutableMailboxContext;
+import org.apache.james.mailbox.store.mail.model.MutableMailboxMessageWithoutAttachment;
 import org.apache.james.mailbox.store.mail.model.Property;
 
 import javax.mail.Flags;
@@ -34,16 +34,16 @@ import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
 
-class MailboxMessageWithoutAttachmentImpl implements MailboxMessageWithoutAttachment {
-    private final HasMailboxContext hasMailboxContext;
+class MutableMailboxMessageWithoutAttachmentImpl implements MutableMailboxMessageWithoutAttachment {
+    private final MutableMailboxContext mailboxContext;
     private final MessageWithoutAttachment message;
 
-    MailboxMessageWithoutAttachmentImpl(
+    MutableMailboxMessageWithoutAttachmentImpl(
         MessageWithoutAttachment message,
-        HasMailboxContext hasMailboxContext
+        MutableMailboxContext mailboxContext
     ) {
         this.message = message;
-        this.hasMailboxContext = hasMailboxContext;
+        this.mailboxContext = mailboxContext;
     }
 
     @Override
@@ -108,71 +108,71 @@ class MailboxMessageWithoutAttachmentImpl implements MailboxMessageWithoutAttach
 
     @Override
     public MailboxId getMailboxId() {
-        return hasMailboxContext.getMailboxId();
+        return mailboxContext.getMailboxId();
     }
 
     @Override
     public MessageUid getUid() {
-        return hasMailboxContext.getUid();
+        return mailboxContext.getUid();
     }
 
     @Override
     public void setUid(MessageUid uid) {
-        hasMailboxContext.setUid(uid);
+        mailboxContext.setUid(uid);
     }
 
     @Override
     public void setModSeq(long modSeq) {
-        hasMailboxContext.setModSeq(modSeq);
+        mailboxContext.setModSeq(modSeq);
     }
 
     @Override
     public long getModSeq() {
-        return hasMailboxContext.getModSeq();
+        return mailboxContext.getModSeq();
     }
 
     @Override
     public boolean isAnswered() {
-        return hasMailboxContext.isAnswered();
+        return mailboxContext.isAnswered();
     }
 
     @Override
     public boolean isDeleted() {
-        return hasMailboxContext.isDeleted();
+        return mailboxContext.isDeleted();
     }
 
     @Override
     public boolean isDraft() {
-        return hasMailboxContext.isDraft();
+        return mailboxContext.isDraft();
     }
 
     @Override
     public boolean isFlagged() {
-        return hasMailboxContext.isFlagged();
+        return mailboxContext.isFlagged();
     }
 
     @Override
     public boolean isRecent() {
-        return hasMailboxContext.isRecent();
+        return mailboxContext.isRecent();
     }
 
     @Override
     public boolean isSeen() {
-        return hasMailboxContext.isSeen();
+        return mailboxContext.isSeen();
     }
 
     @Override
     public void setFlags(Flags flags) {
-        hasMailboxContext.setFlags(flags);
+        mailboxContext.setFlags(flags);
     }
 
     @Override
     public Flags createFlags() {
-        return hasMailboxContext.createFlags();
+        return mailboxContext.createFlags();
     }
 
     @Override
     public int compareTo(HasMailboxContext o) {
-        return hasMailboxContext.compareTo(o);
+        return mailboxContext.compareTo(o);
     }
 }

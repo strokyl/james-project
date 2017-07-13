@@ -78,19 +78,19 @@ public class MailboxMessageAssertTest {
         String bodyString = "body\n.\n";
         Date date = new Date();
 
-        MailboxMessage message1 = createMessage(headerString, bodyString);
+        MutableMailboxMessage message1 = createMessage(headerString, bodyString);
 
         message1.setUid(UID);
         bodyString = "work\n.\n";
 
-        MailboxMessage message2 = createMessage(headerString, bodyString);
+        MutableMailboxMessage message2 = createMessage(headerString, bodyString);
         message2.setUid(UID);
 
         MessageAssert.assertThat(message1).isEqualTo(message2, MessageMapper.FetchType.Body);
     }
 
-    private MailboxMessage createMessage(String headerString, String bodyString) {
-        return MessageUtil.buildMailboxMessage()
+    private MutableMailboxMessage createMessage(String headerString, String bodyString) {
+        return MessageUtil.buildMutableMailboxMessage()
             .messageId(MESSAGE_ID)
             .internalDate(DATE)
             .size(headerString.length() + bodyString.length())

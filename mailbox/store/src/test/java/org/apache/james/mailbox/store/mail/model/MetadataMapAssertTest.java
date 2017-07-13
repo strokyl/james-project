@@ -50,11 +50,11 @@ public class MetadataMapAssertTest {
     private static final String BODY_STRING = "body\\n.\\n";
     private static final TestId MAILBOX_ID = TestId.of(12L);
 
-    private MailboxMessage message1;
+    private MutableMailboxMessage message1;
 
     @Before
     public void setUp() {
-        message1 = MessageUtil.buildMailboxMessage()
+        message1 = MessageUtil.buildMutableMailboxMessage()
             .messageId(MESSAGE_ID)
             .internalDate(DATE)
             .size(HEADER_STRING.length() + BODY_STRING.length())

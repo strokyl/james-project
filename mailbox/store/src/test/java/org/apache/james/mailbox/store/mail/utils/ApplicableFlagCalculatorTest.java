@@ -34,6 +34,7 @@ import org.apache.james.mailbox.model.MessageAttachment;
 import org.apache.james.mailbox.model.TestId;
 import org.apache.james.mailbox.store.mail.model.DefaultMessageId;
 import org.apache.james.mailbox.store.mail.model.MailboxMessage;
+import org.apache.james.mailbox.store.mail.model.MutableMailboxMessage;
 import org.apache.james.mailbox.store.mail.model.impl.MessageUtil;
 import org.apache.james.mailbox.store.mail.model.impl.PropertyBuilder;
 import org.assertj.core.api.JUnitSoftAssertions;
@@ -59,14 +60,14 @@ public class ApplicableFlagCalculatorTest {
 
     @Test
     public void computeApplicableFlagsShouldReturnOnlyDefaultApplicableFlagsWhenNoMessage() throws Exception {
-        ApplicableFlagCalculator calculator = new ApplicableFlagCalculator(ImmutableList.<MailboxMessage>of());
+        ApplicableFlagCalculator calculator = new ApplicableFlagCalculator(ImmutableList.<MutableMailboxMessage>of());
 
         assertThat(calculator.computeApplicableFlags()).isEqualTo(getDefaultApplicableFlag());
     }
 
     @Test
     public void computeApplicableFlagsShouldReturnOnlyDefaultApplicableFlagWhenNoMessageWithUserCustomFlag() throws Exception {
-        List<MailboxMessage> mailboxMessages = ImmutableList.of(
+        List<MutableMailboxMessage> mailboxMessages = ImmutableList.of(
             createMessage(new Flags(Flag.ANSWERED)),
             createMessage(new Flags(Flag.DELETED)),
             createMessage(new Flags(Flag.USER)),
@@ -79,7 +80,7 @@ public class ApplicableFlagCalculatorTest {
 
     @Test
     public void computeApplicableFlagsShouldReturnOnlyDefaultApplicableFlagAndAllUserCustomFlagUsedOneMessage() throws Exception {
-        List<MailboxMessage> mailboxMessages = ImmutableList.of(
+        List<MutableMailboxMessage> mailboxMessages = ImmutableList.of(
             createMessage(new Flags("capture me")),
             createMessage(new Flags("french")));
 
@@ -95,7 +96,7 @@ public class ApplicableFlagCalculatorTest {
 
     @Test
     public void unionFlagsShouldAlwaysIgnoreRecentAndUser() throws  Exception {
-        List<MailboxMessage> mailboxMessages = ImmutableList.of(
+        List<MutableMailboxMessage> mailboxMessages = ImmutableList.of(
             createMessage(new Flags(Flag.RECENT)),
             createMessage(new Flags(Flag.USER)));
 
@@ -107,10 +108,10 @@ public class ApplicableFlagCalculatorTest {
         softly.assertThat(result.contains(Flag.USER)).isFalse();
     }
 
-    private MailboxMessage createMessage(Flags messageFlags) {
+    private MutableMailboxMessage createMessage(Flags messageFlags) {
         String content = "Any content";
         int bodyStart = 10;
-        return MessageUtil.buildMailboxMessage()
+        return MessageUtil.buildMutableMailboxMessage()
             .messageId(new DefaultMessageId())
             .internalDate(new Date())
             .size(content.length())

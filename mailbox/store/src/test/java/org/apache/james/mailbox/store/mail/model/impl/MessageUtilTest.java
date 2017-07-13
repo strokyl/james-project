@@ -30,6 +30,7 @@ import javax.mail.util.SharedByteArrayInputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.apache.commons.lang.mutable.Mutable;
 import org.apache.james.mailbox.FlagsBuilder;
 import org.apache.james.mailbox.MessageUid;
 import org.apache.james.mailbox.exception.MailboxException;
@@ -40,6 +41,7 @@ import org.apache.james.mailbox.model.TestId;
 import org.apache.james.mailbox.model.TestMessageId;
 import org.apache.james.mailbox.store.mail.model.DefaultMessageId;
 import org.apache.james.mailbox.store.mail.model.MailboxMessage;
+import org.apache.james.mailbox.store.mail.model.MutableMailboxMessage;
 import org.assertj.core.api.JUnitSoftAssertions;
 import org.assertj.core.internal.FieldByFieldComparator;
 import org.junit.Before;
@@ -59,8 +61,8 @@ public class MessageUtilTest {
     public static final int BODY_START_OCTET = 0;
     public static final MessageId MESSAGE_ID = new TestMessageId.Factory().generate();
     public static final int SIZE = 1000;
-    private MailboxMessage MESSAGE;
-    private MailboxMessage MESSAGE_SPECIAL_CHAR;
+    private MutableMailboxMessage MESSAGE;
+    private MutableMailboxMessage MESSAGE_SPECIAL_CHAR;
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
@@ -123,7 +125,7 @@ public class MessageUtilTest {
         propertyBuilder.setMediaType(text);
         propertyBuilder.setSubType(plain);
 
-        MailboxMessage original = MessageUtil.buildMailboxMessage()
+        MailboxMessage original = MessageUtil.buildMutableMailboxMessage()
             .messageId(new TestMessageId.Factory().generate())
             .internalDate(new Date())
             .size(MESSAGE_CONTENT.length())
@@ -135,18 +137,18 @@ public class MessageUtilTest {
             .mailboxId(TEST_ID)
             .build();
 
-        MailboxMessage copy = MessageUtil.copy(original, TestId.of(1337));
+        MailboxMessage copy = MessageUtil.copyToMutable(original, TestId.of(1337));
 
         assertThat((Object)copy).isEqualToIgnoringGivenFields(original, "message", "mailboxId").isNotSameAs(original);
-        assertThat(MessageUtil.copy(original, TEST_ID)).usingComparator(new FieldByFieldComparator()).isEqualTo(original);
-        assertThat(MessageUtil.copy(original, TEST_ID).getTextualLineCount()).isEqualTo(textualLineCount);
-        assertThat(MessageUtil.copy(original, TEST_ID).getMediaType()).isEqualTo(text);
-        assertThat(MessageUtil.copy(original, TEST_ID).getSubType()).isEqualTo(plain);
+        assertThat(MessageUtil.copyToMutable(original, TEST_ID)).usingComparator(new FieldByFieldComparator()).isEqualTo(original);
+        assertThat(MessageUtil.copyToMutable(original, TEST_ID).getTextualLineCount()).isEqualTo(textualLineCount);
+        assertThat(MessageUtil.copyToMutable(original, TEST_ID).getMediaType()).isEqualTo(text);
+        assertThat(MessageUtil.copyToMutable(original, TEST_ID).getSubType()).isEqualTo(plain);
 
     }
 
-    private static MailboxMessage buildMessage(String content) {
-        return MessageUtil.buildMailboxMessage()
+    private static MutableMailboxMessage buildMessage(String content) {
+        return MessageUtil.buildMutableMailboxMessage()
             .messageId(new DefaultMessageId())
             .internalDate(Calendar.getInstance().getTime())
             .size(content.length())
@@ -163,7 +165,7 @@ public class MessageUtilTest {
     public void modseqShouldThrowWhenNegative() {
         expectedException.expect(IllegalArgumentException.class);
 
-        MessageUtil.buildMailboxMessage()
+        MessageUtil.buildMutableMailboxMessage()
             .modSeq(-1);
     }
 
@@ -171,7 +173,7 @@ public class MessageUtilTest {
     public void sizeShouldThrowWhenNegative() {
         expectedException.expect(IllegalArgumentException.class);
 
-        MessageUtil.buildMailboxMessage()
+        MessageUtil.buildMutableMailboxMessage()
             .size(-1);
     }
 
@@ -179,14 +181,14 @@ public class MessageUtilTest {
     public void bodyStartOctetShouldThrowWhenNegative() {
         expectedException.expect(IllegalArgumentException.class);
 
-        MessageUtil.buildMailboxMessage()
+        MessageUtil.buildMutableMailboxMessage()
             .bodyStartOctet(-1);
     }
 
     @Test
     public void buildShouldWorkWithMinimalContent() {
         Date internalDate = new Date();
-        MessageUtil.buildMailboxMessage()
+        MessageUtil.buildMutableMailboxMessage()
             .messageId(MESSAGE_ID)
             .mailboxId(TEST_ID)
             .internalDate(internalDate)
@@ -216,7 +218,7 @@ public class MessageUtilTest {
             .name("name")
             .isInline(false)
             .build();
-        MailboxMessage message = MessageUtil.buildMailboxMessage()
+        MailboxMessage message = MessageUtil.buildMutableMailboxMessage()
             .messageId(MESSAGE_ID)
             .mailboxId(TEST_ID)
             .modSeq(modseq)
@@ -248,7 +250,7 @@ public class MessageUtilTest {
         expectedException.expect(IllegalStateException.class);
 
         Date internalDate = new Date();
-        MessageUtil.buildMailboxMessage()
+        MessageUtil.buildMutableMailboxMessage()
             .mailboxId(TEST_ID)
             .internalDate(internalDate)
             .bodyStartOctet(BODY_START_OCTET)
@@ -265,7 +267,7 @@ public class MessageUtilTest {
         expectedException.expect(IllegalStateException.class);
 
         Date internalDate = new Date();
-        MessageUtil.buildMailboxMessage()
+        MessageUtil.buildMutableMailboxMessage()
             .messageId(MESSAGE_ID)
             .internalDate(internalDate)
             .bodyStartOctet(BODY_START_OCTET)
@@ -281,7 +283,7 @@ public class MessageUtilTest {
     public void buildShouldThrowOnMissingInternalDate() {
         expectedException.expect(IllegalStateException.class);
 
-        MessageUtil.buildMailboxMessage()
+        MessageUtil.buildMutableMailboxMessage()
             .messageId(MESSAGE_ID)
             .mailboxId(TEST_ID)
             .bodyStartOctet(BODY_START_OCTET)
@@ -298,7 +300,7 @@ public class MessageUtilTest {
         expectedException.expect(IllegalStateException.class);
 
         Date internalDate = new Date();
-        MessageUtil.buildMailboxMessage()
+        MessageUtil.buildMutableMailboxMessage()
             .messageId(MESSAGE_ID)
             .mailboxId(TEST_ID)
             .internalDate(internalDate)
@@ -315,7 +317,7 @@ public class MessageUtilTest {
         expectedException.expect(IllegalStateException.class);
 
         Date internalDate = new Date();
-        MessageUtil.buildMailboxMessage()
+        MessageUtil.buildMutableMailboxMessage()
             .messageId(MESSAGE_ID)
             .mailboxId(TEST_ID)
             .internalDate(internalDate)
@@ -332,7 +334,7 @@ public class MessageUtilTest {
         expectedException.expect(IllegalStateException.class);
 
         Date internalDate = new Date();
-        MessageUtil.buildMailboxMessage()
+        MessageUtil.buildMutableMailboxMessage()
             .messageId(MESSAGE_ID)
             .mailboxId(TEST_ID)
             .internalDate(internalDate)
@@ -349,7 +351,7 @@ public class MessageUtilTest {
         expectedException.expect(IllegalStateException.class);
 
         Date internalDate = new Date();
-        MessageUtil.buildMailboxMessage()
+        MessageUtil.buildMutableMailboxMessage()
             .messageId(MESSAGE_ID)
             .mailboxId(TEST_ID)
             .internalDate(internalDate)
@@ -366,7 +368,7 @@ public class MessageUtilTest {
         expectedException.expect(IllegalStateException.class);
 
         Date internalDate = new Date();
-        MessageUtil.buildMailboxMessage()
+        MessageUtil.buildMutableMailboxMessage()
             .messageId(MESSAGE_ID)
             .mailboxId(TEST_ID)
             .internalDate(internalDate)

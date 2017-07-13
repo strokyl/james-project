@@ -19,9 +19,11 @@
 package org.apache.james.mailbox.cassandra.mail;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+
 import javax.mail.Flags;
 import javax.mail.util.SharedByteArrayInputStream;
 
@@ -40,17 +42,17 @@ import org.apache.james.mailbox.model.MessageAttachment;
 import org.apache.james.mailbox.model.MessageId;
 import org.apache.james.mailbox.store.mail.MessageMapper;
 import org.apache.james.mailbox.store.mail.model.MailboxMessage;
+import org.apache.james.mailbox.store.mail.model.MutableMailboxMessage;
 import org.apache.james.mailbox.store.mail.model.impl.MessageUtil;
 import org.apache.james.mailbox.store.mail.model.impl.PropertyBuilder;
-
-import com.github.steveash.guavate.Guavate;
-import com.google.common.base.Charsets;
-import com.google.common.collect.ImmutableList;
-
 import org.apache.james.util.FluentFutureStream;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.github.steveash.guavate.Guavate;
+import com.google.common.base.Charsets;
+import com.google.common.collect.ImmutableList;
 
 public class CassandraMessageDAOTest {
     private static final int BODY_START = 16;
@@ -63,7 +65,7 @@ public class CassandraMessageDAOTest {
     private CassandraMessageDAO testee;
     private CassandraMessageId.Factory messageIdFactory;
 
-    private MailboxMessage messageWith1Attachment;
+    private MutableMailboxMessage messageWith1Attachment;
     private CassandraMessageId messageId;
     private CassandraMessageId messageId2;
     private CassandraMessageId messageId3;
@@ -171,14 +173,14 @@ public class CassandraMessageDAOTest {
         assertThat(attachmentRepresentation.get(0).get().getCid().isPresent()).isFalse();
     }
 
-    private MailboxMessage createMessage(
+    private MutableMailboxMessage createMessage(
             MessageId messageId,
             String content,
             int bodyStart,
             PropertyBuilder propertyBuilder,
             List<MessageAttachment> attachments) {
 
-        return MessageUtil.buildMailboxMessage()
+        return MessageUtil.buildMutableMailboxMessage()
             .messageId(messageId)
             .mailboxId(MAILBOX_ID)
             .uid(messageUid)

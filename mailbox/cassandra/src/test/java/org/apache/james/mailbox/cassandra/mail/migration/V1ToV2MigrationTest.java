@@ -297,8 +297,8 @@ public class V1ToV2MigrationTest {
         return messageResult;
     }
 
-    private MailboxMessage createMessage(MessageId messageId, String content, int bodyStart, PropertyBuilder propertyBuilder, List<MessageAttachment> attachments) {
-        return MessageUtil.buildMailboxMessage()
+    private MutableMailboxMessage createMessage(MessageId messageId, String content, int bodyStart, PropertyBuilder propertyBuilder, List<MessageAttachment> attachments) {
+        return MessageUtil.buildMutableMailboxMessage()
             .messageId(messageId)
             .internalDate(new Date())
             .size(content.length())

@@ -82,12 +82,12 @@ public abstract class MessageMapperTest {
     private SimpleMailbox benwaInboxMailbox;
     private SimpleMailbox benwaWorkMailbox;
     
-    private MailboxMessage message1;
-    private MailboxMessage message2;
-    private MailboxMessage message3;
-    private MailboxMessage message4;
-    private MailboxMessage message5;
-    private MailboxMessage message6;
+    private MutableMailboxMessage message1;
+    private MutableMailboxMessage message2;
+    private MutableMailboxMessage message3;
+    private MutableMailboxMessage message4;
+    private MutableMailboxMessage message5;
+    private MutableMailboxMessage message6;
 
     @Rule
     public ExpectedException expected = ExpectedException.none();
@@ -192,7 +192,7 @@ public abstract class MessageMapperTest {
         message6.setUid(messageMapper.getLastUid(benwaInboxMailbox).get().next());
         messageMapper.delete(benwaInboxMailbox, message6);
 
-        Iterator<MailboxMessage> retrievedMessageIterator = messageMapper.findInMailbox(benwaInboxMailbox, MessageRange.all(), MessageMapper.FetchType.Full, LIMIT);
+        Iterator<MutableMailboxMessage> retrievedMessageIterator = messageMapper.findInMailbox(benwaInboxMailbox, MessageRange.all(), MessageMapper.FetchType.Full, LIMIT);
         assertMessages(Lists.newArrayList(retrievedMessageIterator)).containOnly(message1, message2, message3, message4, message5);
     }
 
@@ -213,7 +213,7 @@ public abstract class MessageMapperTest {
     @Test
     public void messagesCanBeRetrievedInMailboxWithRangeTypeRange() throws MailboxException, IOException{
         saveMessages();
-        Iterator<MailboxMessage> retrievedMessageIterator = messageMapper
+        Iterator<MutableMailboxMessage> retrievedMessageIterator = messageMapper
                 .findInMailbox(benwaInboxMailbox, MessageRange.range(message1.getUid(), message4.getUid()), MessageMapper.FetchType.Full, LIMIT);
 
         assertMessages(Lists.newArrayList(retrievedMessageIterator)).containOnly(message1, message2, message3, message4);
@@ -223,7 +223,7 @@ public abstract class MessageMapperTest {
     public void messagesCanBeRetrievedInMailboxWithRangeTypeRangeContainingAHole() throws MailboxException, IOException {
         saveMessages();
         messageMapper.delete(benwaInboxMailbox, message3);
-        Iterator<MailboxMessage> retrievedMessageIterator = messageMapper
+        Iterator<MutableMailboxMessage> retrievedMessageIterator = messageMapper
             .findInMailbox(benwaInboxMailbox, MessageRange.range(message1.getUid(), message4.getUid()), MessageMapper.FetchType.Full, LIMIT);
         assertMessages(Lists.newArrayList(retrievedMessageIterator)).containOnly(message1, message2, message4);
     }
@@ -231,7 +231,7 @@ public abstract class MessageMapperTest {
     @Test
     public void messagesCanBeRetrievedInMailboxWithRangeTypeFrom() throws MailboxException, IOException {
         saveMessages();
-        Iterator<MailboxMessage> retrievedMessageIterator = messageMapper
+        Iterator<MutableMailboxMessage> retrievedMessageIterator = messageMapper
                 .findInMailbox(benwaInboxMailbox, MessageRange.from(message3.getUid()), MessageMapper.FetchType.Full, LIMIT);
         assertMessages(Lists.newArrayList(retrievedMessageIterator)).containOnly(message3, message4, message5);
     }
@@ -240,7 +240,7 @@ public abstract class MessageMapperTest {
     public void messagesCanBeRetrievedInMailboxWithRangeTypeFromContainingAHole() throws MailboxException, IOException {
         saveMessages();
         messageMapper.delete(benwaInboxMailbox, message4);
-        Iterator<MailboxMessage> retrievedMessageIterator = messageMapper
+        Iterator<MutableMailboxMessage> retrievedMessageIterator = messageMapper
                 .findInMailbox(benwaInboxMailbox, MessageRange.from(message3.getUid()), MessageMapper.FetchType.Full, LIMIT);
         assertMessages(Lists.newArrayList(retrievedMessageIterator)).containOnly(message3, message5);
     }
@@ -248,7 +248,7 @@ public abstract class MessageMapperTest {
     @Test
     public void messagesCanBeRetrievedInMailboxWithRangeTypeAll() throws MailboxException, IOException {
         saveMessages();
-        Iterator<MailboxMessage> retrievedMessageIterator = messageMapper.findInMailbox(benwaInboxMailbox, MessageRange.all(), MessageMapper.FetchType.Full, LIMIT);
+        Iterator<MutableMailboxMessage> retrievedMessageIterator = messageMapper.findInMailbox(benwaInboxMailbox, MessageRange.all(), MessageMapper.FetchType.Full, LIMIT);
         assertMessages(Lists.newArrayList(retrievedMessageIterator)).containOnly(message1, message2, message3, message4, message5);
     }
 
@@ -256,7 +256,7 @@ public abstract class MessageMapperTest {
     public void messagesCanBeRetrievedInMailboxWithRangeTypeAllContainingHole() throws MailboxException, IOException {
         saveMessages();
         messageMapper.delete(benwaInboxMailbox, message1);
-        Iterator<MailboxMessage> retrievedMessageIterator = messageMapper
+        Iterator<MutableMailboxMessage> retrievedMessageIterator = messageMapper
                 .findInMailbox(benwaInboxMailbox, MessageRange.all(), MessageMapper.FetchType.Full, LIMIT);
         assertMessages(Lists.newArrayList(retrievedMessageIterator)).containOnly(message2, message3, message4, message5);
     }
@@ -265,7 +265,7 @@ public abstract class MessageMapperTest {
     public void messagesRetrievedUsingFetchTypeMetadataShouldHaveAtLastMetadataDataLoaded() throws MailboxException, IOException{
         saveMessages();
         MessageMapper.FetchType fetchType = MessageMapper.FetchType.Metadata;
-        Iterator<MailboxMessage> retrievedMessageIterator = messageMapper.findInMailbox(benwaInboxMailbox, MessageRange.one(message1.getUid()), fetchType, LIMIT);
+        Iterator<MutableMailboxMessage> retrievedMessageIterator = messageMapper.findInMailbox(benwaInboxMailbox, MessageRange.one(message1.getUid()), fetchType, LIMIT);
         assertThat(retrievedMessageIterator.next()).isEqualTo(message1, fetchType);
         assertThat(retrievedMessageIterator).isEmpty();
     }
@@ -274,7 +274,7 @@ public abstract class MessageMapperTest {
     public void messagesRetrievedUsingFetchTypeHeaderShouldHaveHeaderDataLoaded() throws MailboxException, IOException{
         saveMessages();
         MessageMapper.FetchType fetchType = MessageMapper.FetchType.Headers;
-        Iterator<MailboxMessage> retrievedMessageIterator = messageMapper.findInMailbox(benwaInboxMailbox, MessageRange.one(message1.getUid()), fetchType, LIMIT);
+        Iterator<MutableMailboxMessage> retrievedMessageIterator = messageMapper.findInMailbox(benwaInboxMailbox, MessageRange.one(message1.getUid()), fetchType, LIMIT);
         assertThat(retrievedMessageIterator.next()).isEqualTo(message1, fetchType);
         assertThat(retrievedMessageIterator).isEmpty();
     }
@@ -283,7 +283,7 @@ public abstract class MessageMapperTest {
     public void messagesRetrievedUsingFetchTypeBodyShouldHaveBodyDataLoaded() throws MailboxException, IOException{
         saveMessages();
         MessageMapper.FetchType fetchType = MessageMapper.FetchType.Body;
-        Iterator<MailboxMessage> retrievedMessageIterator = messageMapper.findInMailbox(benwaInboxMailbox, MessageRange.one(message1.getUid()), fetchType, LIMIT);
+        Iterator<MutableMailboxMessage> retrievedMessageIterator = messageMapper.findInMailbox(benwaInboxMailbox, MessageRange.one(message1.getUid()), fetchType, LIMIT);
         assertThat(retrievedMessageIterator.next()).isEqualToWithoutAttachment(message1, fetchType);
         assertThat(retrievedMessageIterator).isEmpty();
     }
@@ -292,7 +292,7 @@ public abstract class MessageMapperTest {
     public void messagesRetrievedUsingFetchTypeFullShouldHaveBodyDataLoaded() throws MailboxException, IOException{
         saveMessages();
         MessageMapper.FetchType fetchType = FetchType.Full;
-        Iterator<MailboxMessage> retrievedMessageIterator = messageMapper.findInMailbox(benwaInboxMailbox, MessageRange.one(message1.getUid()), fetchType, LIMIT);
+        Iterator<MutableMailboxMessage> retrievedMessageIterator = messageMapper.findInMailbox(benwaInboxMailbox, MessageRange.one(message1.getUid()), fetchType, LIMIT);
         assertThat(retrievedMessageIterator.next()).isEqualToWithoutAttachment(message1, fetchType);
         assertThat(retrievedMessageIterator).isEmpty();
     }
@@ -388,7 +388,7 @@ public abstract class MessageMapperTest {
     public void expungeMarkedForDeletionInMailboxShouldReturnEmptyResultWhenNoMessageInMailboxIsDeleted() throws MailboxException, IOException {
         saveMessages();
         assertThat(messageMapper.expungeMarkedForDeletionInMailbox(benwaInboxMailbox, MessageRange.all())).isEmpty();
-        Iterator<MailboxMessage> retrievedMessageIterator = messageMapper.findInMailbox(benwaInboxMailbox, MessageRange.all(), MessageMapper.FetchType.Full, LIMIT);
+        Iterator<MutableMailboxMessage> retrievedMessageIterator = messageMapper.findInMailbox(benwaInboxMailbox, MessageRange.all(), MessageMapper.FetchType.Full, LIMIT);
 
         assertMessages(Lists.newArrayList(retrievedMessageIterator)).containOnly(message1, message2, message3, message4, message5);
     }
@@ -406,7 +406,7 @@ public abstract class MessageMapperTest {
         saveMessages();
         markThenPerformExpunge(MessageRange.all());
 
-        Iterator<MailboxMessage> retrievedMessageIterator = messageMapper.findInMailbox(benwaInboxMailbox, MessageRange.all(), MessageMapper.FetchType.Full, LIMIT);
+        Iterator<MutableMailboxMessage> retrievedMessageIterator = messageMapper.findInMailbox(benwaInboxMailbox, MessageRange.all(), MessageMapper.FetchType.Full, LIMIT);
 
         assertMessages(Lists.newArrayList(retrievedMessageIterator)).containOnly(message2, message3, message5);
     }
@@ -424,7 +424,7 @@ public abstract class MessageMapperTest {
         saveMessages();
         markThenPerformExpunge(MessageRange.one(message1.getUid()));
 
-        Iterator<MailboxMessage> retrievedMessageIterator = messageMapper.findInMailbox(benwaInboxMailbox, MessageRange.all(), MessageMapper.FetchType.Full, LIMIT);
+        Iterator<MutableMailboxMessage> retrievedMessageIterator = messageMapper.findInMailbox(benwaInboxMailbox, MessageRange.all(), MessageMapper.FetchType.Full, LIMIT);
 
         assertMessages(Lists.newArrayList(retrievedMessageIterator)).containOnly(message4, message2, message3, message5);
     }
@@ -442,7 +442,7 @@ public abstract class MessageMapperTest {
         saveMessages();
         markThenPerformExpunge(MessageRange.from(message3.getUid()));
 
-        Iterator<MailboxMessage> retrievedMessageIterator = messageMapper.findInMailbox(benwaInboxMailbox, MessageRange.all(), MessageMapper.FetchType.Full, LIMIT);
+        Iterator<MutableMailboxMessage> retrievedMessageIterator = messageMapper.findInMailbox(benwaInboxMailbox, MessageRange.all(), MessageMapper.FetchType.Full, LIMIT);
 
         assertMessages(Lists.newArrayList(retrievedMessageIterator)).containOnly(message1, message2, message3, message5);
     }
@@ -460,7 +460,7 @@ public abstract class MessageMapperTest {
         saveMessages();
         markThenPerformExpunge(MessageRange.range(message3.getUid(), message5.getUid()));
 
-        Iterator<MailboxMessage> retrievedMessageIterator = messageMapper.findInMailbox(benwaInboxMailbox, MessageRange.all(), MessageMapper.FetchType.Full, LIMIT);
+        Iterator<MutableMailboxMessage> retrievedMessageIterator = messageMapper.findInMailbox(benwaInboxMailbox, MessageRange.all(), MessageMapper.FetchType.Full, LIMIT);
 
         assertMessages(Lists.newArrayList(retrievedMessageIterator)).containOnly(message1, message2, message3, message5);
     }
@@ -497,21 +497,21 @@ public abstract class MessageMapperTest {
     public void copyShouldIncrementUid() throws MailboxException, IOException {
         saveMessages();
         MessageUid uid = messageMapper.getLastUid(benwaInboxMailbox).get();
-        messageMapper.copy(benwaInboxMailbox, MessageUtil.copy(message6, benwaInboxMailbox.getMailboxId()));
+        messageMapper.copy(benwaInboxMailbox, MessageUtil.copyToMutable(message6, benwaInboxMailbox.getMailboxId()));
         assertThat(messageMapper.getLastUid(benwaInboxMailbox).get()).isGreaterThan(uid);
     }
 
     @Test
     public void copyShouldIncrementMessageCount() throws MailboxException, IOException {
         saveMessages();
-        messageMapper.copy(benwaInboxMailbox, MessageUtil.copy(message6, benwaInboxMailbox.getMailboxId()));
+        messageMapper.copy(benwaInboxMailbox, MessageUtil.copyToMutable(message6, benwaInboxMailbox.getMailboxId()));
         assertThat(messageMapper.countMessagesInMailbox(benwaInboxMailbox)).isEqualTo(6);
     }
 
     @Test
     public void copyOfUnSeenMessageShouldIncrementUnSeenMessageCount() throws MailboxException, IOException {
         saveMessages();
-        messageMapper.copy(benwaInboxMailbox, MessageUtil.copy(message6, benwaInboxMailbox.getMailboxId()));
+        messageMapper.copy(benwaInboxMailbox, MessageUtil.copyToMutable(message6, benwaInboxMailbox.getMailboxId()));
         assertThat(messageMapper.countUnseenMessagesInMailbox(benwaInboxMailbox)).isEqualTo(6);
     }
 
@@ -519,19 +519,19 @@ public abstract class MessageMapperTest {
     public void copyShouldIncrementModSeq() throws MailboxException, IOException {
         saveMessages();
         long modSeq = messageMapper.getHighestModSeq(benwaInboxMailbox);
-        messageMapper.copy(benwaInboxMailbox, MessageUtil.copy(message6, benwaInboxMailbox.getMailboxId()));
+        messageMapper.copy(benwaInboxMailbox, MessageUtil.copyToMutable(message6, benwaInboxMailbox.getMailboxId()));
         assertThat(messageMapper.getHighestModSeq(benwaInboxMailbox)).isGreaterThan(modSeq);
     }
 
     @Test
     public void copyShouldCreateAMessageInDestination() throws MailboxException, IOException {
         saveMessages();
-        MailboxMessage message7 = MessageUtil.copy(message6, benwaInboxMailbox.getMailboxId());
+        MutableMailboxMessage message7 = MessageUtil.copyToMutable(message6, benwaInboxMailbox.getMailboxId());
         messageMapper.copy(benwaInboxMailbox, message7);
         message7.setModSeq(messageMapper.getHighestModSeq(benwaInboxMailbox));
         assertThat(messageMapper.getLastUid(benwaInboxMailbox).get()).isGreaterThan(message6.getUid());
 
-        MailboxMessage result = messageMapper.findInMailbox(benwaInboxMailbox,
+        MutableMailboxMessage result = messageMapper.findInMailbox(benwaInboxMailbox,
             MessageRange.one(messageMapper.getLastUid(benwaInboxMailbox).get()),
             MessageMapper.FetchType.Full,
             LIMIT)
@@ -547,14 +547,14 @@ public abstract class MessageMapperTest {
         saveMessages();
         long expectedUnseenMessages = messageMapper.countUnseenMessagesInMailbox(benwaInboxMailbox);
 
-        messageMapper.copy(benwaInboxMailbox, MessageUtil.copy(message6, benwaInboxMailbox.getMailboxId()));
+        messageMapper.copy(benwaInboxMailbox, MessageUtil.copyToMutable(message6, benwaInboxMailbox.getMailboxId()));
         assertThat(messageMapper.countUnseenMessagesInMailbox(benwaInboxMailbox)).isEqualTo(expectedUnseenMessages);
     }
 
     @Test
     public void copiedMessageShouldBeMarkedAsRecent() throws MailboxException {
         saveMessages();
-        MessageMetaData metaData = messageMapper.copy(benwaInboxMailbox, MessageUtil.copy(message6, benwaInboxMailbox.getMailboxId()));
+        MessageMetaData metaData = messageMapper.copy(benwaInboxMailbox, MessageUtil.copyToMutable(message6, benwaInboxMailbox.getMailboxId()));
         assertThat(
             messageMapper.findInMailbox(benwaInboxMailbox,
                 MessageRange.one(metaData.getUid()),
@@ -569,7 +569,7 @@ public abstract class MessageMapperTest {
     public void copiedRecentMessageShouldBeMarkedAsRecent() throws MailboxException {
         saveMessages();
         message6.setFlags(new Flags(Flags.Flag.RECENT));
-        MessageMetaData metaData = messageMapper.copy(benwaInboxMailbox, MessageUtil.copy(message6, benwaInboxMailbox.getMailboxId()));
+        MessageMetaData metaData = messageMapper.copy(benwaInboxMailbox, MessageUtil.copyToMutable(message6, benwaInboxMailbox.getMailboxId()));
         assertThat(
             messageMapper.findInMailbox(benwaInboxMailbox,
                 MessageRange.one(metaData.getUid()),
@@ -583,7 +583,7 @@ public abstract class MessageMapperTest {
     @Test
     public void copiedMessageShouldNotChangeTheFlagsOnOriginalMessage() throws MailboxException {
         saveMessages();
-        messageMapper.copy(benwaInboxMailbox, MessageUtil.copy(message6, benwaInboxMailbox.getMailboxId()));
+        messageMapper.copy(benwaInboxMailbox, MessageUtil.copyToMutable(message6, benwaInboxMailbox.getMailboxId()));
         assertThat(
             messageMapper.findInMailbox(benwaWorkMailbox,
                 MessageRange.one(message6.getUid()),
@@ -699,9 +699,9 @@ public abstract class MessageMapperTest {
         propBuilder.setProperty(StandardNames.NAMESPACE_RFC_2045, StandardNames.MIME_CONTENT_TRANSFER_ENCODING_NAME, "7bit");
         propBuilder.setProperty(StandardNames.MIME_CONTENT_TYPE_PARAMETER_SPACE, StandardNames.MIME_CONTENT_TYPE_PARAMETER_CHARSET_NAME, "US-ASCII");
 
-        MailboxMessage messageWithProperties = createMessage(benwaWorkMailbox, mapperProvider.generateMessageId(), "Subject: messagePropertiesShouldBeStored \n\nBody\n.\n", BODY_START, propBuilder);
+        MutableMailboxMessage messageWithProperties = createMessage(benwaWorkMailbox, mapperProvider.generateMessageId(), "Subject: messagePropertiesShouldBeStored \n\nBody\n.\n", BODY_START, propBuilder);
         MessageMetaData messageMetaData = messageMapper.add(benwaInboxMailbox, messageWithProperties);
-        MailboxMessage message = messageMapper.findInMailbox(benwaInboxMailbox, MessageRange.one(messageMetaData.getUid()), FetchType.Body, 1).next();
+        MutableMailboxMessage message = messageMapper.findInMailbox(benwaInboxMailbox, MessageRange.one(messageMetaData.getUid()), FetchType.Body, 1).next();
 
         assertProperties(message.getProperties()).containsOnly(propBuilder.toProperties());
     }
@@ -712,18 +712,18 @@ public abstract class MessageMapperTest {
         propBuilder.setProperty(StandardNames.MIME_CONTENT_LANGUAGE_SPACE, StandardNames.MIME_CONTENT_LANGUAGE_NAME, "us");
         propBuilder.setProperty(StandardNames.MIME_CONTENT_LANGUAGE_SPACE, StandardNames.MIME_CONTENT_LANGUAGE_NAME, "fr");
 
-        MailboxMessage messageWithProperties = createMessage(benwaWorkMailbox, mapperProvider.generateMessageId(), "Subject: messagePropertiesShouldBeStoredWhenDuplicateEntries \n\nBody\n.\n", BODY_START, propBuilder);
+        MutableMailboxMessage messageWithProperties = createMessage(benwaWorkMailbox, mapperProvider.generateMessageId(), "Subject: messagePropertiesShouldBeStoredWhenDuplicateEntries \n\nBody\n.\n", BODY_START, propBuilder);
         MessageMetaData messageMetaData = messageMapper.add(benwaInboxMailbox, messageWithProperties);
-        MailboxMessage message = messageMapper.findInMailbox(benwaInboxMailbox, MessageRange.one(messageMetaData.getUid()), FetchType.Body, 1).next();
+        MutableMailboxMessage message = messageMapper.findInMailbox(benwaInboxMailbox, MessageRange.one(messageMetaData.getUid()), FetchType.Body, 1).next();
 
         assertProperties(message.getProperties()).containsOnly(propBuilder.toProperties());
     }
 
     @Test
     public void messagePropertiesShouldBeStoredWhenNoProperty() throws Exception {
-        MailboxMessage messageWithProperties = createMessage(benwaWorkMailbox, mapperProvider.generateMessageId(), "Subject: messagePropertiesShouldBeStoredWhenNoProperty \n\nBody\n.\n", BODY_START, new PropertyBuilder());
+        MutableMailboxMessage messageWithProperties = createMessage(benwaWorkMailbox, mapperProvider.generateMessageId(), "Subject: messagePropertiesShouldBeStoredWhenNoProperty \n\nBody\n.\n", BODY_START, new PropertyBuilder());
         MessageMetaData messageMetaData = messageMapper.add(benwaInboxMailbox, messageWithProperties);
-        MailboxMessage message = messageMapper.findInMailbox(benwaInboxMailbox, MessageRange.one(messageMetaData.getUid()), FetchType.Body, 1).next();
+        MutableMailboxMessage message = messageMapper.findInMailbox(benwaInboxMailbox, MessageRange.one(messageMetaData.getUid()), FetchType.Body, 1).next();
         assertThat(message.getProperties()).isEmpty();
     }
 
@@ -733,9 +733,9 @@ public abstract class MessageMapperTest {
         PropertyBuilder propBuilder = new PropertyBuilder();
         propBuilder.setTextualLineCount(textualLineCount);
 
-        MailboxMessage messageWithProperties = createMessage(benwaWorkMailbox, mapperProvider.generateMessageId(), "Subject: messagePropertiesShouldBeStoredWhenDuplicateEntries \n\nBody\n.\n", BODY_START, propBuilder);
+        MutableMailboxMessage messageWithProperties = createMessage(benwaWorkMailbox, mapperProvider.generateMessageId(), "Subject: messagePropertiesShouldBeStoredWhenDuplicateEntries \n\nBody\n.\n", BODY_START, propBuilder);
         MessageMetaData messageMetaData = messageMapper.add(benwaInboxMailbox, messageWithProperties);
-        MailboxMessage message = messageMapper.findInMailbox(benwaInboxMailbox, MessageRange.one(messageMetaData.getUid()), FetchType.Body, 1).next();
+        MutableMailboxMessage message = messageMapper.findInMailbox(benwaInboxMailbox, MessageRange.one(messageMetaData.getUid()), FetchType.Body, 1).next();
         assertThat(message.getTextualLineCount()).isEqualTo(textualLineCount);
     }
 
@@ -745,9 +745,9 @@ public abstract class MessageMapperTest {
         PropertyBuilder propBuilder = new PropertyBuilder();
         propBuilder.setMediaType(mediaType);
 
-        MailboxMessage messageWithProperties = createMessage(benwaWorkMailbox, mapperProvider.generateMessageId(), "Subject: messagePropertiesShouldBeStoredWhenDuplicateEntries \n\nBody\n.\n", BODY_START, propBuilder);
+        MutableMailboxMessage messageWithProperties = createMessage(benwaWorkMailbox, mapperProvider.generateMessageId(), "Subject: messagePropertiesShouldBeStoredWhenDuplicateEntries \n\nBody\n.\n", BODY_START, propBuilder);
         MessageMetaData messageMetaData = messageMapper.add(benwaInboxMailbox, messageWithProperties);
-        MailboxMessage message = messageMapper.findInMailbox(benwaInboxMailbox, MessageRange.one(messageMetaData.getUid()), FetchType.Body, 1).next();
+        MutableMailboxMessage message = messageMapper.findInMailbox(benwaInboxMailbox, MessageRange.one(messageMetaData.getUid()), FetchType.Body, 1).next();
         assertThat(message.getMediaType()).isEqualTo(mediaType);
     }
 
@@ -757,9 +757,9 @@ public abstract class MessageMapperTest {
         PropertyBuilder propBuilder = new PropertyBuilder();
         propBuilder.setSubType(subType);
 
-        MailboxMessage messageWithProperties = createMessage(benwaWorkMailbox, mapperProvider.generateMessageId(), "Subject: messagePropertiesShouldBeStoredWhenDuplicateEntries \n\nBody\n.\n", BODY_START, propBuilder);
+        MutableMailboxMessage messageWithProperties = createMessage(benwaWorkMailbox, mapperProvider.generateMessageId(), "Subject: messagePropertiesShouldBeStoredWhenDuplicateEntries \n\nBody\n.\n", BODY_START, propBuilder);
         MessageMetaData messageMetaData = messageMapper.add(benwaInboxMailbox, messageWithProperties);
-        MailboxMessage message = messageMapper.findInMailbox(benwaInboxMailbox, MessageRange.one(messageMetaData.getUid()), FetchType.Body, 1).next();
+        MutableMailboxMessage message = messageMapper.findInMailbox(benwaInboxMailbox, MessageRange.one(messageMetaData.getUid()), FetchType.Body, 1).next();
         assertThat(message.getSubType()).isEqualTo(subType);
     }
 
@@ -820,7 +820,7 @@ public abstract class MessageMapperTest {
             .awaitTermination(1, TimeUnit.MINUTES))
             .isTrue();
 
-        Iterator<MailboxMessage> messages = messageMapper.findInMailbox(benwaInboxMailbox, MessageRange.one(message1.getUid()),
+        Iterator<MutableMailboxMessage> messages = messageMapper.findInMailbox(benwaInboxMailbox, MessageRange.one(message1.getUid()),
             FetchType.Metadata, 1);
         assertThat(messages.hasNext()).isTrue();
         assertThat(messages.next().createFlags().getUserFlags()).hasSize(threadCount * updateCount);
@@ -851,7 +851,7 @@ public abstract class MessageMapperTest {
             .awaitTermination(1, TimeUnit.MINUTES))
             .isTrue();
 
-        Iterator<MailboxMessage> messages = messageMapper.findInMailbox(benwaInboxMailbox, MessageRange.one(message1.getUid()),
+        Iterator<MutableMailboxMessage> messages = messageMapper.findInMailbox(benwaInboxMailbox, MessageRange.one(message1.getUid()),
             FetchType.Metadata, 1);
         assertThat(messages.hasNext()).isTrue();
         assertThat(messages.next().createFlags().getUserFlags()).isEmpty();
@@ -859,7 +859,7 @@ public abstract class MessageMapperTest {
 
     @Test
     public void messagesShouldBeSavedWithTheirUserFlags() throws Exception {
-        MailboxMessage message = MessageUtil.copy(message1, benwaInboxMailbox.getMailboxId());
+        MutableMailboxMessage message = MessageUtil.copyToMutable(message1, benwaInboxMailbox.getMailboxId());
         messageMapper.add(benwaInboxMailbox, message);
         assertThat(retrieveMessageFromStorage(message)).hasFlags(new Flags(USER_FLAG));
     }
@@ -1137,12 +1137,12 @@ public abstract class MessageMapperTest {
         message6.setModSeq(messageMapper.getHighestModSeq(benwaWorkMailbox));
     }
 
-    private MailboxMessage retrieveMessageFromStorage(MailboxMessage message) throws MailboxException {
+    private MutableMailboxMessage retrieveMessageFromStorage(MailboxMessage message) throws MailboxException {
         return messageMapper.findInMailbox(benwaInboxMailbox, MessageRange.one(message.getUid()), MessageMapper.FetchType.Metadata, LIMIT).next();
     }
     
-    private MailboxMessage createMessage(Mailbox mailbox, MessageId messageId, String content, int bodyStart, PropertyBuilder propertyBuilder) throws MailboxException {
-        return MessageUtil.buildMailboxMessage()
+    private MutableMailboxMessage createMessage(Mailbox mailbox, MessageId messageId, String content, int bodyStart, PropertyBuilder propertyBuilder) throws MailboxException {
+        return MessageUtil.buildMutableMailboxMessage()
             .messageId(messageId)
             .internalDate(new Date())
             .size(content.length())

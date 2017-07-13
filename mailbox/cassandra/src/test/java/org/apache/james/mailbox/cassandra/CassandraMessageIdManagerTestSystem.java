@@ -106,7 +106,7 @@ public class CassandraMessageIdManagerTestSystem extends MessageIdManagerTestSys
     }
 
     private static MailboxMessage createMessage(MailboxId mailboxId, Flags flags, MessageId messageId, MessageUid uid) {
-        return MessageUtil.buildMailboxMessage()
+        return MessageUtil.buildMutableMailboxMessage()
             .messageId(messageId)
             .internalDate(new Date())
             .size(1596)

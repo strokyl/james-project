@@ -55,8 +55,8 @@ public class ListMessageAssertTest {
 
     private Mailbox benwaInboxMailbox;
 
-    private MailboxMessage message1;
-    private MailboxMessage message2;
+    private MutableMailboxMessage message1;
+    private MutableMailboxMessage message2;
     
     @Before
     public void setUp() {
@@ -68,20 +68,20 @@ public class ListMessageAssertTest {
 
     @Test
     public void containsOnlyShouldWork() throws IOException {
-        List<MailboxMessage> actual = ImmutableList.of(message1, message2);
+        List<MutableMailboxMessage> actual = ImmutableList.of(message1, message2);
         assertMessages(actual).containOnly(createMailboxMessage(MAILBOX_ID, MESSAGE_ID, MESSAGE_UID, INTERNAL_DATE, BODY_CONTENT1, BODY_START, new PropertyBuilder()),
                 createMailboxMessage(MAILBOX_ID, MESSAGE_ID, MESSAGE_UID, INTERNAL_DATE, BODY_CONTENT2, BODY_START, new PropertyBuilder()));
     }
 
     @Test(expected = AssertionError.class)
     public void containsOnlyShouldThrowExceptionWhenHavingElementDoesNotBelongToList() throws IOException {
-        List<MailboxMessage> actual = ImmutableList.of(message1);
+        List<MutableMailboxMessage> actual = ImmutableList.of(message1);
         assertMessages(actual).containOnly(createMailboxMessage(MAILBOX_ID, MESSAGE_ID, MESSAGE_UID, INTERNAL_DATE, BODY_CONTENT2, BODY_START, new PropertyBuilder()));
     }
 
-    private MailboxMessage createMailboxMessage(final MailboxId mailboxId, final MessageId messageId, final MessageUid uid,
+    private MutableMailboxMessage createMailboxMessage(final MailboxId mailboxId, final MessageId messageId, final MessageUid uid,
             final Date internalDate, final String content, final int bodyStart, final PropertyBuilder propertyBuilder) {
-        return new MailboxMessage() {
+        return new MutableMailboxMessage() {
             @Override
             public MailboxId getMailboxId() {
                 return mailboxId;
@@ -226,8 +226,8 @@ public class ListMessageAssertTest {
         return mailbox;
     }
 
-    private MailboxMessage createMessage(Mailbox mailbox, MessageId messageId, String content, int bodyStart, PropertyBuilder propertyBuilder) {
-        MailboxMessage mailboxMessage = MessageUtil.buildMailboxMessage()
+    private MutableMailboxMessage createMessage(Mailbox mailbox, MessageId messageId, String content, int bodyStart, PropertyBuilder propertyBuilder) {
+        MutableMailboxMessage mailboxMessage = MessageUtil.buildMutableMailboxMessage()
             .messageId(messageId)
             .internalDate(INTERNAL_DATE)
             .size(content.length())

@@ -36,14 +36,17 @@ import org.apache.james.mailbox.model.MessageId;
 import org.apache.james.mailbox.store.mail.model.HasMailboxContext;
 import org.apache.james.mailbox.store.mail.model.MailboxMessage;
 import org.apache.james.mailbox.store.mail.model.MailboxMessageWithoutAttachment;
+import org.apache.james.mailbox.store.mail.model.MutableMailboxContext;
+import org.apache.james.mailbox.store.mail.model.MutableMailboxMessage;
+import org.apache.james.mailbox.store.mail.model.MutableMailboxMessageWithoutAttachment;
 import org.apache.james.mailbox.store.mail.model.Property;
 
-class MailboxMessageImpl implements MailboxMessage {
+class MutableMailboxMessageImpl implements MutableMailboxMessage {
 
-    private final MailboxMessageWithoutAttachment message;
+    private final MutableMailboxMessageWithoutAttachment message;
     private final ImmutableList<MessageAttachment> attachments;
 
-    public MailboxMessageImpl(MailboxMessageWithoutAttachment message, Collection<MessageAttachment> attachments) {
+    public MutableMailboxMessageImpl(MutableMailboxMessageWithoutAttachment message, Collection<MessageAttachment> attachments) {
         this.message = message;
         this.attachments = ImmutableList.copyOf(attachments);
     }

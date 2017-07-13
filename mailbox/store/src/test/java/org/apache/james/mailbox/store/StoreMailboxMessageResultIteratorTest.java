@@ -48,6 +48,7 @@ import org.apache.james.mailbox.store.mail.MessageMapper;
 import org.apache.james.mailbox.store.mail.model.DefaultMessageId;
 import org.apache.james.mailbox.store.mail.model.Mailbox;
 import org.apache.james.mailbox.store.mail.model.MailboxMessage;
+import org.apache.james.mailbox.store.mail.model.MutableMailboxMessage;
 import org.apache.james.mailbox.store.mail.model.impl.MessageUtil;
 import org.apache.james.mailbox.store.mail.model.impl.PropertyBuilder;
 import org.assertj.core.api.iterable.Extractor;
@@ -105,11 +106,11 @@ public class StoreMailboxMessageResultIteratorTest {
         }
 
         @Override
-        public Iterator<MailboxMessage> findInMailbox(Mailbox mailbox, MessageRange set,
+        public Iterator<MutableMailboxMessage> findInMailbox(Mailbox mailbox, MessageRange set,
                                                       org.apache.james.mailbox.store.mail.MessageMapper.FetchType type, int limit)
             throws MailboxException {
 
-            List<MailboxMessage> messages = new ArrayList<MailboxMessage>();
+            List<MutableMailboxMessage> messages = new ArrayList<MutableMailboxMessage>();
             for (MessageUid uid: Iterables.limit(set, limit)) {
                 if (messageRange.includes(uid)) {
                     messages.add(createMessage(uid));
@@ -118,8 +119,8 @@ public class StoreMailboxMessageResultIteratorTest {
             return messages.iterator();
         }
 
-        private MailboxMessage createMessage(MessageUid uid) {
-            MailboxMessage message = MessageUtil.buildMailboxMessage()
+        private MutableMailboxMessage createMessage(MessageUid uid) {
+            MutableMailboxMessage message = MessageUtil.buildMutableMailboxMessage()
                 .messageId(new DefaultMessageId())
                 .internalDate(new Date())
                 .bodyStartOctet(0)
@@ -170,7 +171,7 @@ public class StoreMailboxMessageResultIteratorTest {
         }
 
         @Override
-        public MessageMetaData add(Mailbox mailbox, MailboxMessage message) throws MailboxException {
+        public MessageMetaData add(Mailbox mailbox, MutableMailboxMessage message) throws MailboxException {
             throw new UnsupportedOperationException();
         }
 

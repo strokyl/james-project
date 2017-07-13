@@ -25,12 +25,7 @@ import org.apache.james.mailbox.model.ComposedMessageId;
 import org.apache.james.mailbox.model.ComposedMessageIdWithMetaData;
 import org.apache.james.mailbox.model.MailboxId;
 import org.apache.james.mailbox.model.MessageAttachment;
-import org.apache.james.mailbox.store.mail.model.HasMailboxContext;
-import org.apache.james.mailbox.store.mail.model.Mailbox;
-import org.apache.james.mailbox.store.mail.model.MailboxMessage;
-import org.apache.james.mailbox.store.mail.model.MailboxMessageWithoutAttachment;
-import org.apache.james.mailbox.store.mail.model.Message;
-import org.apache.james.mailbox.store.mail.model.MessageWithoutAttachment;
+import org.apache.james.mailbox.store.mail.model.*;
 
 public class MessageUtil {
 
@@ -41,63 +36,102 @@ public class MessageUtil {
         return new MessageImpl(message, attachments);
     }
 
-    public static MailboxMessage addAttachmentToMailboxMessage(
-        MailboxMessageWithoutAttachment message,
+    public static ImmutableMailboxMessage addAttachmentToImmutableMailboxMessage(
+        ImmutableMailboxMessageWithoutAttachment message,
         Collection<MessageAttachment> attachments
     ) {
-        return new MailboxMessageImpl(message, attachments);
+        return new ImmutableMailboxMessageImpl(message, attachments);
+    }
+    public static MutableMailboxMessage addAttachmentToMutableMailboxMessage(
+        MutableMailboxMessageWithoutAttachment message,
+        Collection<MessageAttachment> attachments
+    ) {
+        return new MutableMailboxMessageImpl(message, attachments);
     }
 
-    public static MailboxMessageWithoutAttachment addMailboxContext(
+    public static MutableMailboxMessageWithoutAttachment addMutableMailboxContext(
         MessageWithoutAttachment message,
         ComposedMessageIdWithMetaData idAndMetaData
     ) {
-        return new MailboxMessageWithoutAttachmentImpl(message,
-            buildMailboxContext().
+        return new MutableMailboxMessageWithoutAttachmentImpl(message,
+            buildMutableMailboxContext().
                 idWithMetatData(idAndMetaData)
                 .build());
     }
 
-    public static MailboxMessageWithoutAttachment addMailboxContext(
+    public static MutableMailboxMessageWithoutAttachment addMutableMailboxContext(
         MessageWithoutAttachment message,
-        HasMailboxContext mailboxContext
+        MutableMailboxContext mailboxContext
     ) {
-        return new MailboxMessageWithoutAttachmentImpl(message, mailboxContext);
+        return new MutableMailboxMessageWithoutAttachmentImpl(message, mailboxContext);
+    }
+
+    public static ImmutableMailboxMessageWithoutAttachment addImmutableMailboxContext(
+        MessageWithoutAttachment message,
+        ImmutableMailboxContext mailboxContext
+    ) {
+        return new ImmutableMailboxMessageWithoutAttachmentImpl(message, mailboxContext);
     }
 
     public static MessageWithoutAttachmentBuilder buildMessageWithoutAttachment() {
         return new MessageWithoutAttachmentBuilder();
     }
 
-    public static MailboxMessageWithoutAttachmentBuilder buildMailboxMessageWithoutAttachment() {
-        return new MailboxMessageWithoutAttachmentBuilder();
+    public static MutableMailboxMessageWithoutAttachmentBuilder buildMutableMailboxMessageWithoutAttachment() {
+        return new MutableMailboxMessageWithoutAttachmentBuilder();
+    }
+
+    public static MutableMailboxMessageBuilder buildMutableMailboxMessage() {
+        return new MutableMailboxMessageBuilder();
     }
 
 
-    public static MailboxMessageBuilder buildMailboxMessage() {
-        return new MailboxMessageBuilder();
+    public static ImmutableMailboxMessageBuilder buildImmutableMailboxMessage() {
+        return new ImmutableMailboxMessageBuilder();
+    }
+
+    public static ImmutableMailboxMessageWithoutAttachmentBuilder buildImmutableMailboxMessageWithoutAttachment() {
+        return new ImmutableMailboxMessageWithoutAttachmentBuilder();
     }
 
     public static MessageBuilder buildMessage() {
         return new MessageBuilder();
     }
 
-    public static MailboxMessage copy(MailboxMessage origin, MailboxId mailboxId, Collection<MessageAttachment> attachments) {
-        return addAttachmentToMailboxMessage(
-            addMailboxContext(
+    public static MutableMailboxMessage copyToMutable(MailboxMessage origin, MailboxId mailboxId, Collection<MessageAttachment> attachments) {
+        return addAttachmentToMutableMailboxMessage(
+            addMutableMailboxContext(
                 origin,
-                buildMailboxContext()
+                buildMutableMailboxContext()
                     .mailboxContext(origin)
                     .mailboxId(mailboxId).build()),
             attachments);
     }
 
-    public static MailboxMessage copy(MailboxMessage origin, MailboxId mailboxId) {
-        return copy(origin, mailboxId, origin.getAttachments());
+    public static ImmutableMailboxMessage copyToImmutable(MailboxMessage origin, MailboxId mailboxId, Collection<MessageAttachment> attachments) {
+        return addAttachmentToImmutableMailboxMessage(
+            addImmutableMailboxContext(
+                origin,
+                buildImmutableMailboxContext()
+                    .mailboxContext(origin)
+                    .mailboxId(mailboxId).build()),
+            attachments);
     }
 
-    public static MailboxContextBuilder buildMailboxContext() {
-        return new MailboxContextBuilder();
+    public static ImmutableMailboxMessage copyToImmutable(MailboxMessage origin, MailboxId mailboxId) {
+        return copyToImmutable(origin, mailboxId, origin.getAttachments());
+    }
+
+    public static MutableMailboxMessage copyToMutable(MailboxMessage origin, MailboxId mailboxId) {
+        return copyToMutable(origin, mailboxId, origin.getAttachments());
+    }
+
+    public static MutableMailboxContextBuilder buildMutableMailboxContext() {
+        return new MutableMailboxContextBuilder();
+    }
+
+    public static ImmutableMailboxContextBuilder buildImmutableMailboxContext() {
+        return new ImmutableMailboxContextBuilder();
     }
 
     public static <T extends HasMailboxContext & MessageWithoutAttachment> ComposedMessageIdWithMetaData getOnlyMetaData(T message) {
@@ -110,5 +144,9 @@ public class MessageUtil {
             .flags(message.createFlags())
             .modSeq(message.getModSeq())
             .build();
+    }
+
+    public static MutableMailboxMessage mutableViewOfImmutable(ImmutableMailboxMessage immutableMailboxMessage) {
+        return new FakeMutableMailboxMessage(immutableMailboxMessage);
     }
 }

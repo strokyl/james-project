@@ -40,13 +40,13 @@ import org.apache.james.mailbox.model.MessageAttachment;
 import org.apache.james.mailbox.model.MessageId;
 import org.apache.james.mailbox.model.TestId;
 import org.apache.james.mailbox.store.mail.model.HasMailboxContext;
-import org.apache.james.mailbox.store.mail.model.MailboxMessage;
+import org.apache.james.mailbox.store.mail.model.MutableMailboxMessage;
 import org.apache.james.mailbox.store.mail.model.Property;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
 
-public class SimpleMailboxMembership implements MailboxMessage {
+public class SimpleMailboxMembership implements MutableMailboxMessage {
     
     private static final String TOSTRING_SEPARATOR = " ";
     

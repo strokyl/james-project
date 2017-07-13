@@ -247,7 +247,7 @@ public class CassandraMessageDAOV2 {
         CompletableFuture<byte[]> contentFuture = buildContentRetriever(fetchType).apply(row);
 
         return contentFuture.thenApply(content -> {
-            MailboxMessageWithoutAttachment messageWithoutAttachment = MessageUtil.buildMailboxMessageWithoutAttachment()
+            MailboxMessageWithoutAttachment messageWithoutAttachment = MessageUtil.buildMutableMailboxMessageWithoutAttachment()
                 .internalDate(row.getTimestamp(INTERNAL_DATE))
                 .size(row.getLong(FULL_CONTENT_OCTETS))
                 .bodyStartOctet(row.getInt(BODY_START_OCTET))

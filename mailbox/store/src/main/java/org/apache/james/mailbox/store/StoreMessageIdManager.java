@@ -51,6 +51,7 @@ import org.apache.james.mailbox.store.mail.MessageIdMapper;
 import org.apache.james.mailbox.store.mail.MessageMapper;
 import org.apache.james.mailbox.store.mail.model.Mailbox;
 import org.apache.james.mailbox.store.mail.model.MailboxMessage;
+import org.apache.james.mailbox.store.mail.model.MutableMailboxMessage;
 import org.apache.james.mailbox.store.mail.model.impl.MessageUtil;
 import org.apache.james.mailbox.store.mail.model.impl.PropertyBuilder;
 import org.apache.james.mailbox.store.quota.QuotaChecker;
@@ -183,7 +184,7 @@ public class StoreMessageIdManager implements MessageIdManager {
     }
 
     protected MailboxMessage createMessage(Date internalDate, int size, int bodyStartOctet, SharedInputStream content, Flags flags, PropertyBuilder propertyBuilder, List<MessageAttachment> attachments, MailboxId mailboxId) throws MailboxException {
-        return MessageUtil.buildMailboxMessage()
+        return MessageUtil.buildMutableMailboxMessage()
             .messageId(messageIdFactory.generate())
             .internalDate(internalDate)
             .size(size)
@@ -238,13 +239,13 @@ public class StoreMessageIdManager implements MessageIdManager {
     private void addMessageToMailboxes(MessageIdMapper messageIdMapper, MailboxMessage mailboxMessage, SetView<MailboxId> mailboxIds, MailboxSession mailboxSession) throws MailboxException {
         MailboxMapper mailboxMapper = mailboxSessionMapperFactory.getMailboxMapper(mailboxSession);
         for (MailboxId mailboxId : mailboxIds) {
-            MailboxMessage copy = MessageUtil.copy(mailboxMessage, mailboxId);
+            MutableMailboxMessage copy = MessageUtil.copyToMutable(mailboxMessage, mailboxId);
             save(mailboxSession, messageIdMapper, copy);
             dispatcher.added(mailboxSession, mailboxMapper.findMailboxById(mailboxId), copy);
         }
     }
 
-    private void save(MailboxSession mailboxSession, MessageIdMapper messageIdMapper, MailboxMessage mailboxMessage) throws MailboxException {
+    private void save(MailboxSession mailboxSession, MessageIdMapper messageIdMapper, MutableMailboxMessage mailboxMessage) throws MailboxException {
         long modSeq = mailboxSessionMapperFactory.getModSeqProvider().nextModSeq(mailboxSession, mailboxMessage.getMailboxId());
         MessageUid uid = mailboxSessionMapperFactory.getUidProvider().nextUid(mailboxSession, mailboxMessage.getMailboxId());
         mailboxMessage.setModSeq(modSeq);

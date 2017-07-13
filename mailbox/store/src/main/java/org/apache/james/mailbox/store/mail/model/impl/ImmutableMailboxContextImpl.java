@@ -19,20 +19,22 @@
 
 package org.apache.james.mailbox.store.mail.model.impl;
 
+import javax.mail.Flags;
+
 import org.apache.james.mailbox.FlagsBuilder;
 import org.apache.james.mailbox.MessageUid;
 import org.apache.james.mailbox.model.MailboxId;
 import org.apache.james.mailbox.store.mail.model.HasMailboxContext;
+import org.apache.james.mailbox.store.mail.model.ImmutableMailboxContext;
+import org.apache.james.mailbox.store.mail.model.MutableMailboxContext;
 
-import javax.mail.Flags;
-
-class HasMailboxContextImpl implements HasMailboxContext {
+class ImmutableMailboxContextImpl implements ImmutableMailboxContext {
     private final MailboxId mailboxId;
-    private MessageUid uid;
-    private long modSeq;
-    private Flags flags;
+    private final MessageUid uid;
+    private final long modSeq;
+    private final Flags flags;
 
-    HasMailboxContextImpl(MailboxId mailboxId, MessageUid uid, long modSeq, Flags flags) {
+    ImmutableMailboxContextImpl(MailboxId mailboxId, MessageUid uid, long modSeq, Flags flags) {
         this.mailboxId = mailboxId;
         this.uid = uid;
         this.modSeq = modSeq;
@@ -47,16 +49,6 @@ class HasMailboxContextImpl implements HasMailboxContext {
     @Override
     public MessageUid getUid() {
         return uid;
-    }
-
-    @Override
-    public void setUid(MessageUid uid) {
-        this.uid = uid;
-    }
-
-    @Override
-    public void setModSeq(long modSeq) {
-        this.modSeq = modSeq;
     }
 
     @Override
@@ -92,11 +84,6 @@ class HasMailboxContextImpl implements HasMailboxContext {
     @Override
     public boolean isSeen() {
         return flags.contains(Flags.Flag.SEEN);
-    }
-
-    @Override
-    public void setFlags(Flags flags) {
-        this.flags = FlagsBuilder.builder().add(flags).build();
     }
 
     @Override

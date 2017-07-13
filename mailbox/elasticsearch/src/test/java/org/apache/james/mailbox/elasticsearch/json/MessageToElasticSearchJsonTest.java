@@ -92,8 +92,8 @@ public class MessageToElasticSearchJsonTest {
         propertyBuilder.setContentDescription("An e-mail");
     }
 
-    private MailboxMessage createMockMessage(String resource) throws IOException {
-        return MessageUtil.buildMailboxMessage()
+    private MutableMailboxMessage createMockMessage(String resource) throws IOException {
+        return MessageUtil.buildMutableMailboxMessage()
             .messageId(MESSAGE_ID)
             .internalDate(date)
             .size(SIZE)

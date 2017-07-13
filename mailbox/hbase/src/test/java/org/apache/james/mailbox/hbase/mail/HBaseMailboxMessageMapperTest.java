@@ -148,7 +148,7 @@ public class HBaseMailboxMessageMapperTest {
         final Date today = new Date();
 
         for (int i = 0; i < COUNT * 2; i++) {
-            myMsg = MessageUtil.buildMailboxMessage()
+            myMsg = MessageUtil.buildMutableMailboxMessage()
                 .messageId(messageIdFactory.generate())
                 .internalDate(today)
                 .size(messageTemplate.length)
