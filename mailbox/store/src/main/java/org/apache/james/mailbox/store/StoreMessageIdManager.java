@@ -51,8 +51,8 @@ import org.apache.james.mailbox.store.mail.MessageIdMapper;
 import org.apache.james.mailbox.store.mail.MessageMapper;
 import org.apache.james.mailbox.store.mail.model.Mailbox;
 import org.apache.james.mailbox.store.mail.model.MailboxMessage;
+import org.apache.james.mailbox.store.mail.model.impl.MessageUtil;
 import org.apache.james.mailbox.store.mail.model.impl.PropertyBuilder;
-import org.apache.james.mailbox.store.mail.model.impl.SimpleMailboxMessage;
 import org.apache.james.mailbox.store.quota.QuotaChecker;
 
 import com.google.common.base.Function;
@@ -183,7 +183,17 @@ public class StoreMessageIdManager implements MessageIdManager {
     }
 
     protected MailboxMessage createMessage(Date internalDate, int size, int bodyStartOctet, SharedInputStream content, Flags flags, PropertyBuilder propertyBuilder, List<MessageAttachment> attachments, MailboxId mailboxId) throws MailboxException {
-        return new SimpleMailboxMessage(messageIdFactory.generate(), internalDate, size, bodyStartOctet, content, flags, propertyBuilder, mailboxId, attachments);
+        return MessageUtil.buildMailboxMessage()
+            .messageId(messageIdFactory.generate())
+            .internalDate(internalDate)
+            .size(size)
+            .bodyStartOctet(bodyStartOctet)
+            .content(content)
+            .flags(flags)
+            .propertyBuilder(propertyBuilder)
+            .mailboxId(mailboxId)
+            .attachments(attachments)
+            .build();
     }
     
     private void dispatchFlagsChange(MailboxSession mailboxSession, MailboxId mailboxId, UpdatedFlags updatedFlags) throws MailboxException {
@@ -228,7 +238,7 @@ public class StoreMessageIdManager implements MessageIdManager {
     private void addMessageToMailboxes(MessageIdMapper messageIdMapper, MailboxMessage mailboxMessage, SetView<MailboxId> mailboxIds, MailboxSession mailboxSession) throws MailboxException {
         MailboxMapper mailboxMapper = mailboxSessionMapperFactory.getMailboxMapper(mailboxSession);
         for (MailboxId mailboxId : mailboxIds) {
-            SimpleMailboxMessage copy = SimpleMailboxMessage.copy(mailboxId, mailboxMessage);
+            MailboxMessage copy = MessageUtil.copy(mailboxMessage, mailboxId);
             save(mailboxSession, messageIdMapper, copy);
             dispatcher.added(mailboxSession, mailboxMapper.findMailboxById(mailboxId), copy);
         }

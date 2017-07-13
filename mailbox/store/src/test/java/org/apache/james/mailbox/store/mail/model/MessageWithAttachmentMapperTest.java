@@ -41,9 +41,9 @@ import org.apache.james.mailbox.model.MessageId;
 import org.apache.james.mailbox.model.MessageRange;
 import org.apache.james.mailbox.store.mail.AttachmentMapper;
 import org.apache.james.mailbox.store.mail.MessageMapper;
+import org.apache.james.mailbox.store.mail.model.impl.MessageUtil;
 import org.apache.james.mailbox.store.mail.model.impl.PropertyBuilder;
 import org.apache.james.mailbox.store.mail.model.impl.SimpleMailbox;
-import org.apache.james.mailbox.store.mail.model.impl.SimpleMailboxMessage;
 import org.junit.After;
 import org.junit.Assume;
 import org.junit.Before;
@@ -65,9 +65,9 @@ public abstract class MessageWithAttachmentMapperTest {
 
     private SimpleMailbox attachmentsMailbox;
     
-    private SimpleMailboxMessage messageWithoutAttachment;
-    private SimpleMailboxMessage messageWith1Attachment;
-    private SimpleMailboxMessage messageWith2Attachments;
+    private MailboxMessage messageWithoutAttachment;
+    private MailboxMessage messageWith1Attachment;
+    private MailboxMessage messageWith2Attachments;
 
     @Rule
     public ExpectedException expected = ExpectedException.none();
@@ -210,11 +210,43 @@ public abstract class MessageWithAttachmentMapperTest {
         messageWith2Attachments.setModSeq(messageMapper.getHighestModSeq(attachmentsMailbox));
     }
 
-    private SimpleMailboxMessage createMessage(Mailbox mailbox, MessageId messageId, String content, int bodyStart, PropertyBuilder propertyBuilder, List<MessageAttachment> attachments) {
-        return new SimpleMailboxMessage(messageId, new Date(), content.length(), bodyStart, new SharedByteArrayInputStream(content.getBytes()), new Flags(), propertyBuilder, mailbox.getMailboxId(), attachments);
+    private MailboxMessage createMessage(
+        Mailbox mailbox,
+        MessageId messageId,
+        String content,
+        int bodyStart,
+        PropertyBuilder propertyBuilder,
+        List<MessageAttachment> attachments
+    ) {
+        return MessageUtil.buildMailboxMessage()
+            .messageId(messageId)
+            .internalDate(new Date())
+            .size(content.length())
+            .bodyStartOctet(bodyStart)
+            .content(new SharedByteArrayInputStream(content.getBytes()))
+            .flags(new Flags())
+            .propertyBuilder(propertyBuilder)
+            .mailboxId(mailbox.getMailboxId())
+            .attachments(attachments)
+            .build();
     }
 
-    private SimpleMailboxMessage createMessage(Mailbox mailbox, MessageId messageId, String content, int bodyStart, PropertyBuilder propertyBuilder) {
-        return new SimpleMailboxMessage(messageId, new Date(), content.length(), bodyStart, new SharedByteArrayInputStream(content.getBytes()), new Flags(), propertyBuilder, mailbox.getMailboxId());
+    private MailboxMessage createMessage(
+        Mailbox mailbox,
+        MessageId messageId,
+        String content,
+        int bodyStart,
+        PropertyBuilder propertyBuilder) {
+        return MessageUtil.buildMailboxMessage()
+            .messageId(messageId)
+            .internalDate(new Date())
+            .size(content.length())
+            .bodyStartOctet(bodyStart)
+            .content(new SharedByteArrayInputStream(content.getBytes()))
+            .flags(new Flags())
+            .propertyBuilder(propertyBuilder)
+            .mailboxId(mailbox.getMailboxId())
+            .attachments(ImmutableList.<MessageAttachment>of())
+            .build();
     }
 }

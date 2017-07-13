@@ -35,6 +35,7 @@ import org.apache.james.mailbox.model.MailboxId;
 import org.apache.james.mailbox.model.MessageAttachment;
 import org.apache.james.mailbox.model.MessageId;
 import org.apache.james.mailbox.store.mail.model.FlagsBuilder;
+import org.apache.james.mailbox.store.mail.model.HasMailboxContext;
 import org.apache.james.mailbox.store.mail.model.MailboxMessage;
 import org.apache.james.mailbox.store.mail.model.Property;
 
@@ -234,11 +235,6 @@ public class ImmutableMailboxMessage implements MailboxMessage {
     }
 
     @Override
-    public int compareTo(MailboxMessage o) {
-        throw new NotImplementedException();
-    }
-
-    @Override
     public void setUid(MessageUid uid) {
         throw new NotImplementedException();
     }
@@ -258,4 +254,8 @@ public class ImmutableMailboxMessage implements MailboxMessage {
         return FlagsBuilder.createFlags(this, userFlags);
     }
 
+    @Override
+    public int compareTo(HasMailboxContext o) {
+        return this.uid.compareTo(o.getUid());
+    }
 }

@@ -36,10 +36,10 @@ import org.apache.james.mailbox.cassandra.mail.CassandraAttachmentMapper;
 import org.apache.james.mailbox.cassandra.mail.CassandraMessageDAO;
 import org.apache.james.mailbox.cassandra.mail.CassandraMessageDAOV2;
 import org.apache.james.mailbox.cassandra.mail.MessageAttachmentRepresentation;
-import org.apache.james.mailbox.cassandra.mail.MessageWithoutAttachment;
-import org.apache.james.mailbox.cassandra.mail.RawMessageWithoutAttachment;
 import org.apache.james.mailbox.cassandra.mail.utils.Limit;
 import org.apache.james.mailbox.store.mail.MessageMapper;
+import org.apache.james.mailbox.store.mail.model.MailboxMessageWithoutAttachment;
+import org.apache.james.mailbox.store.mail.model.MessageWithoutAttachment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,7 +54,7 @@ public class V1ToV2Migration {
     private final AttachmentLoader attachmentLoader;
     private final CassandraConfiguration cassandraConfiguration;
     private final ExecutorService migrationExecutor;
-    private final ArrayBlockingQueue<Pair<RawMessageWithoutAttachment, Stream<MessageAttachmentRepresentation>>> messagesToBeMigrated;
+    private final ArrayBlockingQueue<Pair<MessageWithoutAttachment, Stream<MessageAttachmentRepresentation>>> messagesToBeMigrated;
     private final MigrationTracking migrationTracking;
 
     @Inject
@@ -84,7 +84,7 @@ public class V1ToV2Migration {
         migrationExecutor.shutdownNow();
     }
 
-    public CompletableFuture<Pair<MessageWithoutAttachment, Stream<MessageAttachmentRepresentation>>>
+    public CompletableFuture<Pair<MailboxMessageWithoutAttachment, Stream<MessageAttachmentRepresentation>>>
             getFromV2orElseFromV1AfterMigration(CassandraMessageDAOV2.MessageResult result) {
 
         if (result.isFound()) {
@@ -95,19 +95,19 @@ public class V1ToV2Migration {
             .thenApply(
                 Throwing.function(results -> results.findAny()
                     .orElseThrow(() -> new IllegalArgumentException("Message not found in DAO V1" + result.getMetadata()))))
-            .thenApply(message -> {
-                this.submitMigration(Pair.of(message.getLeft().toRawMessageWithoutAttachment(), message.getRight()));
+            .thenApply(messageAndAttachments -> {
+                this.submitMigration(messageAndAttachments);
 
-                return message;
+                return messageAndAttachments;
             });
     }
 
-    private void submitMigration(
-        Pair<RawMessageWithoutAttachment, Stream<MessageAttachmentRepresentation>> messageV1
+    private <T extends MessageWithoutAttachment> void submitMigration(
+        Pair<T, Stream<MessageAttachmentRepresentation>> messageV1
     ) {
         if (cassandraConfiguration.isOnTheFlyV1ToV2Migration()) {
             synchronized (messagesToBeMigrated) {
-                if (!messagesToBeMigrated.offer(messageV1)) {
+                if (!messagesToBeMigrated.offer(Pair.of(messageV1.getLeft(), messageV1.getRight()))) {
                     LOGGER.info("Migration queue is full message {} is ignored", messageV1.getLeft().getMessageId());
                 }
             }

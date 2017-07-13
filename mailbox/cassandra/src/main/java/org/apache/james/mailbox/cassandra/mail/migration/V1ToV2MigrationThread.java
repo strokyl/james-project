@@ -30,14 +30,10 @@ import org.apache.james.mailbox.cassandra.mail.AttachmentLoader;
 import org.apache.james.mailbox.cassandra.mail.CassandraMessageDAO;
 import org.apache.james.mailbox.cassandra.mail.CassandraMessageDAOV2;
 import org.apache.james.mailbox.cassandra.mail.MessageAttachmentRepresentation;
-import org.apache.james.mailbox.cassandra.mail.MessageWithoutAttachment;
-import org.apache.james.mailbox.cassandra.mail.RawMessageWithoutAttachment;
 import org.apache.james.mailbox.exception.MailboxException;
-import org.apache.james.mailbox.model.Attachment;
-import org.apache.james.mailbox.model.MessageAttachment;
 import org.apache.james.mailbox.store.mail.MessageMapper;
 import org.apache.james.mailbox.store.mail.model.Message;
-import org.apache.james.mailbox.store.mail.model.impl.SimpleMailboxMessage;
+import org.apache.james.mailbox.store.mail.model.MessageWithoutAttachment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,14 +41,14 @@ public class V1ToV2MigrationThread implements Runnable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(V1ToV2MigrationThread.class);
 
-    private final BlockingQueue<Pair<RawMessageWithoutAttachment, Stream<MessageAttachmentRepresentation>>> messagesToBeMigrated;
+    private final BlockingQueue<Pair<MessageWithoutAttachment, Stream<MessageAttachmentRepresentation>>> messagesToBeMigrated;
     private final CassandraMessageDAO messageDAOV1;
     private final CassandraMessageDAOV2 messageDAOV2;
     private final AttachmentLoader attachmentLoader;
     private final MigrationTracking migrationTracking;
 
     public V1ToV2MigrationThread(
-        BlockingQueue<Pair<RawMessageWithoutAttachment,
+        BlockingQueue<Pair<MessageWithoutAttachment,
         Stream<MessageAttachmentRepresentation>>> messagesToBeMigrated,
         CassandraMessageDAO messageDAOV1,
         CassandraMessageDAOV2 messageDAOV2,
@@ -70,7 +66,7 @@ public class V1ToV2MigrationThread implements Runnable {
     public void run() {
         while (true) {
             try {
-                Pair<RawMessageWithoutAttachment, Stream<MessageAttachmentRepresentation>> message = messagesToBeMigrated.take();
+                Pair<MessageWithoutAttachment, Stream<MessageAttachmentRepresentation>> message = messagesToBeMigrated.take();
                 performV1ToV2Migration(message).join();
             } catch (Exception e) {
                 LOGGER.error("Error occured in migration thread", e);
@@ -78,7 +74,7 @@ public class V1ToV2MigrationThread implements Runnable {
         }
     }
 
-    private CompletableFuture<Void> performV1ToV2Migration(Pair<RawMessageWithoutAttachment, Stream<MessageAttachmentRepresentation>> messageV1) {
+    private CompletableFuture<Void> performV1ToV2Migration(Pair<MessageWithoutAttachment, Stream<MessageAttachmentRepresentation>> messageV1) {
         return attachmentLoader.addAttachmentToMessages(Stream.of(messageV1), MessageMapper.FetchType.Full)
             .thenApply(stream -> stream.findAny().get())
             .thenCompose(this::performV1ToV2Migration);

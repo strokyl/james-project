@@ -35,9 +35,9 @@ import org.apache.james.mailbox.model.MailboxPath;
 import org.apache.james.mailbox.model.MessageAttachment;
 import org.apache.james.mailbox.model.MessageId;
 import org.apache.james.mailbox.model.TestId;
+import org.apache.james.mailbox.store.mail.model.impl.MessageUtil;
 import org.apache.james.mailbox.store.mail.model.impl.PropertyBuilder;
 import org.apache.james.mailbox.store.mail.model.impl.SimpleMailbox;
-import org.apache.james.mailbox.store.mail.model.impl.SimpleMailboxMessage;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -227,9 +227,21 @@ public class ListMessageAssertTest {
     }
 
     private MailboxMessage createMessage(Mailbox mailbox, MessageId messageId, String content, int bodyStart, PropertyBuilder propertyBuilder) {
-        SimpleMailboxMessage simpleMailboxMessage = new SimpleMailboxMessage(messageId, INTERNAL_DATE, content.length(), bodyStart, new SharedByteArrayInputStream(content.getBytes()), new Flags(), propertyBuilder, mailbox.getMailboxId());
-        simpleMailboxMessage.setUid(MESSAGE_UID);
-        return simpleMailboxMessage;
+        MailboxMessage mailboxMessage = MessageUtil.buildMailboxMessage()
+            .messageId(messageId)
+            .internalDate(INTERNAL_DATE)
+            .size(content.length())
+            .bodyStartOctet(bodyStart)
+            .content(new SharedByteArrayInputStream(content.getBytes()))
+            .flags(new Flags())
+            .propertyBuilder(propertyBuilder)
+            .mailboxId(MAILBOX_ID)
+            .uid(MESSAGE_UID)
+            .attachments(ImmutableList.<MessageAttachment>of())
+            .build();
+
+        mailboxMessage.setUid(MESSAGE_UID);
+        return mailboxMessage;
     }
 
 }

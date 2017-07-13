@@ -33,6 +33,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.james.backends.cassandra.CassandraCluster;
 import org.apache.james.backends.cassandra.CassandraConfiguration;
 import org.apache.james.backends.cassandra.init.CassandraModuleComposite;
+import org.apache.james.mailbox.FlagsBuilder;
 import org.apache.james.mailbox.MessageUid;
 import org.apache.james.mailbox.cassandra.ids.CassandraId;
 import org.apache.james.mailbox.cassandra.ids.CassandraMessageId;
@@ -53,8 +54,9 @@ import org.apache.james.mailbox.model.ComposedMessageIdWithMetaData;
 import org.apache.james.mailbox.model.MessageAttachment;
 import org.apache.james.mailbox.model.MessageId;
 import org.apache.james.mailbox.store.mail.MessageMapper;
+import org.apache.james.mailbox.store.mail.model.MailboxMessage;
+import org.apache.james.mailbox.store.mail.model.impl.MessageUtil;
 import org.apache.james.mailbox.store.mail.model.impl.PropertyBuilder;
-import org.apache.james.mailbox.store.mail.model.impl.SimpleMailboxMessage;
 import org.apache.james.util.FluentFutureStream;
 import org.apache.james.util.OptionalConverter;
 import org.assertj.core.api.JUnitSoftAssertions;
@@ -164,7 +166,7 @@ public class V1ToV2MigrationTest {
 
     @Test
     public void migrationShouldWorkWithoutAttachments() throws Exception {
-        SimpleMailboxMessage originalMessage = createMessage(messageId, CONTENT, BODY_START,
+        MailboxMessage originalMessage = createMessage(messageId, CONTENT, BODY_START,
             new PropertyBuilder(), ImmutableList.of());
         messageDAOV1.save(originalMessage).join();
 
@@ -174,20 +176,20 @@ public class V1ToV2MigrationTest {
 
         CassandraMessageDAOV2.MessageResult messageResult = retrieveMessageOnV2().get();
         softly.assertThat(messageResult.message().getLeft().getMessageId()).isEqualTo(messageId);
-        softly.assertThat(IOUtils.toString(messageResult.message().getLeft().getContent(), Charsets.UTF_8))
+        softly.assertThat(IOUtils.toString(messageResult.message().getLeft().getFullContent(), Charsets.UTF_8))
             .isEqualTo(CONTENT);
         softly.assertThat(messageResult.message().getRight().findAny().isPresent()).isFalse();
     }
 
     @Test
     public void fullMigrationShouldRemoveAllMessageFromOldDao() throws Exception {
-        SimpleMailboxMessage originalMessage = createMessage(messageId, CONTENT, BODY_START,
+        MailboxMessage originalMessage = createMessage(messageId, CONTENT, BODY_START,
             new PropertyBuilder(), ImmutableList.of());
 
-        SimpleMailboxMessage originalMessage2 = createMessage(messageId2, CONTENT, BODY_START,
+        MailboxMessage originalMessage2 = createMessage(messageId2, CONTENT, BODY_START,
             new PropertyBuilder(), ImmutableList.of());
 
-        SimpleMailboxMessage originalMessage3 = createMessage(messageId3, CONTENT, BODY_START,
+        MailboxMessage originalMessage3 = createMessage(messageId3, CONTENT, BODY_START,
             new PropertyBuilder(), ImmutableList.of());
 
         FluentFutureStream.ofFutures(
@@ -203,13 +205,13 @@ public class V1ToV2MigrationTest {
 
     @Test
     public void fullMigrationShouldHaveMovedAllMessageIntoNewDao() throws Exception {
-        SimpleMailboxMessage originalMessage = createMessage(messageId, CONTENT, BODY_START,
+        MailboxMessage originalMessage = createMessage(messageId, CONTENT, BODY_START,
             new PropertyBuilder(), ImmutableList.of());
 
-        SimpleMailboxMessage originalMessage2 = createMessage(messageId2, CONTENT, BODY_START,
+        MailboxMessage originalMessage2 = createMessage(messageId2, CONTENT, BODY_START,
             new PropertyBuilder(), ImmutableList.of());
 
-        SimpleMailboxMessage originalMessage3 = createMessage(messageId3, CONTENT, BODY_START,
+        MailboxMessage originalMessage3 = createMessage(messageId3, CONTENT, BODY_START,
             new PropertyBuilder(), ImmutableList.of());
 
         FluentFutureStream.ofFutures(
@@ -242,7 +244,7 @@ public class V1ToV2MigrationTest {
 
     @Test
     public void migrationShouldWorkWithAttachments() throws Exception {
-        SimpleMailboxMessage originalMessage = createMessage(messageId, CONTENT, BODY_START,
+        MailboxMessage originalMessage = createMessage(messageId, CONTENT, BODY_START,
             new PropertyBuilder(), ImmutableList.of(messageAttachment));
 
         attachmentMapper.storeAttachment(attachment);
@@ -255,7 +257,7 @@ public class V1ToV2MigrationTest {
 
         CassandraMessageDAOV2.MessageResult messageResult = retrieveMessageOnV2().get();
         softly.assertThat(messageResult.message().getLeft().getMessageId()).isEqualTo(messageId);
-        softly.assertThat(IOUtils.toString(messageResult.message().getLeft().getContent(), Charsets.UTF_8))
+        softly.assertThat(IOUtils.toString(messageResult.message().getLeft().getFullContent(), Charsets.UTF_8))
             .isEqualTo(CONTENT);
         softly.assertThat(messageResult.message().getRight().findAny().get()).isEqualTo(MessageAttachmentRepresentation.builder()
             .attachmentId(attachment.getAttachmentId())
@@ -295,7 +297,17 @@ public class V1ToV2MigrationTest {
         return messageResult;
     }
 
-    private SimpleMailboxMessage createMessage(MessageId messageId, String content, int bodyStart, PropertyBuilder propertyBuilder, List<MessageAttachment> attachments) {
-        return new SimpleMailboxMessage(messageId, new Date(), content.length(), bodyStart, new SharedByteArrayInputStream(content.getBytes()), new Flags(), propertyBuilder, MAILBOX_ID, attachments);
+    private MailboxMessage createMessage(MessageId messageId, String content, int bodyStart, PropertyBuilder propertyBuilder, List<MessageAttachment> attachments) {
+        return MessageUtil.buildMailboxMessage()
+            .messageId(messageId)
+            .internalDate(new Date())
+            .size(content.length())
+            .bodyStartOctet(bodyStart)
+            .content(new SharedByteArrayInputStream(content.getBytes(Charsets.UTF_8)))
+            .mailboxId(MAILBOX_ID)
+            .attachments(attachments)
+            .propertyBuilder(propertyBuilder)
+            .flags(FlagsBuilder.builder().build())
+            .build();
     }
 }

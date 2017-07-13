@@ -28,12 +28,14 @@ import javax.mail.Flags;
 import javax.mail.Flags.Flag;
 import javax.mail.util.SharedByteArrayInputStream;
 
+import com.google.common.base.Charsets;
 import org.apache.james.mailbox.ApplicableFlagBuilder;
+import org.apache.james.mailbox.model.MessageAttachment;
 import org.apache.james.mailbox.model.TestId;
 import org.apache.james.mailbox.store.mail.model.DefaultMessageId;
 import org.apache.james.mailbox.store.mail.model.MailboxMessage;
+import org.apache.james.mailbox.store.mail.model.impl.MessageUtil;
 import org.apache.james.mailbox.store.mail.model.impl.PropertyBuilder;
-import org.apache.james.mailbox.store.mail.model.impl.SimpleMailboxMessage;
 import org.assertj.core.api.JUnitSoftAssertions;
 import org.junit.Rule;
 import org.junit.Test;
@@ -108,8 +110,17 @@ public class ApplicableFlagCalculatorTest {
     private MailboxMessage createMessage(Flags messageFlags) {
         String content = "Any content";
         int bodyStart = 10;
-        return new SimpleMailboxMessage(new DefaultMessageId(), new Date(), content.length(), bodyStart,
-            new SharedByteArrayInputStream(content.getBytes()), messageFlags, new PropertyBuilder(), TestId.of(1));
+        return MessageUtil.buildMailboxMessage()
+            .messageId(new DefaultMessageId())
+            .internalDate(new Date())
+            .size(content.length())
+            .bodyStartOctet(bodyStart)
+            .content(new SharedByteArrayInputStream(content.getBytes(Charsets.UTF_8)))
+            .flags(messageFlags)
+            .propertyBuilder(new PropertyBuilder())
+            .mailboxId(TestId.of(1))
+            .attachments(ImmutableList.<MessageAttachment>of())
+            .build();
     }
 
     private Flags getDefaultApplicableFlag() {
