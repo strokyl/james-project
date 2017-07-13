@@ -1,4 +1,4 @@
-/****************************************************************
+package org.apache.james.mailbox; /****************************************************************
  * Licensed to the Apache Software Foundation (ASF) under one   *
  * or more contributor license agreements.  See the NOTICE file *
  * distributed with this work for additional information        *
@@ -17,50 +17,38 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mailbox;
+import org.junit.Test;
+
 
 import javax.mail.Flags;
 
-public class FlagsBuilder {
+import static org.assertj.core.api.Assertions.assertThat;
 
-    public static FlagsBuilder builder() {
-        return new FlagsBuilder();
-    }
+public class FlagsBuilderTest {
 
-    private final Flags internalFlags;
 
-    public FlagsBuilder() {
-        internalFlags = new Flags();
-    }
+    @Test
+    public void shouldCorrectErrorOnEqualsOfFlags() {
+        String userFlag = "userFlag";
 
-    public FlagsBuilder add(Flags.Flag... flags) {
-        for (Flags.Flag flag : flags) {
-            internalFlags.add(flag);
-        }
-        return this;
-    }
+        Flags flagWithInternNullUsersFlag = FlagsBuilder.builder()
+            .add(Flags.Flag.DELETED)
+            .build();
 
-    public FlagsBuilder add(String... flags) {
-        for (String userFlag : flags) {
-            internalFlags.add(userFlag);
-        }
-        return this;
-    }
+        Flags flagWithEmptyUsersFlag = FlagsBuilder.builder()
+            .add(Flags.Flag.DELETED)
+            .add(userFlag)
+            .build();
 
-    public FlagsBuilder add(Flags... flagsArray) {
-        for (Flags flags: flagsArray) {
-            for(Flags.Flag flag: flags.getSystemFlags()) {
-                internalFlags.add(flag);
-            }
+        flagWithEmptyUsersFlag.remove(userFlag);
 
-            for(String flag: flags.getUserFlags()) {
-                internalFlags.add(flag);
-            }
-        }
-        return this;
-    }
+        //reveal bug from Flags
+        assertThat(flagWithEmptyUsersFlag).isNotEqualTo(flagWithInternNullUsersFlag);
 
-    public Flags build() {
-        return new Flags(internalFlags);
+        Flags correctedFlagByBuilder = FlagsBuilder.builder()
+            .add(flagWithEmptyUsersFlag)
+            .build();
+
+        assertThat(correctedFlagByBuilder).isEqualTo(flagWithInternNullUsersFlag);
     }
 }
