@@ -471,7 +471,7 @@ public abstract class MailboxManagerTest {
         mailboxManager.setRights(inbox1,
             MailboxACL.EMPTY.apply(MailboxACL.command()
                 .forUser(USER_2)
-                .rights(MailboxACL.Right.Read)
+                .rights(MailboxACL.Right.Lookup)
                 .asAddition()),
             session1);
 
@@ -496,7 +496,7 @@ public abstract class MailboxManagerTest {
         mailboxManager.setRights(inbox1,
             MailboxACL.EMPTY.apply(MailboxACL.command()
                 .forUser(USER_2)
-                .rights(MailboxACL.Right.Read)
+                .rights(MailboxACL.Right.Read, MailboxACL.Right.Lookup)
                 .asAddition()),
             session1);
 
@@ -521,7 +521,7 @@ public abstract class MailboxManagerTest {
         mailboxManager.setRights(inbox1,
             MailboxACL.EMPTY.apply(MailboxACL.command()
                 .forUser(USER_2)
-                .rights(MailboxACL.Right.Read)
+                .rights(MailboxACL.Right.Read, MailboxACL.Right.Lookup)
                 .asAddition()),
             session1);
 
@@ -548,13 +548,13 @@ public abstract class MailboxManagerTest {
         mailboxManager.setRights(inbox1,
             MailboxACL.EMPTY.apply(MailboxACL.command()
                 .forUser(USER_2)
-                .rights(MailboxACL.Right.Read)
+                .rights(MailboxACL.Right.Read, MailboxACL.Right.Lookup)
                 .asAddition()),
             session1);
         mailboxManager.setRights(mailboxPath1,
             MailboxACL.EMPTY.apply(MailboxACL.command()
                 .forUser(USER_2)
-                .rights(MailboxACL.Right.Read)
+                .rights(MailboxACL.Right.Read, MailboxACL.Right.Lookup)
                 .asAddition()),
             session1);
 
@@ -837,14 +837,14 @@ public abstract class MailboxManagerTest {
         mailboxManager.setRights(inbox1,
             MailboxACL.EMPTY.apply(MailboxACL.command()
                 .forUser(USER_2)
-                .rights(MailboxACL.Right.Read)
+                .rights(MailboxACL.Right.Read, MailboxACL.Right.Lookup)
                 .asAddition()),
             session1);
 
         mailboxManager.setRights(inbox1,
             MailboxACL.EMPTY.apply(MailboxACL.command()
                 .forUser(USER_2)
-                .rights(MailboxACL.Right.Read)
+                .rights(MailboxACL.Right.Read, MailboxACL.Right.Lookup)
                 .asRemoval()),
             session1);
 
