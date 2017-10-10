@@ -31,6 +31,8 @@ import java.util.stream.Stream;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 import org.apache.james.mailbox.MailboxListener;
 import org.apache.james.mailbox.MailboxManager;
 import org.apache.james.mailbox.MailboxPathLocker;
@@ -429,7 +431,7 @@ public class StoreMailboxManager implements MailboxManager {
     }
 
     @Override
-    public MailboxSession login(String userid, String passwd) throws BadCredentialsException, MailboxException {
+    public MailboxSession login(String userid, String passwd) throws MailboxException {
         if (isValidLogin(userid, passwd)) {
             return createSession(userid, passwd, SessionType.User);
         } else {
@@ -752,9 +754,42 @@ public class StoreMailboxManager implements MailboxManager {
             .anyMatch(mailbox -> mailbox.isChildOf(parentMailbox, mailboxSession));
     }
 
+    private Stream<MailboxId> getPrivateMailbox(MailboxSession session) throws MailboxException {
+        return search(MailboxQuery.privateMailboxesBuilder(session).build(), session)
+            .stream()
+            .map(mailboxMetaData -> mailboxMetaData.getId());
+    }
+
+    private Stream<MailboxId> getAllReadableMailbox(MailboxSession session) throws MailboxException {
+        MailboxMapper mailboxMapper = mailboxSessionMapperFactory.getMailboxMapper(session);
+
+        Stream<MailboxId> degelatedMailbox = getDelegatedMailboxes(
+              mailboxMapper,
+              MailboxQuery.builder().build(),
+              session)
+            .map(mailbox -> mailbox.getMailboxId());
+
+        return Stream.concat(getPrivateMailbox(session), degelatedMailbox);
+    }
+
     @Override
     public List<MessageId> search(MultimailboxesSearchQuery expression, MailboxSession session, long limit) throws MailboxException {
-        return index.search(session, expression, limit);
+        ImmutableSet<MailboxId> allReadableMailbox = getAllReadableMailbox(session).collect(Guavate.toImmutableSet());
+        ImmutableSet<MailboxId> wantedMailboxesSuperSet;
+
+        if (expression.getInMailboxes().isEmpty()) {
+            wantedMailboxesSuperSet = allReadableMailbox;
+        } else {
+            wantedMailboxesSuperSet = Sets
+                .intersection(allReadableMailbox, expression.getInMailboxes())
+                .immutableCopy();
+        }
+
+        ImmutableSet<MailboxId> wantedMailboxesId = Sets
+            .difference(wantedMailboxesSuperSet, expression.getNotInMailboxes())
+            .immutableCopy();
+
+        return index.search(session, wantedMailboxesId, expression.getSearchQuery(), limit);
     }
 
     @Override
