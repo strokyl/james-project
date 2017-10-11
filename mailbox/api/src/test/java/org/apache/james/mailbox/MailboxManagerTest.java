@@ -642,6 +642,41 @@ public abstract class MailboxManagerTest {
     }
 
     @Test
+    public void searchForMessageShouldNotReturnMessagesFromMyDelegatedMailboxesICanNot() throws MailboxException {
+        Assume.assumeTrue(mailboxManager.hasCapability(MailboxCapabilities.ACL));
+
+        boolean isRecent = false;
+
+        session = mailboxManager.createSystemSession(USER_1);
+        MailboxSession sessionFromDelegater = mailboxManager.createSystemSession(USER_2);
+        MailboxPath delegatedMailboxPath = MailboxPath.forUser(USER_2, "SHARED");
+        MailboxId delegatedMailboxId = mailboxManager.createMailbox(delegatedMailboxPath, sessionFromDelegater).get();
+        MessageManager delegatedMessageManager = mailboxManager.getMailbox(delegatedMailboxId, sessionFromDelegater);
+
+        MessageId messageId = delegatedMessageManager.appendMessage(
+            new ByteArrayInputStream("Subject: test\r\n\r\ntestmail".getBytes()),
+            new Date(),
+            sessionFromDelegater,
+            isRecent,
+            new Flags())
+            .getMessageId();
+
+        mailboxManager.setRights(delegatedMailboxPath,
+            MailboxACL.EMPTY.apply(MailboxACL.command()
+                .forUser(USER_1)
+                .rights(MailboxACL.Right.Lookup)
+                .asAddition()),
+            sessionFromDelegater);
+
+        MultimailboxesSearchQuery multiMailboxesQuery = MultimailboxesSearchQuery
+            .from(new SearchQuery())
+            .build();
+
+        assertThat(mailboxManager.search(multiMailboxesQuery, session, DEFAULT_MAXIMUM_LIMIT))
+            .isEmpty();
+    }
+
+    @Test
     public void searchForMessageShouldOnlySearchInMailboxICanRead() throws MailboxException {
         Assume.assumeTrue(mailboxManager.hasCapability(MailboxCapabilities.ACL));
 
