@@ -70,12 +70,9 @@ public class ElasticSearchSearcher {
         this.mailboxIdFactory = mailboxIdFactory;
         this.messageIdFactory = messageIdFactory;
     }
-    
-    public Stream<MessageSearchIndex.SearchResult> search(
-        Collection<MailboxId> mailboxIds,
-        SearchQuery query,
-        Optional<Long> limit
-    ) throws MailboxException {
+
+    public Stream<MessageSearchIndex.SearchResult> search(Collection<MailboxId> mailboxIds, SearchQuery query,
+                                                          Optional<Long> limit) throws MailboxException {
         SearchRequestBuilder searchRequestBuilder = getSearchRequestBuilder(client, mailboxIds, query, limit);
         Stream<MessageSearchIndex.SearchResult> pairStream = new ScrollIterable(client, searchRequestBuilder).stream()
             .flatMap(this::transformResponseToUidStream);
@@ -83,13 +80,9 @@ public class ElasticSearchSearcher {
         return limit.map(pairStream::limit)
             .orElse(pairStream);
     }
-    
-    private SearchRequestBuilder getSearchRequestBuilder(
-        Client client,
-        Collection<MailboxId> users,
-        SearchQuery query,
-        Optional<Long> limit
-    ) {
+
+    private SearchRequestBuilder getSearchRequestBuilder(Client client, Collection<MailboxId> users,
+                                                         SearchQuery query, Optional<Long> limit) {
         return query.getSorts()
             .stream()
             .reduce(
