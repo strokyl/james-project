@@ -570,6 +570,10 @@ public abstract class MailboxManagerTest {
 
     @Test
     public void searchForMessageShouldReturnMessagesFromAllMyMailboxesIfNoMailboxesAreSpecified() throws MailboxException {
+        Assume.assumeTrue(mailboxManager
+            .getSupportedMessageCapabilities()
+            .contains(MailboxManager.MessageCapabilities.UniqueID));
+
         boolean isRecent = false;
 
         session = mailboxManager.createSystemSession(USER_1);
