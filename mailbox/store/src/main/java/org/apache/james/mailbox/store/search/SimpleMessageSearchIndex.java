@@ -29,6 +29,7 @@ import java.util.stream.Stream;
 
 import javax.inject.Inject;
 
+import com.github.fge.lambdas.Throwing;
 import org.apache.james.mailbox.MailboxManager.MessageCapabilities;
 import org.apache.james.mailbox.MailboxManager.SearchCapabilities;
 import org.apache.james.mailbox.MailboxSession;
@@ -146,13 +147,10 @@ public class SimpleMessageSearchIndex implements MessageSearchIndex {
     @Override
     public List<MessageId> search(MailboxSession session, final Collection<MailboxId> mailboxIds, SearchQuery searchQuery, long limit) throws MailboxException {
         MailboxMapper mailboxManager = mailboxMapperFactory.getMailboxMapper(session);
-        ImmutableList.Builder<Mailbox> builder = ImmutableList.builder();
 
-        for(MailboxId mailboxId : mailboxIds) {
-            builder.add(mailboxManager.findMailboxById(mailboxId));
-        }
-
-        Stream<Mailbox> filteredMailboxes = builder.build().stream();
+        Stream<Mailbox> filteredMailboxes = mailboxIds
+            .stream()
+            .map(Throwing.function(mailboxManager::findMailboxById).sneakyThrow());
 
         return getAsMessageIds(searchResults(session, filteredMailboxes, searchQuery), limit);
     }
