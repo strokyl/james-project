@@ -31,8 +31,6 @@ import java.util.stream.Stream;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
 import org.apache.james.mailbox.MailboxListener;
 import org.apache.james.mailbox.MailboxManager;
 import org.apache.james.mailbox.MailboxPathLocker;
@@ -92,6 +90,7 @@ import org.slf4j.LoggerFactory;
 import com.github.fge.lambdas.Throwing;
 import com.github.steveash.guavate.Guavate;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 
 /**
@@ -754,42 +753,28 @@ public class StoreMailboxManager implements MailboxManager {
             .anyMatch(mailbox -> mailbox.isChildOf(parentMailbox, mailboxSession));
     }
 
-    private Stream<MailboxId> getPrivateMailbox(MailboxSession session) throws MailboxException {
-        return search(MailboxQuery.privateMailboxesBuilder(session).build(), session)
-            .stream()
-            .map(mailboxMetaData -> mailboxMetaData.getId());
+    @Override
+    public List<MessageId> search(MultimailboxesSearchQuery expression, MailboxSession session, long limit) throws MailboxException {
+        ImmutableSet<MailboxId> wantedMailboxesId =
+            getInMailboxes(expression.getInMailboxes(), session)
+                .filter(id -> !expression.getNotInMailboxes().contains(id))
+                .collect(Guavate.toImmutableSet());
+
+        return index.search(session, wantedMailboxesId, expression.getSearchQuery(), limit);
+    }
+
+    private Stream<MailboxId> getInMailboxes(ImmutableSet<MailboxId> inMailboxes, MailboxSession session) throws MailboxException {
+       if (inMailboxes.isEmpty()) {
+            return getAllReadableMailbox(session);
+        } else {
+            return getAllReadableMailbox(session).filter(inMailboxes::contains);
+        }
     }
 
     private Stream<MailboxId> getAllReadableMailbox(MailboxSession session) throws MailboxException {
-        MailboxMapper mailboxMapper = mailboxSessionMapperFactory.getMailboxMapper(session);
-
-        Stream<MailboxId> degelatedMailbox = getDelegatedMailboxes(
-              mailboxMapper,
-              MailboxQuery.builder().build(),
-              session)
-            .map(mailbox -> mailbox.getMailboxId());
-
-        return Stream.concat(getPrivateMailbox(session), degelatedMailbox);
-    }
-
-    @Override
-    public List<MessageId> search(MultimailboxesSearchQuery expression, MailboxSession session, long limit) throws MailboxException {
-        ImmutableSet<MailboxId> allReadableMailbox = getAllReadableMailbox(session).collect(Guavate.toImmutableSet());
-        ImmutableSet<MailboxId> wantedMailboxesSuperSet;
-
-        if (expression.getInMailboxes().isEmpty()) {
-            wantedMailboxesSuperSet = allReadableMailbox;
-        } else {
-            wantedMailboxesSuperSet = Sets
-                .intersection(allReadableMailbox, expression.getInMailboxes())
-                .immutableCopy();
-        }
-
-        ImmutableSet<MailboxId> wantedMailboxesId = Sets
-            .difference(wantedMailboxesSuperSet, expression.getNotInMailboxes())
-            .immutableCopy();
-
-        return index.search(session, wantedMailboxesId, expression.getSearchQuery(), limit);
+        return search(MailboxQuery.builder().matchesAllMailboxNames().build(), session)
+            .stream()
+            .map(MailboxMetaData::getId);
     }
 
     @Override
