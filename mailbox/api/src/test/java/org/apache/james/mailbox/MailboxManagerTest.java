@@ -569,7 +569,7 @@ public abstract class MailboxManagerTest {
     }
 
     @Test
-    public void searchForMessageShouldReturnMessagesFromAllMyMailboxesIfNoMailboxesArePrecised() throws MailboxException {
+    public void searchForMessageShouldReturnMessagesFromAllMyMailboxesIfNoMailboxesAreSpecified() throws MailboxException {
         boolean isRecent = false;
 
         session = mailboxManager.createSystemSession(USER_1);
@@ -629,7 +629,7 @@ public abstract class MailboxManagerTest {
         mailboxManager.setRights(delegatedMailboxPath,
             MailboxACL.EMPTY.apply(MailboxACL.command()
                 .forUser(USER_1)
-                .rights(MailboxACL.Right.Read)
+                .rights(MailboxACL.Right.Read, MailboxACL.Right.Lookup)
                 .asAddition()),
             sessionFromDelegater);
 
