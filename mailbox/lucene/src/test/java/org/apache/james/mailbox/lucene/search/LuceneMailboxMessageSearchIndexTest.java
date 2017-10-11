@@ -295,7 +295,7 @@ public class LuceneMailboxMessageSearchIndexTest {
         query.andCriteria(SearchQuery.bodyContains("My Body"));
 
         List<MessageId> result = index.search(session,
-                ImmutableList.of(mailbox.getMailboxId(), mailbox2.getMailboxId(), mailbox3.getMailboxId()),
+                ImmutableList.of(mailbox.getMailboxId(), mailbox3.getMailboxId()),
                 query,
                 LIMIT);
 
@@ -319,7 +319,7 @@ public class LuceneMailboxMessageSearchIndexTest {
         query.andCriteria(SearchQuery.all());
 
         int limit = 1;
-        List<MessageId> result = index.search(session, ImmutableList.of(mailbox.getMailboxId(), mailbox2.getMailboxId(), mailbox3.getMailboxId()), query, LIMIT);
+        List<MessageId> result = index.search(session, ImmutableList.of(mailbox.getMailboxId(), mailbox2.getMailboxId(), mailbox3.getMailboxId()), query, limit);
 
         assertThat(result).hasSize(limit);
     }
