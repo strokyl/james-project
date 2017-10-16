@@ -109,16 +109,17 @@ public abstract class GetMessageListMethodTest {
                 .build();
 
         this.domain = "domain.tld";
-        String password = "password";
 
         this.alice = "alice@" + domain;
         dataProbe.addDomain(domain);
-        dataProbe.addUser(alice, password);
-        this.aliceAccessToken = HttpJmapAuthentication.authenticateJamesUser(baseUri(), alice, password);
+        String alicePassword = "alicePassword";
+        dataProbe.addUser(alice, alicePassword);
+        this.aliceAccessToken = HttpJmapAuthentication.authenticateJamesUser(baseUri(), alice, alicePassword);
 
         this.bob = "bob@" + domain;
-        dataProbe.addUser(bob, password);
-        this.bobAccessToken = HttpJmapAuthentication.authenticateJamesUser(baseUri(), bob, password);
+        String bobPassword = "bobPassword";
+        dataProbe.addUser(bob, bobPassword);
+        this.bobAccessToken = HttpJmapAuthentication.authenticateJamesUser(baseUri(), bob, bobPassword);
     }
 
     private URIBuilder baseUri() {
