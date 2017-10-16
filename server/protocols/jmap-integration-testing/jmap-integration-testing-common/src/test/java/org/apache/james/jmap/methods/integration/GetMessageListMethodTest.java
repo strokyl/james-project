@@ -182,7 +182,7 @@ public abstract class GetMessageListMethodTest {
         .then()
             .statusCode(200)
             .body(NAME, equalTo("messageList"))
-            .body(ARGUMENTS + ".messageIds", hasSize(0));
+            .body(ARGUMENTS + ".messageIds", empty());
     }
 
     @Test
