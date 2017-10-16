@@ -45,11 +45,11 @@ import org.apache.james.jmap.HttpJmapAuthentication;
 import org.apache.james.jmap.api.access.AccessToken;
 import org.apache.james.mailbox.FlagsBuilder;
 import org.apache.james.mailbox.model.ComposedMessageId;
-import org.apache.james.mailbox.model.MailboxACL;
+import org.apache.james.mailbox.model.MailboxACL.Rfc4314Rights;
+import org.apache.james.mailbox.model.MailboxACL.Right;
 import org.apache.james.mailbox.model.MailboxConstants;
 import org.apache.james.mailbox.model.MailboxId;
 import org.apache.james.mailbox.model.MailboxPath;
-import org.apache.james.mailbox.store.probe.ACLProbe;
 import org.apache.james.mailbox.store.probe.MailboxProbe;
 import org.apache.james.mime4j.dom.Message;
 import org.apache.james.mime4j.dom.MessageWriter;
@@ -78,6 +78,7 @@ public abstract class GetMessageListMethodTest {
     private static final String NAME = "[0][0]";
     private static final String ARGUMENTS = "[0][1]";
     private static final ZoneId ZONE_ID = ZoneId.of("Europe/Paris");
+    private ACLProbeImpl aclProbe;
 
     protected abstract GuiceJamesServer createJmapServer();
 
@@ -98,6 +99,7 @@ public abstract class GetMessageListMethodTest {
         jmapServer.start();
         mailboxProbe = jmapServer.getProbe(MailboxProbeImpl.class);
         dataProbe = jmapServer.getProbe(DataProbeImpl.class);
+        aclProbe = jmapServer.getProbe(ACLProbeImpl.class);
 
         RestAssured.requestSpecification = new RequestSpecBuilder()
                 .setContentType(ContentType.JSON)
@@ -134,18 +136,17 @@ public abstract class GetMessageListMethodTest {
     }
 
     @Test
-    public void getMessageListShouldWorkOnDelegatedMailboxes() throws Exception {
-        MailboxId mailboxId = mailboxProbe.createMailbox(MailboxConstants.USER_NAMESPACE, bob, "delegated");
+    public void getMessageListShouldListMessagesWhenReadRight() throws Exception {
+        mailboxProbe.createMailbox(MailboxConstants.USER_NAMESPACE, bob, "delegated");
         MailboxPath delegatedMailboxPath = MailboxPath.forUser(bob, "delegated");
         ComposedMessageId message = mailboxProbe.appendMessage(bob, delegatedMailboxPath,
             new ByteArrayInputStream("Subject: test\r\n\r\ntestmail".getBytes()), new Date(), false, new Flags());
 
         await();
 
-        jmapServer.getProbe(ACLProbeImpl.class).replaceRights(delegatedMailboxPath, alice, MailboxACL.command()
-                .forUser(bob)
-                .rights(MailboxACL.Right.Read, MailboxACL.Right.Lookup)
-                .asAddition().getRights());
+        aclProbe.replaceRights(delegatedMailboxPath,
+            alice,
+            new Rfc4314Rights(Right.Read));
 
         given()
             .header("Authorization", aliceAccessToken.serialize())
@@ -160,18 +161,17 @@ public abstract class GetMessageListMethodTest {
     }
 
     @Test
-    public void getMessageListShouldNotLeastMessageIfTheUserHasOnlyReadRight() throws Exception {
-        MailboxId mailboxId = mailboxProbe.createMailbox(MailboxConstants.USER_NAMESPACE, bob, "delegated");
+    public void getMessageListShouldNotListMessageIfTheUserHasOnlyLookupRight() throws Exception {
+        mailboxProbe.createMailbox(MailboxConstants.USER_NAMESPACE, bob, "delegated");
         MailboxPath delegatedMailboxPath = MailboxPath.forUser(bob, "delegated");
-        ComposedMessageId message = mailboxProbe.appendMessage(bob, delegatedMailboxPath,
+        mailboxProbe.appendMessage(bob, delegatedMailboxPath,
             new ByteArrayInputStream("Subject: test\r\n\r\ntestmail".getBytes()), new Date(), false, new Flags());
 
         await();
 
-        jmapServer.getProbe(ACLProbeImpl.class).replaceRights(delegatedMailboxPath, alice, MailboxACL.command()
-            .forUser(bob)
-            .rights(MailboxACL.Right.Read)
-            .asAddition().getRights());
+        aclProbe.replaceRights(delegatedMailboxPath,
+            alice,
+            new Rfc4314Rights(Right.Lookup));
 
         given()
             .header("Authorization", aliceAccessToken.serialize())
@@ -179,30 +179,6 @@ public abstract class GetMessageListMethodTest {
         .when()
             .post("/jmap")
         .then()
-            .statusCode(200)
-            .body(NAME, equalTo("messageList"))
-            .body(ARGUMENTS + ".messageIds", hasSize(0));
-    }
-
-    public void getMessageListShouldNotLeastMessageIfTheUserHasOnlyLookupRight() throws Exception {
-        MailboxId mailboxId = mailboxProbe.createMailbox(MailboxConstants.USER_NAMESPACE, bob, "delegated");
-        MailboxPath delegatedMailboxPath = MailboxPath.forUser(bob, "delegated");
-        ComposedMessageId message = mailboxProbe.appendMessage(bob, delegatedMailboxPath,
-            new ByteArrayInputStream("Subject: test\r\n\r\ntestmail".getBytes()), new Date(), false, new Flags());
-
-        await();
-
-        jmapServer.getProbe(ACLProbeImpl.class).replaceRights(delegatedMailboxPath, alice, MailboxACL.command()
-            .forUser(bob)
-            .rights(MailboxACL.Right.Lookup)
-            .asAddition().getRights());
-
-        given()
-            .header("Authorization", aliceAccessToken.serialize())
-            .body("[[\"getMessageList\", {}, \"#0\"]]")
-            .when()
-            .post("/jmap")
-            .then()
             .statusCode(200)
             .body(NAME, equalTo("messageList"))
             .body(ARGUMENTS + ".messageIds", hasSize(0));
