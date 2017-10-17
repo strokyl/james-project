@@ -29,6 +29,7 @@ import org.apache.james.mailbox.store.CombinationManagerTestSystem;
 import org.apache.james.mailbox.store.FakeAuthenticator;
 import org.apache.james.mailbox.store.FakeAuthorizator;
 import org.apache.james.mailbox.store.MessageManagerTestSystem;
+import org.apache.james.mailbox.store.StoreRightManager;
 import org.apache.james.mailbox.store.mail.model.impl.MessageParser;
 
 import com.google.common.base.Throwables;
@@ -57,11 +58,12 @@ public class MessageManagerTestSystemProvider {
         InMemoryMailboxSessionMapperFactory mailboxSessionMapperFactory = new InMemoryMailboxSessionMapperFactory();
         MessageId.Factory messageIdFactory = new InMemoryMessageId.Factory();
         FakeAuthenticator authenticator = new FakeAuthenticator();
+        StoreRightManager storeRightManager = new StoreRightManager(mailboxSessionMapperFactory, aclResolver, groupMembershipResolver);
         FakeAuthorizator authorizator = FakeAuthorizator.defaultReject();
         authenticator.addUser(MailboxFixture.USER, PASSWORD);
         authenticator.addUser(MailboxFixture.OTHER_USER, PASSWORD);
         InMemoryMailboxManager mailboxManager = new InMemoryMailboxManager(mailboxSessionMapperFactory, authenticator, authorizator,
-                aclResolver, groupMembershipResolver, messageParser, messageIdFactory, LIMIT_ANNOTATIONS, LIMIT_ANNOTATION_SIZE);
+                messageParser, messageIdFactory, LIMIT_ANNOTATIONS, LIMIT_ANNOTATION_SIZE, storeRightManager);
 
         try {
             mailboxManager.init();

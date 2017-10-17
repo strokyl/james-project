@@ -53,6 +53,7 @@ import org.apache.james.mailbox.model.search.MailboxQuery;
 import org.apache.james.mailbox.store.FakeAuthorizator;
 import org.apache.james.mailbox.store.JVMMailboxPathLocker;
 import org.apache.james.mailbox.store.SimpleMailboxMetaData;
+import org.apache.james.mailbox.store.StoreRightManager;
 import org.apache.james.mailbox.store.mail.model.DefaultMessageId;
 import org.apache.james.mailbox.store.mail.model.impl.MessageParser;
 import org.apache.james.metrics.logger.DefaultMetricFactory;
@@ -112,14 +113,19 @@ public class UserMailboxesRoutesTest {
         @Before
         public void setUp() throws Exception {
             MessageId.Factory messageIdFactory = new DefaultMessageId.Factory();
-            InMemoryMailboxManager mailboxManager = new InMemoryMailboxManager(new InMemoryMailboxSessionMapperFactory(),
+            InMemoryMailboxSessionMapperFactory mailboxSessionMapperFactory = new InMemoryMailboxSessionMapperFactory();
+
+            StoreRightManager storeRightManager = new StoreRightManager(mailboxSessionMapperFactory,
+                                                                        new UnionMailboxACLResolver(),
+                                                                        new SimpleGroupMembershipResolver());
+
+            InMemoryMailboxManager mailboxManager = new InMemoryMailboxManager(mailboxSessionMapperFactory,
                 (userid, passwd) -> true,
                 FakeAuthorizator.defaultReject(),
                 new JVMMailboxPathLocker(),
-                new UnionMailboxACLResolver(),
-                new SimpleGroupMembershipResolver(),
                 new MessageParser(),
-                messageIdFactory);
+                messageIdFactory,
+                storeRightManager);
             mailboxManager.init();
 
             createServer(mailboxManager);

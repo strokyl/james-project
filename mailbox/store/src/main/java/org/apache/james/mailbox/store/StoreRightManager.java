@@ -20,7 +20,10 @@
 package org.apache.james.mailbox.store;
 
 import javax.inject.Inject;
+import javax.mail.Flags;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableMap;
 import org.apache.james.mailbox.MailboxSession;
 import org.apache.james.mailbox.RightManager;
 import org.apache.james.mailbox.acl.GroupMembershipResolver;
@@ -101,6 +104,39 @@ public class StoreRightManager implements RightManager {
         mapper.execute(Mapper.toTransaction(() -> mapper.setACL(mailbox, mailboxACL)));
     }
 
+    public boolean isReadWrite(MailboxSession session, Mailbox mailbox, Flags sharedPermanentFlags) throws UnsupportedRightException {
+        return aclResolver.isReadWrite(myRights(session, mailbox), sharedPermanentFlags);
+    }
+    /**
+     * Applies the global ACL (if there are any) to the mailbox ACL.
+     *
+     * @param mailboxSession
+     * @return the ACL of the present mailbox merged with the global ACL (if
+     *         there are any).
+     * @throws UnsupportedRightException
+     */
+    protected MailboxACL getResolvedMailboxACL(Mailbox mailbox, MailboxSession mailboxSession) throws UnsupportedRightException {
+        return filteredForSession(mailbox, aclResolver.applyGlobalACL(mailbox.getACL(), new GroupFolderResolver(mailboxSession).isGroupFolder(mailbox)), mailboxSession);
+    }
+
+    /**
+     * ACL is sensible information and as such we should expose as few information as possible
+     * to users. This method allows to filter a {@link MailboxACL} in order to present it to
+     * the connected user.
+     */
+    @VisibleForTesting
+    static MailboxACL filteredForSession(Mailbox mailbox, MailboxACL acl, MailboxSession mailboxSession) throws UnsupportedRightException {
+        if (mailboxSession.getUser().isSameUser(mailbox.getUser())) {
+            return acl;
+        }
+        MailboxACL.EntryKey userAsKey = MailboxACL.EntryKey.createUserEntryKey(mailboxSession.getUser().getUserName());
+        Rfc4314Rights rights = acl.getEntries().getOrDefault(userAsKey, new Rfc4314Rights());
+        if (rights.contains(MailboxACL.Right.Administer)) {
+            return acl;
+        }
+        return new MailboxACL(ImmutableMap.of(userAsKey, rights));
+    }
+
     private Rfc4314Rights myRights(MailboxSession session, Mailbox mailbox) throws UnsupportedRightException {
         MailboxSession.User user = session.getUser();
         if (user != null) {
@@ -109,5 +145,4 @@ public class StoreRightManager implements RightManager {
             return MailboxACL.NO_RIGHTS;
         }
     }
-
 }

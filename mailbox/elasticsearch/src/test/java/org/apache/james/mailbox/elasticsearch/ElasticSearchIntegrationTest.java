@@ -55,6 +55,7 @@ import org.apache.james.mailbox.store.FakeAuthenticator;
 import org.apache.james.mailbox.store.FakeAuthorizator;
 import org.apache.james.mailbox.store.JVMMailboxPathLocker;
 import org.apache.james.mailbox.store.MailboxSessionMapperFactory;
+import org.apache.james.mailbox.store.StoreRightManager;
 import org.apache.james.mailbox.store.mail.model.impl.MessageParser;
 import org.apache.james.mailbox.store.search.AbstractMessageSearchIndexTest;
 import org.apache.james.mailbox.tika.TikaConfiguration;
@@ -114,6 +115,7 @@ public class ElasticSearchIntegrationTest extends AbstractMessageSearchIndexTest
 
         MailboxSessionMapperFactory mapperFactory = new InMemoryMailboxSessionMapperFactory();
         InMemoryMessageId.Factory messageIdFactory = new InMemoryMessageId.Factory();
+        StoreRightManager storeRightManager = new StoreRightManager(mapperFactory, new UnionMailboxACLResolver(), new SimpleGroupMembershipResolver());
         messageSearchIndex = new ElasticSearchListeningMessageSearchIndex(mapperFactory,
             new ElasticSearchIndexer(client,
                 new DeleteByQueryPerformer(client,
@@ -130,10 +132,9 @@ public class ElasticSearchIntegrationTest extends AbstractMessageSearchIndexTest
             new FakeAuthenticator(),
             FakeAuthorizator.defaultReject(),
             new JVMMailboxPathLocker(),
-            new UnionMailboxACLResolver(),
-            new SimpleGroupMembershipResolver(),
             new MessageParser(),
-            messageIdFactory);
+            messageIdFactory,
+            storeRightManager);
         messageIdManager = new InMemoryMessageIdManager(storeMailboxManager);
         storeMailboxManager.setMessageSearchIndex(messageSearchIndex);
         storeMailboxManager.init();
