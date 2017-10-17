@@ -142,9 +142,7 @@ public class StoreMessageManager implements org.apache.james.mailbox.MessageMana
 
     private final MessageSearchIndex index;
 
-    private final MailboxACLResolver aclResolver;
-
-    private final GroupMembershipResolver groupMembershipResolver;
+    private final StoreRightManager storeRightManager;
 
     private final QuotaManager quotaManager;
 
@@ -161,23 +159,22 @@ public class StoreMessageManager implements org.apache.james.mailbox.MessageMana
     private final ImmutableMailboxMessage.Factory immutableMailboxMessageFactory;
 
     public StoreMessageManager(MailboxSessionMapperFactory mapperFactory, MessageSearchIndex index, MailboxEventDispatcher dispatcher, 
-            MailboxPathLocker locker, Mailbox mailbox, MailboxACLResolver aclResolver, GroupMembershipResolver groupMembershipResolver,
+            MailboxPathLocker locker, Mailbox mailbox,
             QuotaManager quotaManager, QuotaRootResolver quotaRootResolver, MessageParser messageParser, MessageId.Factory messageIdFactory, BatchSizes batchSizes,
-            ImmutableMailboxMessage.Factory immutableMailboxMessageFactory) 
+            ImmutableMailboxMessage.Factory immutableMailboxMessageFactory, StoreRightManager storeRightManager)
                     throws MailboxException {
         this.mailbox = mailbox;
         this.dispatcher = dispatcher;
         this.mapperFactory = mapperFactory;
         this.index = index;
         this.locker = locker;
-        this.aclResolver = aclResolver;
-        this.groupMembershipResolver = groupMembershipResolver;
         this.quotaManager = quotaManager;
         this.quotaRootResolver = quotaRootResolver;
         this.messageParser = messageParser;
         this.messageIdFactory = messageIdFactory;
         this.batchSizes = batchSizes;
         this.immutableMailboxMessageFactory = immutableMailboxMessageFactory;
+        this.storeRightManager = storeRightManager;
     }
 
     protected Factory getMessageIdFactory() {

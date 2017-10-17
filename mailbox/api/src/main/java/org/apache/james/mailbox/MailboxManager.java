@@ -348,6 +348,7 @@ public interface MailboxManager extends RequestAware, MailboxListenerSupport {
      *         mailbox; false otherwise.
      * @throws MailboxException
      */
+    @Deprecated
     boolean hasRight(MailboxPath mailboxPath, MailboxACL.Right right, MailboxSession session) throws MailboxException;
 
     /**
@@ -361,8 +362,10 @@ public interface MailboxManager extends RequestAware, MailboxListenerSupport {
      *         {@code session.getUser()} is null.
      * @throws UnsupportedRightException
      */
+    @Deprecated
     MailboxACL.Rfc4314Rights myRights(MailboxPath mailboxPath, MailboxSession session) throws MailboxException;
 
+    @Deprecated
     MailboxACL.Rfc4314Rights myRights(MailboxId mailboxId, MailboxSession session) throws MailboxException;
 
     /**
@@ -387,6 +390,7 @@ public interface MailboxManager extends RequestAware, MailboxListenerSupport {
      * @return result suitable for the LISTRIGHTS IMAP command
      * @throws UnsupportedRightException
      */
+    @Deprecated
     MailboxACL.Rfc4314Rights[] listRigths(MailboxPath mailboxPath, MailboxACL.EntryKey identifier, MailboxSession session) throws MailboxException;
 
     /**
@@ -395,6 +399,7 @@ public interface MailboxManager extends RequestAware, MailboxListenerSupport {
      * @param mailboxACLCommand Update to perform.
      * @throws UnsupportedRightException
      */
+    @Deprecated
     void applyRightsCommand(MailboxPath mailboxPath, MailboxACL.ACLCommand mailboxACLCommand, MailboxSession session) throws MailboxException;
 
 
@@ -404,6 +409,7 @@ public interface MailboxManager extends RequestAware, MailboxListenerSupport {
      * @param mailboxACL New ACL value
      * @throws UnsupportedRightException
      */
+    @Deprecated
     void setRights(MailboxPath mailboxPath, MailboxACL mailboxACL, MailboxSession session) throws MailboxException;
 
     /**
