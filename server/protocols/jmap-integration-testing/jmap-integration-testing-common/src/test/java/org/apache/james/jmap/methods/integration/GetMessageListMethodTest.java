@@ -137,7 +137,7 @@ public abstract class GetMessageListMethodTest {
     }
 
     @Test
-    public void getMessageListShouldListMessagesWhenReadRight() throws Exception {
+    public void getMessageListShouldListMessagesWhenReadAndLookupRight() throws Exception {
         mailboxProbe.createMailbox(MailboxConstants.USER_NAMESPACE, bob, "delegated");
         MailboxPath delegatedMailboxPath = MailboxPath.forUser(bob, "delegated");
         ComposedMessageId message = mailboxProbe.appendMessage(bob, delegatedMailboxPath,
@@ -147,7 +147,7 @@ public abstract class GetMessageListMethodTest {
 
         aclProbe.replaceRights(delegatedMailboxPath,
             alice,
-            new Rfc4314Rights(Right.Read));
+            new Rfc4314Rights(Right.Read, Right.Lookup));
 
         given()
             .header("Authorization", aliceAccessToken.serialize())
@@ -173,6 +173,29 @@ public abstract class GetMessageListMethodTest {
         aclProbe.replaceRights(delegatedMailboxPath,
             alice,
             new Rfc4314Rights(Right.Lookup));
+
+        given()
+            .header("Authorization", aliceAccessToken.serialize())
+            .body("[[\"getMessageList\", {}, \"#0\"]]")
+        .when()
+            .post("/jmap")
+        .then()
+            .statusCode(200)
+            .body(NAME, equalTo("messageList"))
+            .body(ARGUMENTS + ".messageIds", empty());
+    }
+
+    public void getMessageListShouldNotListMessageIfTheUserHasOnlyReadRight() throws Exception {
+        mailboxProbe.createMailbox(MailboxConstants.USER_NAMESPACE, bob, "delegated");
+        MailboxPath delegatedMailboxPath = MailboxPath.forUser(bob, "delegated");
+        mailboxProbe.appendMessage(bob, delegatedMailboxPath,
+            new ByteArrayInputStream("Subject: test\r\n\r\ntestmail".getBytes()), new Date(), false, new Flags());
+
+        await();
+
+        aclProbe.replaceRights(delegatedMailboxPath,
+            alice,
+            new Rfc4314Rights(Right.Read));
 
         given()
             .header("Authorization", aliceAccessToken.serialize())
