@@ -1,4 +1,4 @@
-package org.apache.james.rrt.lib; /****************************************************************
+/****************************************************************
  * Licensed to the Apache Software Foundation (ASF) under one   *
  * or more contributor license agreements.  See the NOTICE file *
  * distributed with this work for additional information        *
@@ -16,10 +16,9 @@ package org.apache.james.rrt.lib; /*********************************************
  * specific language governing permissions and limitations      *
  * under the License.                                           *
  ****************************************************************/
+package org.apache.james.rrt.lib;
 
 import org.apache.james.core.MailAddress;
-import org.assertj.core.api.JUnitSoftAssertions;
-import org.junit.Rule;
 import org.junit.Test;
 
 
@@ -28,7 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class RecipientRewriteTableUtilTest {
 
     @Test
-    public void regexMap() throws Exception {
+    public void regexMapShouldCorrectlyReplaceMatchingUsername() throws Exception {
         MailAddress mailAddress = new MailAddress("prefix_abc@test");
         assertThat(RecipientRewriteTableUtil.regexMap(mailAddress, "regex:prefix_.*:admin@test"))
             .isEqualTo("admin@test");

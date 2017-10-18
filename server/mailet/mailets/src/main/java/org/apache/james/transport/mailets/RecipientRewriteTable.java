@@ -55,6 +55,7 @@ public class RecipientRewriteTable extends GenericMailet {
         processor = new RecipientRewriteTableProcessor(virtualTableStore, domainList, getMailetContext());
     }
 
+
     /**
      * The service rewrite the recipient list of mail. The method should:
      * - Set Return-Path and remove all other Return-Path headers from the mail's message. This only works because there is a placeholder inserted by MimeMessageWrapper
