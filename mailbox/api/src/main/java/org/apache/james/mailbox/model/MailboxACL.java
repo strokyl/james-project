@@ -230,8 +230,7 @@ public class MailboxACL {
         }
 
         public boolean contains(Right... rights) {
-            return Arrays.stream(rights)
-                .allMatch(value::contains);
+            return value.containsAll(Arrays.asList(rights));
         }
 
         public boolean equals(Object o) {
