@@ -76,6 +76,17 @@ public abstract class AbstractRecipientRewriteTableTest {
     }
 
     @Test
+    public void testStoreAndGetMappings() throws
+        org.apache.james.rrt.api.RecipientRewriteTable.ErrorMappingException, RecipientRewriteTableException {
+
+        String user = "*";
+        String domain = "test";
+        String regex = "prefix_.*:admin@test";
+        addMapping(user, domain, regex, REGEX_TYPE);
+        assertThat(virtualUserTable.getMappings("prefix_abc", domain)).isNotEmpty();
+    }
+
+    @Test
     public void testStoreAndRetrieveRegexMapping() throws
             org.apache.james.rrt.api.RecipientRewriteTable.ErrorMappingException, RecipientRewriteTableException {
 
