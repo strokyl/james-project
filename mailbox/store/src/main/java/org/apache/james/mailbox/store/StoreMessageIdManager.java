@@ -70,16 +70,6 @@ import com.google.common.collect.Sets;
 
 public class StoreMessageIdManager implements MessageIdManager {
 
-    private static class MetadataWithMailboxId {
-        private final MessageMetaData messageMetaData;
-        private final MailboxId mailboxId;
-
-        public MetadataWithMailboxId(MessageMetaData messageMetaData, MailboxId mailboxId) {
-            this.messageMetaData = messageMetaData;
-            this.mailboxId = mailboxId;
-        }
-    }
-
     private static MetadataWithMailboxId toMetadataWithMailboxId(MailboxMessage message) {
         return new MetadataWithMailboxId(new SimpleMessageMetaData(message), message.getMailboxId());
     }
@@ -106,6 +96,27 @@ public class StoreMessageIdManager implements MessageIdManager {
         }
     }
 
+    private static class MetadataWithMailboxId {
+        private final MessageMetaData messageMetaData;
+        private final MailboxId mailboxId;
+
+        public MetadataWithMailboxId(MessageMetaData messageMetaData, MailboxId mailboxId) {
+            this.messageMetaData = messageMetaData;
+            this.mailboxId = mailboxId;
+        }
+    }
+
+    private static class WrappedException extends RuntimeException {
+        private final MailboxException cause;
+
+        public WrappedException(MailboxException cause) {
+            this.cause = cause;
+        }
+
+        public MailboxException unwrap() throws MailboxException {
+            throw cause;
+        }
+    }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StoreMessageIdManager.class);
 
