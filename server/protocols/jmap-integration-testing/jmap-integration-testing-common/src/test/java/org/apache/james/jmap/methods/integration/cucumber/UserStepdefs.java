@@ -33,6 +33,8 @@ import org.apache.james.jmap.HttpJmapAuthentication;
 import org.apache.james.jmap.api.access.AccessToken;
 import org.apache.james.mailbox.model.MailboxACL;
 import org.apache.james.mailbox.model.MailboxConstants;
+import org.apache.james.mailbox.model.MailboxPath;
+import org.apache.james.modules.ACLProbeImpl;
 
 import com.github.fge.lambdas.Throwing;
 import com.google.common.base.Charsets;
@@ -143,6 +145,14 @@ public class UserStepdefs {
         MailboxACL.Rfc4314Rights rights = new MailboxACL.Rfc4314Rights(MailboxACL.Right.Lookup, MailboxACL.Right.Read);
 
         mainStepdefs.aclProbe.addRights(mailboxPath, shareTo, rights);
+    }
+
+    @Given("^\"([^\"]*)\" shares its mailbox \"([^\"]*)\" with \"([^\"]*)\" with rights \"([^\"]*)\"$")
+    public void shareMailbox(String owner, String mailbox, String shareTo, String rights) throws Throwable {
+        mainStepdefs.jmapServer.getProbe(ACLProbeImpl.class)
+            .replaceRights(MailboxPath.forUser(owner, mailbox),
+                shareTo,
+                MailboxACL.Rfc4314Rights.fromSerializedRfc4314Rights(rights));
     }
 
     private String generatePassword(String username) {
