@@ -206,7 +206,7 @@ public class StoreMessageIdManager implements MessageIdManager {
         List<MailboxMessage> currentMailboxMessages = findRelatedMailboxMessages(messageId, mailboxSession);
 
         if (currentMailboxMessages.isEmpty()) {
-            LOGGER.info("tried to access a message that doesn't belongs to current user");
+            LOGGER.info("Tried to access {} not accessible for {}", messageId, mailboxSession.getUser().getUserName());
             return;
         }
 
