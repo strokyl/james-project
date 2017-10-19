@@ -37,7 +37,9 @@ Feature: SetMessages method on shared folders
     When "alice@domain.tld" ask for messages "mBob"
     Then the list should contain 1 message
     And the id of the message is "mBob"
-    And the message is in "alice@domain.tld:INBOX,bob@domain.tld:shared" user mailboxes
+    And the message is in following user mailboxes:
+        |alice@domain.tld |INBOX  |
+        |bob@domain.tld   |shared |
 
   Scenario: SetMessages can move messages out of shared mailbox when allowed
     Given "bob@domain.tld" shares its mailbox "shared" with "alice@domain.tld" with rights "lrte"
@@ -45,7 +47,8 @@ Feature: SetMessages method on shared folders
     When "alice@domain.tld" ask for messages "mBob"
     Then the list should contain 1 message
     And the id of the message is "mBob"
-    And the message is in "alice@domain.tld:INBOX" user mailboxes
+    And the message is in following user mailboxes:
+        |alice@domain.tld |INBOX  |
 
   Scenario: SetMessages can add messages to a shared mailbox when allowed
     Given "bob@domain.tld" shares its mailbox "shared" with "alice@domain.tld" with rights "lri"
@@ -53,7 +56,10 @@ Feature: SetMessages method on shared folders
     When "alice@domain.tld" ask for messages "mAlice"
     Then the list should contain 1 message
     And the id of the message is "mAlice"
-    And the message is in "alice@domain.tld:INBOX,bob@domain.tld:shared" user mailboxes
+#    And the message is in "alice@domain.tld:INBOX,bob@domain.tld:shared" user mailboxes
+    And the message is in following user mailboxes:
+        |alice@domain.tld |INBOX  |
+        |bob@domain.tld   |shared |
 
   Scenario: SetMessages can not copy messages from shared mailbox when not allowed
     Given "bob@domain.tld" shares its mailbox "shared" with "alice@domain.tld" with rights "litewsa"

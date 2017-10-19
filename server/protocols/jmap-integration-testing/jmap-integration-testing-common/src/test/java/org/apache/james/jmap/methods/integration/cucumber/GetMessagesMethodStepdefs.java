@@ -55,7 +55,6 @@ import com.github.fge.lambdas.Throwing;
 import com.github.steveash.guavate.Guavate;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
-import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import com.jayway.jsonpath.Configuration;
@@ -578,15 +577,12 @@ public class GetMessagesMethodStepdefs {
             .containsOnlyElementsOf(values);
     }
 
-    @Then("^the message is in \"([^\"]*)\" user mailboxes")
-    public void assertMailboxNamesOfTheFirstMessageWithUser(String mailboxIds) throws Exception {
-        List<String> values = Splitter.on(",")
-            .splitToList(mailboxIds).stream()
-            .map(name -> Splitter.on(':').omitEmptyStrings().splitToList(name))
-            .peek(nameParts -> Preconditions.checkArgument(nameParts.size() == 2))
-            .map(Throwing.function(nameParts -> mainStepdefs.jmapServer
+    @Then("^the message is in following user mailboxes:")
+    public void assertMailboxNamesOfTheFirstMessageWithUser(DataTable userMailboxes) throws Exception {
+        List<String> values = userMailboxes.asMap(String.class, String.class).entrySet().stream()
+        .map(Throwing.function(userMailbox -> mainStepdefs.jmapServer
                 .getProbe(MailboxProbeImpl.class)
-                .getMailbox(MailboxConstants.USER_NAMESPACE, nameParts.get(0), nameParts.get(1))
+                .getMailbox(MailboxConstants.USER_NAMESPACE, userMailbox.getKey(), userMailbox.getValue())
                 .getMailboxId()
                 .serialize()))
             .distinct()
