@@ -239,13 +239,13 @@ public class GetMessagesMethodStepdefs {
     }
 
     @Given("^\"([^\"]*)\" has a multipart message \"([^\"]*)\" in \"([^\"]*)\" mailbox$")
-    public void appendMultipartMessageWithOneAttachments(String username, String messageName, String arg1) throws Throwable {
-        userStepdefs.execWithUser(username, () -> appendMultipartMessageWithOneAttachments(messageName, arg1));
+    public void appendMultipartMessageWithOneAttachments(String username, String messageName, String mailbox) throws Throwable {
+        userStepdefs.execWithUser(username, () -> appendMultipartMessageWithOneAttachments(messageName, mailbox));
     }
 
     @Given("^the user has a multipart message \"([^\"]*)\" in \"([^\"]*)\" mailbox$")
-    public void appendMultipartMessageWithOneAttachments(String messageName, String arg1) throws Exception {
-        appendMessage(messageName, arg1, "eml/htmlAndTextMultipartWithOneAttachment.eml");
+    public void appendMultipartMessageWithOneAttachments(String messageName, String mailbox) throws Exception {
+        appendMessage(messageName, mailbox, "eml/htmlAndTextMultipartWithOneAttachment.eml");
     }
 
     @Given("\"([^\"]*)\" has a multipart/related message \"([^\"]*)\" in \"([^\"]*)\" mailbox$")
@@ -563,7 +563,7 @@ public class GetMessagesMethodStepdefs {
     }
 
     @Then("^the message is in \"([^\"]*)\" mailboxes")
-    public void assertMailboxIdsOfTheFirstMessage(String mailboxNames) throws Exception {
+    public void assertMailboxNamesOfTheFirstMessage(String mailboxNames) throws Exception {
         List<String> values = Splitter.on(",")
             .splitToList(mailboxNames).stream()
             .map(Throwing.function(name -> mainStepdefs.jmapServer
@@ -579,7 +579,7 @@ public class GetMessagesMethodStepdefs {
     }
 
     @Then("^the message is in \"([^\"]*)\" user mailboxes")
-    public void assertMailboxIdsOfTheFirstMessageWithUser(String mailboxIds) throws Exception {
+    public void assertMailboxNamesOfTheFirstMessageWithUser(String mailboxIds) throws Exception {
         List<String> values = Splitter.on(",")
             .splitToList(mailboxIds).stream()
             .map(name -> Splitter.on(':').omitEmptyStrings().splitToList(name))
