@@ -41,10 +41,8 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import com.google.common.hash.Hashing;
 
-import cucumber.api.PendingException;
 import cucumber.api.java.en.Given;
 import cucumber.runtime.java.guice.ScenarioScoped;
-import org.apache.james.mailbox.model.MailboxPath;
 
 @ScenarioScoped
 public class UserStepdefs {
