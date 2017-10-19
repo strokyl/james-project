@@ -207,7 +207,6 @@ public class SetMessagesMethodStepdefs {
     @Then("^the message \"([^\"]*)\" is not updated$")
     public void assertIdOfTheFirstMessage(String messageName) throws Exception {
         MessageId id = getMessagesMethodStepdefs.getMessageId(messageName);
-        System.out.println(jsonPath);
         assertThat(jsonPath.<Map<String, String>>read("[0][1].notUpdated"))
             .containsOnlyKeys(id.serialize());
     }

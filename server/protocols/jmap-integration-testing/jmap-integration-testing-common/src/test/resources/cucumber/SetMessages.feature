@@ -16,10 +16,9 @@
 # specific language governing permissions and limitations      *
 # under the License.                                           *
 # **************************************************************/
-
-Feature: GetMessages method
+Feature: SetMessages method on shared folders
   As a James user
-  I want to be able to retrieve my messages
+  I want to be able to modify properties of a shared mail
 
   Background:
     Given a domain named "domain.tld"
@@ -32,7 +31,7 @@ Feature: GetMessages method
 
 # Set in mailboxes
 
-  Scenario: When allowed SetMessages can copy messages from shared mailbox
+  Scenario: SetMessages can copy messages from shared mailbox when allowed
     Given "bob@domain.tld" shares its mailbox "shared" with "alice@domain.tld" with rights "lr"
     And "alice@domain.tld" copy "mBob" from mailbox "shared" of user "bob@domain.tld" to mailbox "INBOX" of user "alice@domain.tld"
     When "alice@domain.tld" ask for messages "mBob"
@@ -40,7 +39,7 @@ Feature: GetMessages method
     And the id of the message is "mBob"
     And the message is in "alice@domain.tld:INBOX,bob@domain.tld:shared" user mailboxes
 
-  Scenario: When allowed SetMessages can move messages out of shared mailbox
+  Scenario: SetMessages can move messages out of shared mailbox when allowed
     Given "bob@domain.tld" shares its mailbox "shared" with "alice@domain.tld" with rights "lrte"
     And "alice@domain.tld" move "mBob" to mailbox "INBOX" of user "alice@domain.tld"
     When "alice@domain.tld" ask for messages "mBob"
@@ -48,7 +47,7 @@ Feature: GetMessages method
     And the id of the message is "mBob"
     And the message is in "alice@domain.tld:INBOX" user mailboxes
 
-  Scenario: When allowed SetMessages can add messages to a shared mailbox
+  Scenario: SetMessages can add messages to a shared mailbox when allowed
     Given "bob@domain.tld" shares its mailbox "shared" with "alice@domain.tld" with rights "lri"
     And "alice@domain.tld" copy "mAlice" from mailbox "INBOX" of user "alice@domain.tld" to mailbox "shared" of user "bob@domain.tld"
     When "alice@domain.tld" ask for messages "mAlice"
@@ -56,24 +55,24 @@ Feature: GetMessages method
     And the id of the message is "mAlice"
     And the message is in "alice@domain.tld:INBOX,bob@domain.tld:shared" user mailboxes
 
-  Scenario: When not allowed SetMessages can not copy messages from shared mailbox
+  Scenario: SetMessages can not copy messages from shared mailbox when not allowed
     Given "bob@domain.tld" shares its mailbox "shared" with "alice@domain.tld" with rights "litewsa"
     When "alice@domain.tld" copy "mBob" from mailbox "shared" of user "bob@domain.tld" to mailbox "INBOX" of user "alice@domain.tld"
     Then the message "mBob" is not updated
 
-  Scenario: When not allowed SetMessages can not copy messages to shared mailbox
+  Scenario: SetMessages can not copy messages to shared mailbox when not allowed
     Given "bob@domain.tld" shares its mailbox "shared" with "alice@domain.tld" with rights "lrtewsa"
     When "alice@domain.tld" copy "mAlice" from mailbox "INBOX" of user "alice@domain.tld" to mailbox "shared" of user "bob@domain.tld"
     Then the message "mAlice" is not updated
 
-  Scenario: When not allowed SetMessages can not move messages out of shared mailbox
+  Scenario: SetMessages can not move messages out of shared mailbox when not allowed
     Given "bob@domain.tld" shares its mailbox "shared" with "alice@domain.tld" with rights "lriwsa"
     When "alice@domain.tld" move "mBob" to mailbox "INBOX" of user "alice@domain.tld"
     Then the message "mBob" is not updated
 
 # Flags update
 
-  Scenario: When allowed SetMessages can update delegated message flags
+  Scenario: SetMessages can update delegated message flags when allowed
     Given "bob@domain.tld" shares its mailbox "shared" with "alice@domain.tld" with rights "lrw"
     When "alice@domain.tld" set flags on "mBob" to "$Flagged"
     When "alice@domain.tld" ask for messages "mBob"
@@ -82,7 +81,7 @@ Feature: GetMessages method
     And the keywords of the message is $Flagged
 
 
-  Scenario: When not allowed SetMessages can not update delegated message flags
+  Scenario: SetMessages can not update delegated message flags when not allowed
     Given "bob@domain.tld" shares its mailbox "shared" with "alice@domain.tld" with rights "latires"
     When "alice@domain.tld" set flags on "mBob" to "$Flagged"
     Then the message "mBob" is not updated
