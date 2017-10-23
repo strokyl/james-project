@@ -106,18 +106,6 @@ public class StoreMessageIdManager implements MessageIdManager {
         }
     }
 
-    private static class WrappedException extends RuntimeException {
-        private final MailboxException cause;
-
-        public WrappedException(MailboxException cause) {
-            this.cause = cause;
-        }
-
-        public MailboxException unwrap() throws MailboxException {
-            throw cause;
-        }
-    }
-
     private static final Logger LOGGER = LoggerFactory.getLogger(StoreMessageIdManager.class);
 
     private final MailboxManager mailboxManager;
