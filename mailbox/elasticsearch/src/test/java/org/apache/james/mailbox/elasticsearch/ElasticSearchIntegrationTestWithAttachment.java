@@ -19,21 +19,37 @@
 
 package org.apache.james.mailbox.elasticsearch;
 
-    import org.apache.james.mailbox.extractor.TextExtractor;
-    import org.apache.james.mailbox.store.extractor.DefaultTextExtractor;
-    import org.junit.Assume;
-    import org.junit.Test;
+import org.apache.james.mailbox.extractor.TextExtractor;
+import org.apache.james.mailbox.tika.TikaConfiguration;
+import org.apache.james.mailbox.tika.TikaContainer;
+import org.apache.james.mailbox.tika.TikaHttpClientImpl;
+import org.apache.james.mailbox.tika.TikaTextExtractor;
+import org.junit.ClassRule;
 
-public class ElasticSearchIntegrationTestWithDefaultTextExtractor extends AbstractElasticIntegrationTest {
+public class ElasticSearchIntegrationTestWithAttachment extends AbstractElasticIntegrationTest {
+
+
+    @ClassRule
+    public static TikaContainer tika = new TikaContainer();
+    private TikaTextExtractor textExtractor;
 
     @Override
-    protected TextExtractor getTextExtractor() {
-        return new DefaultTextExtractor();
+    public void setUp() throws Exception {
+        textExtractor = new TikaTextExtractor(new TikaHttpClientImpl(TikaConfiguration.builder()
+            .host(tika.getIp())
+            .port(tika.getPort())
+            .timeoutInMillis(tika.getTimeoutInMillis())
+            .build()));
+        super.setUp();
     }
 
     @Override
-    @Test
-    public void searchWithPDFAttachmentShouldReturnMailsWhenAttachmentContentMatches() throws Exception {
-        Assume.assumeTrue(false);
+    protected TextExtractor getTextExtractor() {
+        return textExtractor;
+    }
+
+    @Override
+    protected IndexAttachments handleAttachment() {
+        return IndexAttachments.YES;
     }
 }

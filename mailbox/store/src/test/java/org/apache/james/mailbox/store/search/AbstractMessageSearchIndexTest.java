@@ -990,6 +990,8 @@ public abstract class AbstractMessageSearchIndexTest {
 
     @Test
     public void mailsContainsShouldIncludeMailHavingAttachmentsMatchingTheRequest() throws Exception {
+        Assume.assumeTrue(storeMailboxManager.getSupportedSearchCapabilities().contains(MailboxManager.SearchCapabilities.Attachment));
+
         SearchQuery searchQuery = new SearchQuery(SearchQuery.mailContains("root mailing list"));
 
         assertThat(messageSearchIndex.search(session, mailbox, searchQuery))
@@ -1278,6 +1280,7 @@ public abstract class AbstractMessageSearchIndexTest {
     @Test
     public void searchWithTextAttachmentShouldReturnMailsWhenAttachmentContentMatches() throws Exception {
         Assume.assumeTrue(storeMailboxManager.getSupportedSearchCapabilities().contains(MailboxManager.SearchCapabilities.Attachment));
+
         ComposedMessageId messageWithBeautifulBananaAsTextAttachment = myFolderMessageManager.appendMessage(
                 ClassLoader.getSystemResourceAsStream("eml/emailWithTextAttachment.eml"),
                 new Date(1404252000000L),

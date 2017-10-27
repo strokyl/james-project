@@ -20,31 +20,21 @@
 package org.apache.james.mailbox.elasticsearch;
 
 import org.apache.james.mailbox.extractor.TextExtractor;
-import org.apache.james.mailbox.tika.TikaConfiguration;
-import org.apache.james.mailbox.tika.TikaContainer;
-import org.apache.james.mailbox.tika.TikaHttpClientImpl;
-import org.apache.james.mailbox.tika.TikaTextExtractor;
-import org.junit.ClassRule;
+import org.apache.james.mailbox.store.extractor.DefaultTextExtractor;
+import org.junit.Ignore;
 
-public class ElasticSearchIntegrationTestWithTika extends AbstractElasticIntegrationTest {
-
-
-    @ClassRule
-    public static TikaContainer tika = new TikaContainer();
-    private TikaTextExtractor textExtractor;
-
-    @Override
-    public void setUp() throws Exception {
-        textExtractor = new TikaTextExtractor(new TikaHttpClientImpl(TikaConfiguration.builder()
-            .host(tika.getIp())
-            .port(tika.getPort())
-            .timeoutInMillis(tika.getTimeoutInMillis())
-            .build()));
-        super.setUp();
-    }
-
+//This test does not bring any value compare to ElasticSearchIntegrationTestWithTika except
+//that it is faster. Therefore, it does not need to be run by the CI because the CI will also
+//run ElasticSearchIntegrationTestWithAttachment. It's aim is just to provide to developper fast test
+//when working on the ES implementation
+@Ignore
+public class ElasticSearchIntegrationTestWithoutAttachment extends AbstractElasticIntegrationTest {
     @Override
     protected TextExtractor getTextExtractor() {
-        return textExtractor;
+        return new DefaultTextExtractor();
+    }
+
+    protected IndexAttachments handleAttachment() {
+        return IndexAttachments.NO;
     }
 }

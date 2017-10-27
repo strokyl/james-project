@@ -82,6 +82,7 @@ public abstract class AbstractElasticIntegrationTest extends AbstractMessageSear
     private EmbeddedElasticSearch embeddedElasticSearch= new EmbeddedElasticSearch(temporaryFolder, MailboxElasticsearchConstants.MAILBOX_INDEX);
 
     protected abstract TextExtractor getTextExtractor();
+    protected abstract IndexAttachments handleAttachment();
 
     @Rule
     public RuleChain ruleChain = RuleChain.outerRule(temporaryFolder).around(embeddedElasticSearch);
@@ -114,7 +115,7 @@ public abstract class AbstractElasticIntegrationTest extends AbstractMessageSear
                 MailboxElasticsearchConstants.MAILBOX_INDEX,
                 MailboxElasticsearchConstants.MESSAGE_TYPE),
             new ElasticSearchSearcher(client, new QueryConverter(new CriterionConverter()), SEARCH_SIZE, new InMemoryId.Factory(), messageIdFactory),
-            new MessageToElasticSearchJson(getTextExtractor(), ZoneId.of("Europe/Paris"), IndexAttachments.YES));
+            new MessageToElasticSearchJson(getTextExtractor(), ZoneId.of("Europe/Paris"), handleAttachment()));
         storeMailboxManager = new InMemoryMailboxManager(
             mapperFactory,
             new FakeAuthenticator(),
