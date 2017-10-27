@@ -19,10 +19,10 @@
 
 package org.apache.james.mailbox.elasticsearch;
 
-import org.apache.james.mailbox.extractor.TextExtractor;
-import org.apache.james.mailbox.store.extractor.DefaultTextExtractor;
-import org.junit.Assume;
-import org.junit.Test;
+    import org.apache.james.mailbox.extractor.TextExtractor;
+    import org.apache.james.mailbox.store.extractor.DefaultTextExtractor;
+    import org.junit.Assume;
+    import org.junit.Test;
 
 public class ElasticSearchIntegrationTestWithDefaultTextExtractor extends AbstractElasticIntegrationTest {
 
