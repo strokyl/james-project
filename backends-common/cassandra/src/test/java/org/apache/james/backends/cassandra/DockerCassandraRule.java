@@ -43,7 +43,7 @@ public class DockerCassandraRule implements TestRule {
 
     private static final Logger logger = LoggerFactory.getLogger(DockerCassandraRule.class);
 
-    public static final int DEFAULT_ITERATIONS_BETWEEN_RESTART = 20;
+    public static final int DEFAULT_ITERATIONS_BETWEEN_RESTART = 10;
 
     private static final int CASSANDRA_PORT = 9042;
     private static final String CASSANDRA_CONFIG_DIR = "$CASSANDRA_CONFIG";
