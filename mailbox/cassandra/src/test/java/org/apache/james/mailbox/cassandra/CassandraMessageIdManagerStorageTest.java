@@ -55,7 +55,7 @@ public class CassandraMessageIdManagerStorageTest extends AbstractMessageIdManag
     private CassandraCluster cassandra;
 
     @Rule
-    public TestRule cassandraLifecycleTestRule = cassandraServer.getLifecycleTestRule(20);
+    public TestRule cassandraLifecycleTestRule = cassandraServer.defaultLifecycleTestRule();
 
     @Before
     public void setUp() throws Exception {

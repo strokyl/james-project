@@ -35,7 +35,7 @@ public class CassandraGetVacationResponseTest extends GetVacationResponseTest {
     public static DockerCassandraRule cassandra = new DockerCassandraRule();
 
     @Rule
-    public TestRule cassandraLifecycleTestRule = cassandra.getLifecycleTestRule(20);
+    public TestRule cassandraLifecycleTestRule = cassandra.defaultLifecycleTestRule();
     
     @Rule 
     public CassandraJmapTestRule rule = CassandraJmapTestRule.defaultTestRule();

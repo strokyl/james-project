@@ -34,9 +34,9 @@ public class CassandraGetMailboxesMethodTest extends GetMailboxesMethodTest {
     public static DockerCassandraRule cassandra = new DockerCassandraRule();
 
     @Rule
-    public TestRule cassandraLifecycleTestRule = cassandra.getLifecycleTestRule(20);
-
-    @Rule
+    public TestRule cassandraLifecycleTestRule = cassandra.defaultLifecycleTestRule();
+    
+    @Rule 
     public CassandraJmapTestRule rule = CassandraJmapTestRule.defaultTestRule();
 
 

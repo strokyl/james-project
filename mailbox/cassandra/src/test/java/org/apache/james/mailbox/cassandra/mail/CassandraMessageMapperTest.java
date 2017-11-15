@@ -48,7 +48,7 @@ public class CassandraMessageMapperTest extends MessageMapperTest {
     @ClassRule public static DockerCassandraRule cassandraServer = new DockerCassandraRule();
 
     @Rule
-    public TestRule cassandraLifecycleTestRule = cassandraServer.getLifecycleTestRule(20);
+    public TestRule cassandraLifecycleTestRule = cassandraServer.defaultLifecycleTestRule();
 
     private CassandraCluster cassandra;
 
