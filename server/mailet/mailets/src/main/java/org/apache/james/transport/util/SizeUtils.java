@@ -23,9 +23,9 @@ import com.jakewharton.byteunits.BinaryByteUnit;
 
 public class SizeUtils {
 
-    public static String humanSize(long size) {
+    public static String humanReadableSize(long size) {
         if (size < 0) {
-            return "-" + humanSize(-size);
+            return "-" + humanReadableSize(-size);
         } else {
             return BinaryByteUnit.format(size, "#.#");
         }
