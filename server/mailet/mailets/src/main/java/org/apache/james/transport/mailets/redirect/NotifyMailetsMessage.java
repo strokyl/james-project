@@ -31,6 +31,8 @@ import org.apache.mailet.base.RFC2822Headers;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 
+import static org.apache.james.transport.util.SizeUtils.humanSize;
+
 public class NotifyMailetsMessage {
 
     private static final char LINE_BREAK = '\n';
@@ -78,7 +80,7 @@ public class NotifyMailetsMessage {
         appendAddresses(builder, "To", message.getHeader(RFC2822Headers.TO));
         appendAddresses(builder, "CC", message.getHeader(RFC2822Headers.CC));
 
-        builder.append("  Size (in bytes): " + message.getSize())
+        builder.append("  Size: " + humanSize(message.getSize()))
             .append(LINE_BREAK);
         if (message.getLineCount() >= 0) {
             builder.append("  Number of lines: " + message.getLineCount())
