@@ -20,10 +20,12 @@
 package org.apache.james.transport.mailets.redirect;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.apache.mailet.Mail;
 import org.apache.james.core.MailAddress;
 import org.apache.mailet.base.RFC2822Headers;
@@ -80,14 +82,26 @@ public class NotifyMailetsMessage {
         appendAddresses(builder, "To", message.getHeader(RFC2822Headers.TO));
         appendAddresses(builder, "CC", message.getHeader(RFC2822Headers.CC));
 
-        builder.append("  Size: " + humanSize(message.getSize()))
-            .append(LINE_BREAK);
+        getMessageSizeEstimation(originalMail).ifPresent(size -> {
+            builder.append("  Size: " + humanSize(size));
+            builder.append(LINE_BREAK);
+        });
+
         if (message.getLineCount() >= 0) {
             builder.append("  Number of lines: " + message.getLineCount())
                 .append(LINE_BREAK);
         }
 
         return builder.toString();
+    }
+
+    @VisibleForTesting static Optional<Long> getMessageSizeEstimation(Mail mail) {
+        try  {
+            return Optional.of(mail.getMessageSize())
+                .filter(size -> size > 0);
+        } catch (MessagingException e) {
+            return Optional.empty();
+        }
     }
 
     private void appendAddresses(StringBuilder builder, String title, String[] addresses) {
