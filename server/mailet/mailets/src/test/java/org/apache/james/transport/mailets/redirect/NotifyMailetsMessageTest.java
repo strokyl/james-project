@@ -20,12 +20,10 @@
 package org.apache.james.transport.mailets.redirect;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.within;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayInputStream;
-import java.util.Collections;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.TimeZone;
@@ -244,7 +242,7 @@ public class NotifyMailetsMessageTest {
     @Test
     public void internalGetMessageInternalSizeShouldTransformZeroSizeIntoEmpty() throws MessagingException {
         Mail mail = mock(Mail.class);
-        when(mail.getMessageSize()).thenReturn(0l);
+        when(mail.getMessageSize()).thenReturn(0L);
 
         assertThat(NotifyMailetsMessage.getMessageSizeEstimation(mail))
             .isEqualTo(Optional.empty());
@@ -253,7 +251,7 @@ public class NotifyMailetsMessageTest {
     @Test
     public void internalGetMessageInternalSizeShouldTransformNegatifIntoEmpty() throws MessagingException {
         Mail mail = mock(Mail.class);
-        when(mail.getMessageSize()).thenReturn(-1l);
+        when(mail.getMessageSize()).thenReturn(-1L);
 
         assertThat(NotifyMailetsMessage.getMessageSizeEstimation(mail))
             .isEqualTo(Optional.empty());
@@ -261,7 +259,7 @@ public class NotifyMailetsMessageTest {
 
     @Test
     public void internalGetMessageInternalSizeShouldReturnSizeWhenAvailable() throws MessagingException {
-        long size = 42l;
+        long size = 42L;
 
         Mail mail = mock(Mail.class);
         when(mail.getMessageSize()).thenReturn(size);

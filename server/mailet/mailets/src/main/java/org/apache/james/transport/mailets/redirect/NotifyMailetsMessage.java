@@ -33,7 +33,7 @@ import org.apache.mailet.base.RFC2822Headers;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 
-import static org.apache.james.transport.util.SizeUtils.humanSize;
+import static org.apache.james.transport.util.SizeUtils.humanReadableSize;
 
 public class NotifyMailetsMessage {
 
@@ -83,7 +83,7 @@ public class NotifyMailetsMessage {
         appendAddresses(builder, "CC", message.getHeader(RFC2822Headers.CC));
 
         getMessageSizeEstimation(originalMail).ifPresent(size -> {
-            builder.append("  Size: " + humanSize(size));
+            builder.append("  Size: " + humanReadableSize(size));
             builder.append(LINE_BREAK);
         });
 
