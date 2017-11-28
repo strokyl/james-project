@@ -19,23 +19,27 @@
 
 package org.apache.james.transport.mailets.redirect;
 
+import org.apache.james.transport.util.SizeUtils;
+
 import java.util.List;
 import java.util.Optional;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
-import com.google.common.annotations.VisibleForTesting;
-import org.apache.mailet.Mail;
 import org.apache.james.core.MailAddress;
+import org.apache.mailet.Mail;
 import org.apache.mailet.base.RFC2822Headers;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
-
-import static org.apache.james.transport.util.SizeUtils.humanReadableSize;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class NotifyMailetsMessage {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(NotifyMailetsMessage.class);
 
     private static final char LINE_BREAK = '\n';
 
@@ -82,10 +86,11 @@ public class NotifyMailetsMessage {
         appendAddresses(builder, "To", message.getHeader(RFC2822Headers.TO));
         appendAddresses(builder, "CC", message.getHeader(RFC2822Headers.CC));
 
-        getMessageSizeEstimation(originalMail).ifPresent(size -> {
-            builder.append("  Size: " + humanReadableSize(size));
-            builder.append(LINE_BREAK);
-        });
+        getMessageSizeEstimation(originalMail).ifPresent(size ->
+            builder
+                .append("  Size: ")
+                .append(SizeUtils.humanReadableSize(size))
+                .append(LINE_BREAK));
 
         if (message.getLineCount() >= 0) {
             builder.append("  Number of lines: " + message.getLineCount())
@@ -100,6 +105,8 @@ public class NotifyMailetsMessage {
             return Optional.of(mail.getMessageSize())
                 .filter(size -> size > 0);
         } catch (MessagingException e) {
+            LOGGER.debug("Could not estimate mail size", e);
+
             return Optional.empty();
         }
     }
