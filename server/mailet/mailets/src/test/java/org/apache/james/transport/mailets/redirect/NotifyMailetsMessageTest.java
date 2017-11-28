@@ -226,12 +226,7 @@ public class NotifyMailetsMessageTest {
 
         String generateMessage = new NotifyMailetsMessage().generateMessage("my message", mail);
 
-        assertThat(generateMessage).isEqualTo("my message\n" +
-            "\n" +
-            "Message details:\n" +
-            "  Subject: Clôture & Paie du mois\n" +
-            "  MAIL FROM: null\n" +
-            "  Size (in bytes): 6\n");
+        assertThat(generateMessage).contains("Subject: Clôture & Paie du mois");
     }
 
     @Test
@@ -247,14 +242,8 @@ public class NotifyMailetsMessageTest {
 
         String generateMessage = new NotifyMailetsMessage().generateMessage("my message", mail);
 
-        assertThat(generateMessage).isEqualTo("my message\n" +
-            "\n" +
-            "Message details:\n" +
-            "  MAIL FROM: null\n" +
-            "  From: \n" +
-            "🐃@linagora.com \n" +
-            "\n" +
-            "  Size (in bytes): 6\n");
+        assertThat(generateMessage).contains("  From: \n" +
+            "🐃@linagora.com");
     }
 
     @Test
@@ -270,14 +259,8 @@ public class NotifyMailetsMessageTest {
 
         String generateMessage = new NotifyMailetsMessage().generateMessage("my message", mail);
 
-        assertThat(generateMessage).isEqualTo("my message\n" +
-            "\n" +
-            "Message details:\n" +
-            "  MAIL FROM: null\n" +
-            "  To: \n" +
-            "🚾@linagora.com \n" +
-            "\n" +
-            "  Size (in bytes): 6\n");
+        assertThat(generateMessage).contains("  To: \n" +
+            "🚾@linagora.com");
     }
 
     @Test
@@ -293,13 +276,7 @@ public class NotifyMailetsMessageTest {
 
         String generateMessage = new NotifyMailetsMessage().generateMessage("my message", mail);
 
-        assertThat(generateMessage).isEqualTo("my message\n" +
-            "\n" +
-            "Message details:\n" +
-            "  MAIL FROM: null\n" +
-            "  CC: \n" +
-            "🚲@linagora.com \n" +
-            "\n" +
-            "  Size (in bytes): 6\n");
+        assertThat(generateMessage).contains("  CC: \n" +
+            "🚲@linagora.com");
     }
 }

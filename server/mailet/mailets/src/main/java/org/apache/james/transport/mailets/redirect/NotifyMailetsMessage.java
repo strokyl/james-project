@@ -59,7 +59,7 @@ public class NotifyMailetsMessage {
 
         if (message.getSubject() != null) {
             builder.append("  Subject: ")
-                .append(safeDecode(message.getSubject()))
+                .append(safelyDecode(message.getSubject()))
                 .append(LINE_BREAK);
         }
         if (message.getSentDate() != null) {
@@ -95,11 +95,11 @@ public class NotifyMailetsMessage {
         return builder.toString();
     }
 
-    private String safeDecode(String text) {
+    private String safelyDecode(String text) {
         try {
             return MimeUtility.decodeText(text);
         } catch (UnsupportedEncodingException e) {
-            LOGGER.debug("Could not decode following header value {}", text, e);
+            LOGGER.error("Could not decode following value {}", text, e);
 
             return text;
         }
@@ -110,7 +110,7 @@ public class NotifyMailetsMessage {
             builder.append("  " + title + ": ")
                 .append(LINE_BREAK);
             for (String address : flatten(addresses)) {
-                builder.append(safeDecode(address))
+                builder.append(safelyDecode(address))
                     .append(" ")
                     .append(LINE_BREAK);
             }
