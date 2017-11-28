@@ -231,7 +231,7 @@ public class NotifyMailetsMessageTest {
     }
 
     @Test
-    public void internalGetMessageInternalSizeShouldTransformMessagingErrorIntoEmpty() throws MessagingException {
+    public void getMessageInternalSizeShouldTransformMessagingErrorIntoEmpty() throws MessagingException {
         Mail mail = mock(Mail.class);
         when(mail.getMessageSize()).thenThrow(MessagingException.class);
 
@@ -240,7 +240,7 @@ public class NotifyMailetsMessageTest {
     }
 
     @Test
-    public void internalGetMessageInternalSizeShouldTransformZeroSizeIntoEmpty() throws MessagingException {
+    public void getMessageInternalSizeShouldTransformZeroSizeIntoEmpty() throws MessagingException {
         Mail mail = mock(Mail.class);
         when(mail.getMessageSize()).thenReturn(0L);
 
@@ -249,7 +249,7 @@ public class NotifyMailetsMessageTest {
     }
 
     @Test
-    public void internalGetMessageInternalSizeShouldTransformNegatifIntoEmpty() throws MessagingException {
+    public void getMessageInternalSizeShouldTransformNegatifIntoEmpty() throws MessagingException {
         Mail mail = mock(Mail.class);
         when(mail.getMessageSize()).thenReturn(-1L);
 
@@ -258,7 +258,7 @@ public class NotifyMailetsMessageTest {
     }
 
     @Test
-    public void internalGetMessageInternalSizeShouldReturnSizeWhenAvailable() throws MessagingException {
+    public void getMessageInternalSizeShouldReturnSizeWhenAvailable() throws MessagingException {
         long size = 42L;
 
         Mail mail = mock(Mail.class);
