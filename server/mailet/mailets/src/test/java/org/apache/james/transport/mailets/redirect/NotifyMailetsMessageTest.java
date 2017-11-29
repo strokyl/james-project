@@ -300,4 +300,34 @@ public class NotifyMailetsMessageTest {
         assertThat(generateMessage).contains("  CC: \n" +
             "🚲@linagora.com");
     }
+
+    @Test
+    public void safelyDecodeShouldReturnTextNotEncodedUnmodified() throws Exception {
+        String text = "Why not unicode for Llama";
+
+        assertThat(NotifyMailetsMessage.safelyDecode(text))
+            .isEqualTo(text);
+    }
+
+    @Test
+    public void safelyDecodeShouldCorrectlyDecodeQuotedPrintable() throws Exception {
+        assertThat(NotifyMailetsMessage.safelyDecode("=?UTF-8?Q?=E2=99=A5=F0=9F=9A=B2?="))
+            .isEqualTo("♥🚲");
+    }
+
+    @Test
+    public void safelyDecodeShouldReturnInvalidEncodedTextUnmodified() throws Exception {
+        String invalidEncodedText = "=?UTF-8?Q?=E2=99=A5=FX=9F=9A=B2?=";
+
+        assertThat(NotifyMailetsMessage.safelyDecode(invalidEncodedText))
+            .isEqualTo(invalidEncodedText);
+    }
+
+    @Test
+    public void safelyDecodeShouldReturnEncodedTextUnmodifiedWhenUnknownCharset() throws Exception {
+        String encodedTextWithUnknownCharset = "=?UTF-9?Q?=E2=99=A5=F0=9F=9A=B2?=";
+
+        assertThat(NotifyMailetsMessage.safelyDecode(encodedTextWithUnknownCharset))
+            .isEqualTo(encodedTextWithUnknownCharset);
+    }
 }

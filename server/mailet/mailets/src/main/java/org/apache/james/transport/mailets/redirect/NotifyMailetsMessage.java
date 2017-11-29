@@ -113,7 +113,7 @@ public class NotifyMailetsMessage {
         }
     }
 
-    private String safelyDecode(String text) {
+    @VisibleForTesting static String safelyDecode(String text) {
         try {
             return MimeUtility.decodeText(text);
         } catch (UnsupportedEncodingException e) {
