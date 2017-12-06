@@ -216,7 +216,7 @@ public abstract class GetMessageListMethodTest {
     }
 
     @Test
-    public void getMessageListShouldListMessageThatHasBeenDeplacedInAMailboxWhereTheUserHasOnlyReadRight() throws Exception {
+    public void getMessageListShouldListMessageThatHasBeenMovedInAMailboxWhereTheUserHasOnlyReadRight() throws Exception {
         MailboxId delegatedMailboxId = mailboxProbe.createMailbox(MailboxConstants.USER_NAMESPACE, bob, "delegated");
         mailboxProbe.createMailbox(MailboxConstants.USER_NAMESPACE, bob, "not_delegated");
 
@@ -224,7 +224,7 @@ public abstract class GetMessageListMethodTest {
         MailboxPath delegatedMailboxPath = MailboxPath.forUser(bob, "delegated");
 
         ComposedMessageId message = mailboxProbe.appendMessage(bob, notDelegatedMailboxPath,
-            new ByteArrayInputStream("Subject: test\r\n\r\ntestmail".getBytes()), new Date(), false, new Flags());
+            new ByteArrayInputStream("Subject: chaussette\r\n\r\ntestmail".getBytes()), new Date(), false, new Flags());
 
         await();
 
@@ -244,7 +244,7 @@ public abstract class GetMessageListMethodTest {
 
         given()
             .header("Authorization", aliceAccessToken.serialize())
-            .body("[[\"getMessageList\", {}, \"#0\"]]")
+            .body("[[\"getMessageList\", {\"filter\":{\"subject\":\"chaussette\"}}, \"#0\"]]")
             .when()
             .post("/jmap")
             .then()
