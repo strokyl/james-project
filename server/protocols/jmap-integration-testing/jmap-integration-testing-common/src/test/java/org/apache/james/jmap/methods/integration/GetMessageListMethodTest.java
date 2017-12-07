@@ -241,6 +241,7 @@ public abstract class GetMessageListMethodTest {
             .post("/jmap")
             .then()
             .statusCode(200);
+        await();
 
         given()
             .header("Authorization", aliceAccessToken.serialize())
