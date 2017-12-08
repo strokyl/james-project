@@ -198,19 +198,18 @@ public abstract class GetMessageListMethodTest {
         given()
             .header("Authorization", aliceAccessToken.serialize())
             .body("[[\"setMessages\", {\"update\":{\"" + messageId + "\":{\"mailboxIds\": [\"" + otherMailboxId.serialize() + "\"]}}}, \"#0\"]]")
-            .when()
+        .when()
             .post("/jmap")
-            .then()
-            .statusCode(200)
-            .log();
+        .then()
+            .statusCode(200);
         await();
 
         given()
             .header("Authorization", aliceAccessToken.serialize())
-            .body(String.format("[[\"getMessageList\", {\"filter\":{\"text\":\"tiramisu\"}}, \"#0\"]]"))
-            .when()
+            .body("[[\"getMessageList\", {\"filter\":{\"text\":\"tiramisu\"}}, \"#0\"]]")
+        .when()
             .post("/jmap")
-            .then()
+        .then()
             .statusCode(200)
             .body(ARGUMENTS + ".messageIds", contains(messageId));
     }
@@ -237,18 +236,18 @@ public abstract class GetMessageListMethodTest {
         given()
             .header("Authorization", bobAccessToken.serialize())
             .body("[[\"setMessages\", {\"update\":{\"" + messageId + "\":{\"mailboxIds\": [\"" + delegatedMailboxId.serialize() + "\"]}}}, \"#0\"]]")
-            .when()
+        .when()
             .post("/jmap")
-            .then()
+        .then()
             .statusCode(200);
         await();
 
         given()
             .header("Authorization", aliceAccessToken.serialize())
             .body("[[\"getMessageList\", {\"filter\":{\"subject\":\"chaussette\"}}, \"#0\"]]")
-            .when()
+        .when()
             .post("/jmap")
-            .then()
+        .then()
             .statusCode(200)
             .body(NAME, equalTo("messageList"))
             .body(ARGUMENTS + ".messageIds", contains(message.getMessageId().serialize()));
