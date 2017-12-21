@@ -10,7 +10,7 @@ pipeline {
     stage('build') {
       steps {
         dir(path: 'dockerfiles/compilation/java-8/') {
-          sh '''mvn -B -am -pl mpt/impl/imap-mailbox/inmemory install -DskipTests -P inmemory'''
+          sh 'mvn install -B -DskipTests -Pcassandra,inmemory,jpa,elasticsearch,lucene,with-assembly,with-jetm,swagger-json'
           stash name: 'build', includes: '*'
         }
       }
@@ -31,7 +31,7 @@ pipeline {
             testGroups["split-${j}"] = {
               node {
                 unstash 'build'
-                def mavenTest = 'mvn -B -pl mpt/impl/imap-mailbox/inmemory test -P inmemory -DMaven.test.failure.ignore=true'
+                def mavenTest = 'mvn test -B -DMaven.test.failure.ignore=true -Pcassandra,inmemory,jpa,elasticsearch,lucene,with-assembly,with-jetm,swagger-json'
 
                 if (split.list.size() > 0) {
                   if (split.includes) {
